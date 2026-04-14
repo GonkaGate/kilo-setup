@@ -82,6 +82,10 @@ The installer will:
 6. write the managed config and verify the result
 7. return you to normal `kilo` usage
 
+If you launch the installer from inside an active `kilo` terminal session, the
+durable install can still succeed while that specific shell remains overridden
+by Kilo runtime config until you exit the session and return to plain `kilo`.
+
 ### Non-interactive setup
 
 Use this for scripts, automation, or repeatable local setup:
