@@ -10,6 +10,14 @@
   config tree, which could falsely trigger rollback with
   `inferred_non_local` verification blockers.
 
+## [0.2.4](https://github.com/GonkaGate/kilo-setup/compare/v0.2.3...v0.2.4) (2026-04-14)
+
+
+### Bug Fixes
+
+* restore kilo setup verification on 7.2.0 ([340fab8](https://github.com/GonkaGate/kilo-setup/commit/340fab87d8750533c598e7de65018a82a3b402cd))
+* restore kilo setup verification on 7.2.0 ([d506776](https://github.com/GonkaGate/kilo-setup/commit/d506776e6ce126bfa1691f5164aa6d99b1647657))
+
 ## [0.2.3](https://github.com/GonkaGate/kilo-setup/compare/v0.2.2...v0.2.3) (2026-04-14)
 
 
