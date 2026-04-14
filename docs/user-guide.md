@@ -166,8 +166,10 @@ kilo
 ```
 
 If the current shell has runtime-only Kilo overrides such as
-`KILO_CONFIG_CONTENT`, the installer may report that the durable install
-succeeded while the current session is still blocked.
+`KILO_CONFIG_CONTENT`, or you are running inside an active `kilo` terminal
+session that still carries `KILO_CONFIG` or `KILO_CONFIG_DIR`, the installer
+may report that the durable install succeeded while the current session is
+still blocked.
 
 ## Safe Reruns
 

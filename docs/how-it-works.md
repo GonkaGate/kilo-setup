@@ -53,7 +53,9 @@ Current public limit:
    old location and preserve unrelated Kilo config.
 10. Verify the durable intended Kilo outcome with the local resolver and use
     the XDG-isolated oracle as a compatibility check.
-11. If `KILO_CONFIG_CONTENT` is active, verify the current session separately.
+11. If `KILO_CONFIG_CONTENT` is active, or the installer is running inside an
+    active `kilo` terminal session with runtime config overrides, verify the
+    current session separately.
 12. Report redacted blockers or mismatches instead of printing raw resolved
     config.
 13. Finish by sending the user back to plain `kilo`.

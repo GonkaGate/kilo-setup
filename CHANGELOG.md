@@ -34,6 +34,10 @@
 
 ## Unreleased
 
+- Fixed installs launched from an active `kilo` terminal session so
+  session-only `KILO_CONFIG` and `KILO_CONFIG_DIR` overrides no longer force a
+  rollback of an otherwise valid durable GonkaGate setup; the installer now
+  keeps the durable writes and reports the current shell as still overridden.
 - Fixed the release-please version sync seam by marking
   `src/constants/contract.ts` with `x-release-please-version`, matching the
   working pattern already used in `opencode-setup`.

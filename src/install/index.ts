@@ -27,6 +27,10 @@ import type { InstallDependencies } from "./deps.js";
 import { isInstallError, isInstallErrorCode } from "./errors.js";
 import type { InstallFlowResult } from "./contracts.js";
 import { redactSecretBearingText } from "./redact.js";
+import {
+  hasCurrentSessionRuntimeOverrides,
+  stripKiloTerminalRuntimeOverrides,
+} from "./runtime-overrides.js";
 
 export async function runInstallFlow(
   request: CliOptions,
@@ -147,6 +151,9 @@ async function verifyPreparedInstall(
   installFlow: PreparedInstallSession,
   dependencies: InstallDependencies,
 ): Promise<void> {
+  const durableVerificationDependencies =
+    createDurableVerificationDependencies(dependencies);
+
   await verifyEffectiveKiloConfig(
     {
       kiloCommand: installFlow.context.kilo.command,
@@ -156,7 +163,7 @@ async function verifyPreparedInstall(
       projectRoot: installFlow.context.workspace.projectRoot,
       scope: installFlow.summary.scope,
     },
-    dependencies,
+    durableVerificationDependencies,
   );
 }
 
@@ -165,7 +172,7 @@ async function verifyCurrentSessionInstall(
   progressState: InstallProgressState,
   dependencies: InstallDependencies,
 ): Promise<InstallFlowResult | undefined> {
-  if (dependencies.runtime.env.KILO_CONFIG_CONTENT === undefined) {
+  if (!hasCurrentSessionRuntimeOverrides(dependencies.runtime.env)) {
     return undefined;
   }
 
@@ -187,7 +194,7 @@ async function verifyCurrentSessionInstall(
         errorCode: error.code,
         kilo: installFlow.context.kilo,
         message:
-          "GonkaGate was installed durably, but the current shell is still overridden by KILO_CONFIG_CONTENT.",
+          "GonkaGate was installed durably, but the current shell is still overridden by active Kilo runtime config.",
         modelDisplayName: progressState.modelDisplayName,
         modelKey: progressState.modelKey,
         modelRef: progressState.modelRef,
@@ -308,6 +315,26 @@ function formatInstallFailureMessage(error: unknown): string {
   }
 
   return redactSecretBearingText(String(error));
+}
+
+function createDurableVerificationDependencies(
+  dependencies: InstallDependencies,
+): InstallDependencies {
+  const durableVerificationEnv = stripKiloTerminalRuntimeOverrides(
+    dependencies.runtime.env,
+  );
+
+  if (durableVerificationEnv === dependencies.runtime.env) {
+    return dependencies;
+  }
+
+  return {
+    ...dependencies,
+    runtime: {
+      ...dependencies.runtime,
+      env: durableVerificationEnv,
+    },
+  };
 }
 
 function toFailedErrorCode(

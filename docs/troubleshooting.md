@@ -44,6 +44,10 @@ attribute blockers, but they are not durable installer targets.
 `KILO_CONFIG_CONTENT` is runtime-only. It can block the current shell even
 after a durable install has succeeded.
 
+If you run the installer from inside an active `kilo` terminal session,
+session-scoped `KILO_CONFIG` or `KILO_CONFIG_DIR` values can also keep that
+shell overridden until you exit the session and return to plain `kilo`.
+
 ## Can I Pass `--api-key`?
 
 No. Plain `--api-key` is intentionally rejected so secrets do not land in

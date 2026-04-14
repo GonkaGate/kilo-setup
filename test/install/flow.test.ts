@@ -183,3 +183,86 @@ test("runInstallFlow keeps durable writes when only current-session verification
     /"selectedScope": "project"/,
   );
 });
+
+test("runInstallFlow keeps durable writes when a Kilo terminal session carries a runtime KILO_CONFIG override", async () => {
+  const dependencies = createFlowDependencies({
+    env: {
+      KILO_CONFIG: "/workspace/session/kilo.json",
+      KILO_TERMINAL: "1",
+    },
+    repository: true,
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  fs.seedFile(
+    "/workspace/session/kilo.json",
+    '{\n  "model": "openai/gpt-4.1"\n}\n',
+  );
+
+  const result = await runInstallFlow(
+    {
+      apiKeyStdin: false,
+      json: true,
+      yes: true,
+    },
+    dependencies,
+  );
+
+  assert.equal(result.status, "blocked");
+  assert.equal(result.errorCode, "effective_config_blocked");
+  assert.equal(result.blockers?.[0]?.layer, "KILO_CONFIG");
+  assert.equal(fs.readText(managedPaths.secretPath), "gp-flow-secret");
+  assert.match(
+    fs.readText(managedPaths.userConfigDefaultPath) ?? "",
+    /"provider"/,
+  );
+  assert.match(
+    fs.readText(managedPaths.projectConfigDefaultPath) ?? "",
+    /"model": "gonkagate\//,
+  );
+  assert.match(
+    fs.readText(managedPaths.installStatePath) ?? "",
+    /"selectedScope": "project"/,
+  );
+});
+
+test("runInstallFlow still rolls managed writes back when KILO_CONFIG blocks durable verification outside a Kilo terminal session", async () => {
+  const dependencies = createFlowDependencies({
+    env: {
+      KILO_CONFIG: "/workspace/session/kilo.json",
+    },
+    repository: true,
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  fs.seedFile(
+    "/workspace/session/kilo.json",
+    '{\n  "model": "openai/gpt-4.1"\n}\n',
+  );
+
+  const result = await runInstallFlow(
+    {
+      apiKeyStdin: false,
+      json: true,
+      yes: true,
+    },
+    dependencies,
+  );
+
+  assert.equal(result.status, "rolled_back");
+  assert.equal(result.errorCode, "installation_rolled_back");
+  assert.equal(fs.readText(managedPaths.secretPath), undefined);
+  assert.equal(fs.readText(managedPaths.userConfigDefaultPath), undefined);
+  assert.equal(fs.readText(managedPaths.projectConfigDefaultPath), undefined);
+  assert.equal(fs.readText(managedPaths.installStatePath), undefined);
+});
