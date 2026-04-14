@@ -23,6 +23,7 @@ import type {
 
 interface ParsedProgramOptions {
   apiKeyStdin?: boolean;
+  clearKiloModelCache?: boolean;
   cwd?: string;
   json?: boolean;
   model?: string;
@@ -77,6 +78,12 @@ function createProgram(output?: ProgramOutput): Command {
     )
     .addOption(
       new Option(
+        "--clear-kilo-model-cache",
+        "Clear Kilo's cached last-selected UI model after setup when possible.",
+      ).default(false),
+    )
+    .addOption(
+      new Option(
         "--yes",
         "Accept recommended non-interactive defaults when available.",
       ).default(false),
@@ -99,6 +106,7 @@ function createProgram(output?: ProgramOutput): Command {
 Examples:
   ${CONTRACT_METADATA.publicEntrypoint}
   ${CONTRACT_METADATA.publicEntrypoint} --scope project --json
+  ${CONTRACT_METADATA.publicEntrypoint} --clear-kilo-model-cache
   printf '%s' "$${GONKAGATE_SECRET_ENV_VAR}" | ${CONTRACT_METADATA.publicEntrypoint} --api-key-stdin --scope project --yes --json
 
 Runtime status:
@@ -141,6 +149,7 @@ export function parseCliOptions(
   const options = program.opts<ParsedProgramOptions>();
   return {
     apiKeyStdin: options.apiKeyStdin ?? false,
+    clearKiloModelCache: options.clearKiloModelCache ?? false,
     cwd: options.cwd,
     json: options.json ?? false,
     modelKey: options.model,

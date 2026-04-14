@@ -49,6 +49,68 @@ test("resolveInstallScope requires --scope or --yes in non-interactive mode", as
   );
 });
 
+test("resolveInstallScope auto-selects the recommended scope in interactive happy paths", async () => {
+  const scope = await resolveInstallScope(
+    {
+      insideGitRepository: true,
+      yes: false,
+    },
+    createStubbedTestInstallDependencies({
+      prompts: {
+        kind: "override",
+        value: {
+          readSecret: async () => "gp-test-secret",
+          selectOption: async () => {
+            throw new Error("scope prompt should not run");
+          },
+        },
+      },
+      runtime: {
+        stdinIsTTY: true,
+        stdoutIsTTY: true,
+      },
+    }),
+  );
+
+  assert.equal(scope, "project");
+});
+
+test("resolveInstallScope asks for confirmation when the previous managed scope differs", async () => {
+  const promptMessages: string[] = [];
+
+  const scope = await resolveInstallScope(
+    {
+      insideGitRepository: true,
+      previousManagedScope: "user",
+      yes: false,
+    },
+    createStubbedTestInstallDependencies({
+      prompts: {
+        kind: "override",
+        value: {
+          readSecret: async () => "gp-test-secret",
+          selectOption: async (options) => {
+            promptMessages.push(options.message);
+            return (
+              options.defaultValue ?? options.choices[0]?.value ?? "project"
+            );
+          },
+        },
+      },
+      runtime: {
+        stdinIsTTY: true,
+        stdoutIsTTY: true,
+      },
+    }),
+  );
+
+  assert.equal(scope, "project");
+  assert.match(
+    promptMessages[0] ?? "",
+    /The last installer run used "this machine" activation/i,
+  );
+});
+
 test("resolveInstallModel uses the recommended validated default for --yes", async () => {
   const model = await resolveInstallModel(
     {

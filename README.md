@@ -77,10 +77,15 @@ The installer will:
 1. detect `kilo`, or fall back to `kilocode`
 2. verify exact `@kilocode/cli@7.2.0`
 3. show the curated model choice
-4. ask whether setup should apply to `user` or `project` scope
+4. choose the recommended scope automatically:
+   - inside a git repository: `project`
+   - outside a repository: `user`
 5. collect your API key through a hidden prompt
 6. write the managed config and verify the result
 7. return you to normal `kilo` usage
+
+On interactive reruns, the installer asks about scope only if the last
+installer-managed scope differs from the new recommendation.
 
 If you launch the installer from inside an active `kilo` terminal session, the
 durable install can still succeed while that specific shell remains overridden
@@ -92,6 +97,12 @@ Use this for scripts, automation, or repeatable local setup:
 
 ```bash
 npx @gonkagate/kilo-setup --scope project --yes
+```
+
+Optional Kilo UI-model cache cleanup:
+
+```bash
+npx @gonkagate/kilo-setup --scope project --clear-kilo-model-cache --yes
 ```
 
 With a key from the environment:
@@ -122,6 +133,8 @@ Use `project` when you want this repository to activate GonkaGate by default.
 - keeps the provider definition and secret binding in user config
 - writes only activation settings into `.kilo/kilo.jsonc`
 - good default inside a git repository
+- the installer also warns when Kilo's global UI model cache could make another
+  repository reopen on the last selected GonkaGate model
 
 Important limit:
 

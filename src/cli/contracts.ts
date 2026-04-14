@@ -5,6 +5,7 @@ export type { InstallScope };
 
 export interface CliOptions {
   apiKeyStdin: boolean;
+  clearKiloModelCache: boolean;
   cwd?: string;
   json: boolean;
   modelKey?: string;

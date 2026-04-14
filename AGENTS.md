@@ -18,11 +18,16 @@ Current honest state:
 - the real installer runtime is implemented under `src/install/`
 - the public CLI detects local Kilo, resolves model and scope, accepts safe
   secret input, writes managed files, verifies the durable/current-session
-  result, and renders installed, blocked, failed, or rolled-back outcomes
+  result, renders installed, blocked, failed, or rolled-back outcomes, and
+  now auto-selects the recommended interactive scope unless a rerun needs an
+  explicit scope-change confirmation
 - when setup is launched from an active `kilo` terminal session, durable
   verification now strips session-only `KILO_CONFIG`, `KILO_CONFIG_DIR`, and
   `KILO_CONFIG_CONTENT` overrides before proving the plain-`kilo` outcome, and
   then reports the still-overridden current shell separately
+- project-scope installs now surface Kilo global UI-model cache notices and
+  support optional `--clear-kilo-model-cache` cleanup for the current cached
+  selection, while staying explicit that Kilo can recreate that cache later
 - the XDG-isolated oracle now mirrors user-level global Kilo config into the
   sandbox XDG config tree so project-scope verification matches the local
   resolver on supported `@kilocode/cli@7.2.0` installs
@@ -49,13 +54,17 @@ The intended happy path is:
 1. user runs `npx @gonkagate/kilo-setup`
 2. installer validates local `kilo` or fallback `kilocode`
 3. installer offers curated validated Kilo model choices
-4. installer asks for `user` or `project` scope
+4. installer auto-selects `project` inside a git repository or `user`
+   otherwise, and only asks on interactive reruns when the previous
+   installer-managed scope differs from the new recommendation
 5. installer collects a GonkaGate key through a hidden prompt,
    `GONKAGATE_API_KEY`, or `--api-key-stdin`
 6. installer writes the minimum safe Kilo config layers
-7. installer verifies the durable Kilo result and the current session when
+7. for `project` installs, installer reports Kilo global UI-model cache risk
+   and can clear the current cached model on request
+8. installer verifies the durable Kilo result and the current session when
    runtime-only overrides are active
-8. user returns to plain `kilo`
+9. user returns to plain `kilo`
 
 For `project` scope, repository config stays secret-free. Each participating
 machine still needs a compatible user-level `provider.gonkagate` definition,

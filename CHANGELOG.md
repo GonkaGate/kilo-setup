@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Simplified the interactive happy path so the installer now auto-selects the
+  recommended scope by location, asks about scope only on reruns that would
+  change the previous installer-managed scope, and documents the advanced
+  `--scope` override separately.
+- Added project-scope notices for Kilo's global UI model cache plus an
+  optional `--clear-kilo-model-cache` cleanup for the current cached
+  selection.
 - Restored installer-managed `limit.output = 8192` for the curated Qwen
   default after Kilo `7.2.0` oracle validation showed custom model entries
   fail without a numeric output limit.

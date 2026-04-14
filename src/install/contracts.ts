@@ -65,6 +65,7 @@ export interface BlockedKiloSummary {
 interface InstallFlowResultBase {
   context: InstallFlowContext;
   message: string;
+  notices?: readonly string[];
   ok: boolean;
   status: InstallFlowStatus;
 }

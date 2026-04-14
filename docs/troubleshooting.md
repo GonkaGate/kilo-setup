@@ -41,6 +41,9 @@ remain user-level. That keeps the repository commit-safe, but it also means
 each participating machine needs a compatible user-level
 `provider.gonkagate` definition before repo-local activation can work.
 
+Inside a git repository, the interactive installer now defaults to `project`
+scope automatically. Outside a repository, it defaults to `user`.
+
 ## Why Are `KILO_CONFIG`, `KILO_CONFIG_DIR`, And `KILO_CONFIG_CONTENT` Mentioned?
 
 They are real Kilo override layers. The verifier inspects them when it can
@@ -52,6 +55,25 @@ after a durable install has succeeded.
 If you run the installer from inside an active `kilo` terminal session,
 session-scoped `KILO_CONFIG` or `KILO_CONFIG_DIR` values can also keep that
 shell overridden until you exit the session and return to plain `kilo`.
+
+## Why Does `kilo` Still Open On A GonkaGate Model In Another Repository?
+
+First check the resolved Kilo config layer, not only the UI selection. If
+`kilo debug config` in that repository resolves `model: null` while the UI
+still opens on a GonkaGate model, the installer is not currently activating
+GonkaGate there.
+
+On Kilo `7.2.0`, the app can still reuse the last interactively selected model
+from `~/.local/state/kilo/model.json`. That file is upstream Kilo state, not
+installer-owned config, so project-scope cleanup does not remove it.
+
+If you want a different default outside the repo where project scope was
+installed, change the model from inside plain `kilo` in that other repository
+or clear the cached selection in `~/.local/state/kilo/model.json`.
+
+The installer can help with the current cached selection by running with
+`--clear-kilo-model-cache`, but Kilo may set that cache again after future
+interactive model changes.
 
 ## Can I Pass `--api-key`?
 

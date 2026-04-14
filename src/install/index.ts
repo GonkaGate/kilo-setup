@@ -9,7 +9,11 @@ import {
 import { createManagedWriteTransaction } from "./managed-write-transaction.js";
 import { rollbackManagedWrites } from "./rollback.js";
 import { resolveInstallContext } from "./context.js";
-import { resolveInstallModel, resolveInstallScope } from "./selection.js";
+import {
+  canUseInteractiveInstallPrompts,
+  resolveInstallModel,
+  resolveInstallScope,
+} from "./selection.js";
 import { resolveSecretInput, writeManagedSecret } from "./secrets.js";
 import { writeScopeManagedConfigs } from "./scope.js";
 import {
@@ -17,6 +21,7 @@ import {
   readManagedInstallState,
   writeManagedInstallState,
 } from "./state.js";
+import type { ManagedInstallStateRecord } from "./contracts/install-state.js";
 import {
   verifyCurrentSessionKiloConfig,
   verifyEffectiveKiloConfig,
@@ -31,6 +36,10 @@ import {
   hasCurrentSessionRuntimeOverrides,
   stripKiloTerminalRuntimeOverrides,
 } from "./runtime-overrides.js";
+import {
+  clearKiloModelCacheSelection,
+  inspectKiloModelCache,
+} from "./kilo-model-cache.js";
 
 export async function runInstallFlow(
   request: CliOptions,
@@ -39,6 +48,7 @@ export async function runInstallFlow(
   let progressState: InstallProgressState = {};
   const managedWrites = createManagedWriteTransaction();
   let installFlow: PreparedInstallSession;
+  let previousInstallState: ManagedInstallStateRecord | undefined;
 
   try {
     const resolvedContext = await resolveInstallContext(dependencies, {
@@ -62,6 +72,10 @@ export async function runInstallFlow(
       };
     }
 
+    previousInstallState = await readManagedInstallState(
+      dependencies,
+      resolvedContext.workspace.managedPaths,
+    );
     const model = await resolveInstallModel(
       {
         modelKey: request.modelKey,
@@ -74,6 +88,7 @@ export async function runInstallFlow(
     const scope = await resolveInstallScope(
       {
         insideGitRepository: resolvedContext.workspace.insideGitRepository,
+        previousManagedScope: previousInstallState?.selectedScope,
         scope: request.scope,
         yes: request.yes,
       },
@@ -85,10 +100,23 @@ export async function runInstallFlow(
     return buildInstallErrorResult(error, progressState);
   }
 
+  let notices: readonly string[] = [];
+
   try {
-    await applyManagedWrites(request, installFlow, managedWrites, dependencies);
+    await applyManagedWrites(
+      request,
+      installFlow,
+      previousInstallState,
+      managedWrites,
+      dependencies,
+    );
     await verifyPreparedInstall(installFlow, dependencies);
     await persistInstallState(installFlow, managedWrites, dependencies);
+    notices = await collectPostInstallNotices(
+      request,
+      installFlow,
+      dependencies,
+    );
   } catch (error) {
     return await buildInstallFailureResult(
       error,
@@ -100,23 +128,23 @@ export async function runInstallFlow(
 
   const currentSessionResult = await verifyCurrentSessionInstall(
     installFlow,
+    notices,
     progressState,
     dependencies,
   );
 
-  return currentSessionResult ?? createSuccessfulInstallResult(installFlow);
+  return (
+    currentSessionResult ?? createSuccessfulInstallResult(installFlow, notices)
+  );
 }
 
 async function applyManagedWrites(
   request: CliOptions,
   installFlow: PreparedInstallSession,
+  previousInstallState: ManagedInstallStateRecord | undefined,
   managedWrites: ReturnType<typeof createManagedWriteTransaction>,
   dependencies: InstallDependencies,
 ): Promise<void> {
-  const previousInstallState = await readManagedInstallState(
-    dependencies,
-    installFlow.context.workspace.managedPaths,
-  );
   const resolvedSecret = await resolveSecretInput(
     {
       apiKeyStdin: request.apiKeyStdin,
@@ -169,6 +197,7 @@ async function verifyPreparedInstall(
 
 async function verifyCurrentSessionInstall(
   installFlow: PreparedInstallSession,
+  notices: readonly string[],
   progressState: InstallProgressState,
   dependencies: InstallDependencies,
 ): Promise<InstallFlowResult | undefined> {
@@ -198,6 +227,7 @@ async function verifyCurrentSessionInstall(
         modelDisplayName: progressState.modelDisplayName,
         modelKey: progressState.modelKey,
         modelRef: progressState.modelRef,
+        notices,
         ok: false,
         scope: progressState.scope,
         status: "blocked",
@@ -209,6 +239,58 @@ async function verifyCurrentSessionInstall(
   }
 
   return undefined;
+}
+
+async function collectPostInstallNotices(
+  request: CliOptions,
+  installFlow: PreparedInstallSession,
+  dependencies: InstallDependencies,
+): Promise<readonly string[]> {
+  if (installFlow.summary.scope !== "project") {
+    return [];
+  }
+
+  const interactive =
+    !request.yes && canUseInteractiveInstallPrompts(dependencies);
+  const inspection = await inspectKiloModelCache(dependencies);
+
+  if (request.clearKiloModelCache) {
+    const clearResult = await clearKiloModelCacheSelection(dependencies);
+
+    return [formatProjectScopeCacheClearNotice(clearResult, inspection.path)];
+  }
+
+  if (interactive && inspection.status === "gonkagate_selected") {
+    const selection = await dependencies.prompts.selectOption({
+      choices: [
+        {
+          description:
+            "Remove only Kilo's current global UI-selected model for now. Kilo can set it again later.",
+          label: "Clear cached model (Recommended)",
+          value: "clear",
+        },
+        {
+          description:
+            "Keep GonkaGate as the current last-selected model across repositories.",
+          label: "Keep cached model",
+          value: "keep",
+        },
+      ],
+      defaultValue: "clear",
+      message:
+        "Kilo currently remembers GonkaGate as the last UI-selected model for this machine. Clear that cached model now so other repositories can fall back to their own config?",
+    });
+
+    if (selection === "clear") {
+      const clearResult = await clearKiloModelCacheSelection(dependencies);
+
+      return [formatProjectScopeCacheClearNotice(clearResult, inspection.path)];
+    }
+
+    return [createPersistingProjectScopeCacheNotice(inspection.path)];
+  }
+
+  return [createProjectScopeCacheNotice(inspection.path)];
 }
 
 async function persistInstallState(
@@ -345,4 +427,47 @@ function toFailedErrorCode(
   }
 
   return error.code;
+}
+
+function createProjectScopeCacheNotice(path?: string): string {
+  if (path === undefined) {
+    return "Kilo can remember the last UI-selected model across repositories after future interactive model changes. If another repository later opens on GonkaGate, switch models there or clear Kilo's global model cache.";
+  }
+
+  return `Kilo can remember the last UI-selected model across repositories. If another repository later opens on GonkaGate, switch models there or clear ${path}.`;
+}
+
+function createPersistingProjectScopeCacheNotice(path?: string): string {
+  if (path === undefined) {
+    return "Kilo still remembers GonkaGate as the last UI-selected model for this machine. Another repository may open on GonkaGate until you switch models there or clear Kilo's global model cache.";
+  }
+
+  return `Kilo still remembers GonkaGate as the last UI-selected model for this machine. Another repository may open on GonkaGate until you switch models there or clear ${path}.`;
+}
+
+function formatProjectScopeCacheClearNotice(
+  result: Awaited<ReturnType<typeof clearKiloModelCacheSelection>>,
+  fallbackPath?: string,
+): string {
+  const path = result.path ?? fallbackPath;
+
+  if (result.status === "cleared") {
+    return path === undefined
+      ? "Cleared Kilo's cached last UI-selected model for now. Kilo may set it again after future interactive model changes."
+      : `Cleared Kilo's cached last UI-selected model at ${path} for now. Kilo may set it again after future interactive model changes.`;
+  }
+
+  if (result.status === "already_clear" || result.status === "missing") {
+    return path === undefined
+      ? "Kilo's cached last UI-selected model was already clear. Kilo may still set it again after future interactive model changes."
+      : `Kilo's cached last UI-selected model at ${path} was already clear. Kilo may still set it again after future interactive model changes.`;
+  }
+
+  if (result.status === "unsupported_platform") {
+    return "GonkaGate was installed for this repository, but this platform's Kilo global model-cache path is not currently managed by the installer.";
+  }
+
+  return path === undefined
+    ? "GonkaGate was installed, but Kilo's cached last UI-selected model could not be updated. Another repository may still open on GonkaGate until you switch models there."
+    : `GonkaGate was installed, but Kilo's cached last UI-selected model at ${path} could not be updated. Another repository may still open on GonkaGate until you switch models there.`;
 }
