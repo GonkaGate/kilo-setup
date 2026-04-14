@@ -18,6 +18,9 @@
 
 ## Unreleased
 
+- Fixed the release-please version sync seam by marking
+  `src/constants/contract.ts` with `x-release-please-version`, matching the
+  working pattern already used in `opencode-setup`.
 - Fixed Windows CI so the oracle-proof script reuses the repository command
   runner instead of directly spawning bare `npm`, and added `.gitattributes`
   to keep LF line endings stable for `prettier --check` on `windows-latest`.

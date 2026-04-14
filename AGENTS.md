@@ -119,6 +119,8 @@ These are implementation facts today:
   contain the checked-in release PR and npm publish automation
 - `release-please-config.json` and `.release-please-manifest.json` keep
   package versioning aligned with `src/constants/contract.ts`
+- `src/constants/contract.ts` keeps `cliVersion` marked with
+  `x-release-please-version` so post-release version sync stays automatic
 - `test/package-contract.test.ts`, `test/docs-contract.test.ts`, and
   `test/cli.test.ts` protect the shipped runtime contract
 - mirrored skill packs live under `.agents/skills/` and `.claude/skills/`

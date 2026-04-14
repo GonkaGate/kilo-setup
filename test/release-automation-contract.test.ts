@@ -21,6 +21,7 @@ test("release automation scaffolding matches the repository versioning contract"
   const manifest = JSON.parse(
     readText(".release-please-manifest.json"),
   ) as ReleasePleaseManifest;
+  const contractSource = readText("src/constants/contract.ts");
   const releaseWorkflow = readText(".github/workflows/release-please.yml");
   const publishWorkflow = readText(".github/workflows/publish.yml");
 
@@ -31,6 +32,10 @@ test("release automation scaffolding matches the repository versioning contract"
     "src/constants/contract.ts",
   ]);
   assert.equal(manifest["."], CONTRACT_METADATA.cliVersion);
+  assert.match(
+    contractSource,
+    /cliVersion:\s*"[^"]+",\s*\/\/ x-release-please-version/,
+  );
 
   assert.match(releaseWorkflow, /googleapis\/release-please-action/);
   assert.match(releaseWorkflow, /actions:\s*write/);
