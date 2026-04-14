@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fixed Windows CI so the oracle-proof script reuses the repository command
+  runner instead of directly spawning bare `npm`, and added `.gitattributes`
+  to keep LF line endings stable for `prettier --check` on `windows-latest`.
 - Rewrote `README.md` and the user-facing docs for first-time GitHub/npm
   readers, including clearer setup paths, scope guidance, safe API key input
   rules, file locations, honest current limits, and direct GonkaGate site/docs

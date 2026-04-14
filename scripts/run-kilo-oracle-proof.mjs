@@ -1,4 +1,3 @@
-import { spawn } from "node:child_process";
 import { mkdtempSync } from "node:fs";
 import { mkdir, readdir, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -74,7 +73,7 @@ try {
     dependencies,
   );
   const realPathSnapshotsBefore = await captureRealPathSnapshots();
-  const oracleResult = await runOracleInvocation(invocation);
+  const oracleResult = await runOracleInvocation(invocation, dependencies);
   const parsedOutput = tryParseJsoncObject(oracleResult.stdout);
 
   if (!parsedOutput.ok) {
@@ -161,43 +160,23 @@ async function seedFixtureFiles() {
   );
 }
 
-async function runOracleInvocation(invocation) {
-  return await new Promise((resolvePromise, rejectPromise) => {
-    const child = spawn(invocation.command, [...invocation.args], {
+async function runOracleInvocation(invocation, dependencies) {
+  const result = await dependencies.commands.run(
+    invocation.command,
+    invocation.args,
+    {
       cwd: invocation.cwd,
       env: invocation.env,
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-    });
+    },
+  );
 
-    let stdout = "";
-    let stderr = "";
+  if (result.exitCode !== 0) {
+    throw new Error(
+      `Sandbox oracle command failed with exit code ${result.exitCode}${result.signal ? ` and signal ${result.signal}` : ""}. stderr length=${result.stderr.length}.`,
+    );
+  }
 
-    child.stdout.setEncoding("utf8");
-    child.stdout.on("data", (chunk) => {
-      stdout += chunk;
-    });
-    child.stderr.setEncoding("utf8");
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk;
-    });
-    child.on("error", rejectPromise);
-    child.on("close", (exitCode, signal) => {
-      if ((exitCode ?? 1) !== 0) {
-        rejectPromise(
-          new Error(
-            `Sandbox oracle command failed with exit code ${exitCode ?? 1}${signal ? ` and signal ${signal}` : ""}. stderr length=${stderr.length}.`,
-          ),
-        );
-        return;
-      }
-
-      resolvePromise({
-        stderr,
-        stdout,
-      });
-    });
-  });
+  return result;
 }
 
 async function captureRealPathSnapshots() {
