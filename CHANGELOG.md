@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3](https://github.com/GonkaGate/kilo-setup/compare/v0.2.2...v0.2.3) (2026-04-14)
+
+
+### Bug Fixes
+
+* avoid rollback in kilo terminal sessions ([f6c4412](https://github.com/GonkaGate/kilo-setup/commit/f6c4412ad13b0a1cb295e9a243ebecda1fa8a4c3))
+* avoid rollback in kilo terminal sessions ([551e43f](https://github.com/GonkaGate/kilo-setup/commit/551e43f24b530297002b195ccd47516645e99000))
+
 ## [0.2.2](https://github.com/GonkaGate/kilo-setup/compare/v0.2.1...v0.2.2) (2026-04-14)
 
 
