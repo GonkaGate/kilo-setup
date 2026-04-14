@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Restored installer-managed `limit.output = 8192` for the curated Qwen
+  default after Kilo `7.2.0` oracle validation showed custom model entries
+  fail without a numeric output limit.
+- Fixed project-scope installs whose XDG-isolated oracle sandbox mirrored
+  user-level global Kilo config into `HOME/.config` instead of the sandbox XDG
+  config tree, which could falsely trigger rollback with
+  `inferred_non_local` verification blockers.
+
 ## [0.2.3](https://github.com/GonkaGate/kilo-setup/compare/v0.2.2...v0.2.3) (2026-04-14)
 
 

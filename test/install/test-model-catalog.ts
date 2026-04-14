@@ -7,6 +7,7 @@ export const TEST_VALIDATED_MODEL = {
   key: "qwen3-235b-a22b-instruct-2507-fp8",
   limits: {
     context: 262144,
+    output: 8192,
   },
   modelId: "qwen/qwen3-235b-a22b-instruct-2507-fp8",
   recommended: true,

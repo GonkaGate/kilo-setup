@@ -59,7 +59,7 @@ Current public baseline:
 - current transport target: `chat/completions`
 - curated default:
   `qwen/qwen3-235b-a22b-instruct-2507-fp8`
-- no installer-owned `limit.output` clamp
+- installer-managed `limit.output = 8192` for exact `@kilocode/cli@7.2.0`
 - no native Windows production claim yet
 
 ## Shortest Start Path
@@ -180,7 +180,10 @@ This repository intentionally stays narrow today:
 
 The shipped runtime treats effective Kilo config as the real success gate. It
 uses the local resolver as the durable verifier and keeps the XDG-isolated
-`kilo debug config` oracle as a compatibility check with fake secrets.
+`kilo debug config` oracle as a compatibility check with fake secrets. Inside
+that sandbox, mirrored global Kilo config is written into the sandbox XDG
+config tree so Kilo loads the same user-level provider layer the local
+resolver inspected.
 
 ## Need More Detail?
 

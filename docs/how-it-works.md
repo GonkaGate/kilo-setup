@@ -30,7 +30,7 @@ Current public limit:
   `@kilocode/cli@7.2.0`, `chat/completions`, and non-Windows production claims
 - the curated default is
   `qwen/qwen3-235b-a22b-instruct-2507-fp8` with `limit.context = 262144`
-  and no installer-owned `limit.output` clamp
+  and `limit.output = 8192`
 - broader model claims still require additional proof before they should be
   added to the public default set
 
@@ -87,7 +87,8 @@ user config, project config, `KILO_CONFIG`, `KILO_CONFIG_DIR`, managed config,
 and the canonical managed secret binding. After the durable resolver matches,
 the runtime runs `kilo debug config` only inside an XDG-isolated sandbox with
 fake secret material and compares that oracle output against the intended
-contract.
+contract. Mirrored global config is written into the sandbox XDG config tree so
+the oracle sees the same user-level provider layer as the local resolver.
 
 That means:
 

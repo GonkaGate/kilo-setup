@@ -23,9 +23,12 @@ Current honest state:
   verification now strips session-only `KILO_CONFIG`, `KILO_CONFIG_DIR`, and
   `KILO_CONFIG_CONTENT` overrides before proving the plain-`kilo` outcome, and
   then reports the still-overridden current shell separately
+- the XDG-isolated oracle now mirrors user-level global Kilo config into the
+  sandbox XDG config tree so project-scope verification matches the local
+  resolver on supported `@kilocode/cli@7.2.0` installs
 - the stock public build now ships one validated curated default,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, without an installer-owned
-  `limit.output` clamp
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, with installer-managed
+  `limit.output = 8192` for Kilo `7.2.0` compatibility
 - exact support remains pinned to `@kilocode/cli@7.2.0`; later `7.2.x`
   versions are not implied
 - native Windows production support is not yet claimed because the native
@@ -116,7 +119,8 @@ These are implementation facts today:
   intake, managed config writes, rollback, effective-config verification, and
   orchestration
 - `src/constants/models.ts` now exposes a recommended validated production
-  default without forcing an explicit `limit.output` value into managed config
+  default with installer-managed `limit.output = 8192` in the written Kilo
+  provider config
 - `docs/specs/kilo-setup-prd/spec.md` is the copied Kilo setup PRD
 - `docs/release-readiness.md` records the current production-readiness audit
 - `.github/workflows/release-please.yml` and `.github/workflows/publish.yml`

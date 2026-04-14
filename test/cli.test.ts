@@ -27,6 +27,7 @@ const VALIDATED_MODEL: RecommendedProductionDefaultCuratedModel = {
   key: MODEL_KEY,
   limits: {
     context: 262144,
+    output: 8192,
   },
   modelId: "qwen/qwen3-235b-a22b-instruct-2507-fp8",
   recommended: true,

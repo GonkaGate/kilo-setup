@@ -68,10 +68,11 @@ Redacted evidence notes are preserved in
 - Production setup should leave `small_model` untouched by default.
 - GonkaGate public sources prove the selected model's context window as `262K`
   tokens, interpreted for Kilo as `262144`.
-- The exact output-token limit remains unproven.
+- GonkaGate public OpenClaw guidance documents `maxTokens: 8192` for the
+  selected model, which the installer writes as Kilo `limit.output`.
 - No safe `GONKAGATE_API_KEY` was present during the spike, so live GonkaGate
-  inference was not run. Production shipment remains blocked until a safe live
-  smoke and real `limit.output` value exist.
+  inference was not run. Production shipment still benefits from a safe live
+  smoke, but the numeric `limit.output` value is now documented.
 
 ## Problem
 
@@ -576,8 +577,9 @@ Evidence:
   produces a doubled `/chat/completions/chat/completions` path.
 
 The `limit.context` value is proven from the GonkaGate public model page as
-`262K`, mapped to the integer `262144`. The `limit.output` value remains
-blocked. Kilo docs state that `context: 0` disables compaction and
+`262K`, mapped to the integer `262144`. GonkaGate OpenClaw guidance documents
+`maxTokens: 8192` for the same model, so the installer writes
+`limit.output = 8192`. Kilo docs state that `context: 0` disables compaction and
 context-size-dependent usage tracking, while `output: 0` falls back to Kilo's
 internal output default. Do not use `0` as the production value for this model
 unless a later PRD update explicitly accepts that trade-off.

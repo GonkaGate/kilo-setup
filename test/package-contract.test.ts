@@ -133,7 +133,7 @@ test("curated model registry exposes the shipped validated default", () => {
 
   assert.equal(model.adapterPackage, "@ai-sdk/openai-compatible");
   assert.equal(model.limits?.context, 262144);
-  assert.equal("output" in (model.limits ?? {}), false);
+  assert.equal(model.limits?.output, 8192);
   assert.equal(model.modelId, "qwen/qwen3-235b-a22b-instruct-2507-fp8");
   assert.equal(model.transport, "chat_completions");
   assert.equal(model.validationStatus, "validated");
@@ -146,7 +146,7 @@ test("curated model registry exposes the shipped validated default", () => {
   );
 });
 
-test("managed provider config omits an installer-owned output token cap", () => {
+test("managed provider config includes the required Kilo output token limit", () => {
   const providerConfig = buildManagedProviderConfig(
     "qwen3-235b-a22b-instruct-2507-fp8",
   ) as {
@@ -158,8 +158,7 @@ test("managed provider config omits an installer-owned output token cap", () => 
     262144,
   );
   assert.equal(
-    "output" in
-      (providerConfig.models["qwen3-235b-a22b-instruct-2507-fp8"]?.limit ?? {}),
-    false,
+    providerConfig.models["qwen3-235b-a22b-instruct-2507-fp8"]?.limit?.output,
+    8192,
   );
 });

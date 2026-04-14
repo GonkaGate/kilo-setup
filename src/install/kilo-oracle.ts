@@ -347,6 +347,16 @@ function mapLayerPathToSandbox(
     );
   }
 
+  if (layer === "global_config") {
+    // The sandbox sets XDG_CONFIG_HOME, so mirrored global config must live
+    // under that tree for `kilo debug config` to load the same layer.
+    return pathApi.join(
+      context.layout.configDir,
+      "kilo",
+      pathApi.basename(normalizedOriginalPath),
+    );
+  }
+
   if (layer === "system_managed_config") {
     return pathApi.join(
       context.layout.testManagedConfigDir,
