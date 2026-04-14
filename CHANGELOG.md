@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/GonkaGate/kilo-setup/compare/v0.2.0...v0.2.1) (2026-04-14)
+
+
+### Bug Fixes
+
+* keep contract version in sync after release ([abd3a39](https://github.com/GonkaGate/kilo-setup/commit/abd3a3981888a031d5b40797eefd3b294d678804))
+* keep contract version in sync after release ([2a19bff](https://github.com/GonkaGate/kilo-setup/commit/2a19bff7dd07038be6716c328d0186350ab8ef1c))
+
 ## [0.2.0](https://github.com/GonkaGate/kilo-setup/compare/v0.1.0...v0.2.0) (2026-04-14)
 
 
