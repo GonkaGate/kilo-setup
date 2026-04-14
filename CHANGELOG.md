@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.0](https://github.com/GonkaGate/kilo-setup/compare/v0.1.0...v0.2.0) (2026-04-14)
+
+
+### Features
+
+* add kilo setup docs and release automation ([984250e](https://github.com/GonkaGate/kilo-setup/commit/984250ea4a77857e0f8697ed03ebb988893adb95))
+* add kilo setup docs and release automation ([e1eab13](https://github.com/GonkaGate/kilo-setup/commit/e1eab138aeb4ef5a3900ad6c3444352bdb14f488))
+
+
+### Bug Fixes
+
+* stabilize windows oracle and formatting checks ([ad918eb](https://github.com/GonkaGate/kilo-setup/commit/ad918ebb83c57aa35406f7d47190a9b82ff44469))
+* stabilize windows oracle and formatting checks ([e3f2978](https://github.com/GonkaGate/kilo-setup/commit/e3f29781d45613a2af32e451a1f9b7971593bd84))
+
+## Changelog
+
 ## Unreleased
 
 - Fixed Windows CI so the oracle-proof script reuses the repository command
