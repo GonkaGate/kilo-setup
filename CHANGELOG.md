@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/GonkaGate/kilo-setup/compare/v0.2.1...v0.2.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* ignore changelog in prettier checks ([6bc136a](https://github.com/GonkaGate/kilo-setup/commit/6bc136acb9f74c282bc08c8e81f3da11aa560c23))
+* ignore changelog in prettier checks ([d3babfd](https://github.com/GonkaGate/kilo-setup/commit/d3babfdecdbf01017fc6febb6cccd9fcb75ff172))
+
 ## [0.2.1](https://github.com/GonkaGate/kilo-setup/compare/v0.2.0...v0.2.1) (2026-04-14)
 
 
