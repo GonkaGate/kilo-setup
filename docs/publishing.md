@@ -38,6 +38,11 @@ The version sync points currently include:
 - `src/constants/contract.ts`
 - `.release-please-manifest.json`
 
+For `src/constants/contract.ts`, keep the inline
+`// x-release-please-version` marker on `cliVersion`. That is the same
+practical pattern already used in `opencode-setup` so `release-please` keeps
+the runtime contract version aligned after merge.
+
 ## Files In This Repository
 
 Release automation is defined by these files:
