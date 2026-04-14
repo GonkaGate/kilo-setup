@@ -87,6 +87,13 @@ test("package metadata matches the shipped Kilo runtime contract", () => {
   assert.match(packageJson.scripts?.ci ?? "", /npm run package:check/);
 });
 
+test("prettier ignore matches the release-please changelog workflow", () => {
+  const prettierIgnore = readText(".prettierignore");
+
+  assert.match(prettierIgnore, /^dist$/m);
+  assert.match(prettierIgnore, /^CHANGELOG\.md$/m);
+});
+
 test("constants use Kilo-specific defaults and leave OpenCode env vars out", () => {
   assert.equal(KILO_PRIMARY_COMMAND, "kilo");
   assert.equal(KILO_FALLBACK_COMMAND, "kilocode");
