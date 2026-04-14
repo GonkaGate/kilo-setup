@@ -128,35 +128,45 @@ function renderHumanResult(result: InstallFlowResult): string {
       }
     }
 
+    appendHumanResultNotices(output, result.notices);
     output.push("");
 
     return output.join("\n");
   }
 
   if (result.status === "failed") {
-    return [
+    const output = [
       "GonkaGate Kilo setup failed.",
       redactSecretBearingText(result.message),
-      "",
-    ].join("\n");
+    ];
+    appendHumanResultNotices(output, result.notices);
+    output.push("");
+
+    return output.join("\n");
   }
 
   if (result.status === "rolled_back") {
-    return [
+    const output = [
       "GonkaGate Kilo setup rolled back after a failed install attempt.",
       redactSecretBearingText(result.message),
-      "",
-    ].join("\n");
+    ];
+    appendHumanResultNotices(output, result.notices);
+    output.push("");
+
+    return output.join("\n");
   }
 
-  return [
+  const output = [
     "GonkaGate is configured for Kilo.",
     `Detected Kilo CLI: ${result.kilo.command} ${result.kilo.installedVersion}`,
     `Model: ${result.modelRef}`,
     `Scope: ${result.scope}`,
     "Run kilo",
-    "",
-  ].join("\n");
+  ];
+  appendHumanResultNotices(output, result.notices);
+  output.push("");
+
+  return output.join("\n");
 }
 
 function finalizeCliExecution(
@@ -215,4 +225,19 @@ function formatVerificationMismatch(
 
 function formatDiagnosticValue(value: unknown): string {
   return JSON.stringify(redactSecretBearingValue(value));
+}
+
+function appendHumanResultNotices(
+  output: string[],
+  notices: readonly string[] | undefined,
+): void {
+  if ((notices?.length ?? 0) === 0) {
+    return;
+  }
+
+  output.push("Notes:");
+
+  for (const notice of notices ?? []) {
+    output.push(`- ${redactSecretBearingText(notice)}`);
+  }
 }

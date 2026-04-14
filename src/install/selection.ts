@@ -14,6 +14,7 @@ export interface ModelSelectionRequest {
 
 export interface ScopeSelectionRequest {
   insideGitRepository: boolean;
+  previousManagedScope?: InstallScope;
   scope?: InstallScope;
   yes: boolean;
 }
@@ -109,11 +110,24 @@ export async function resolveInstallScope(
     });
   }
 
-  return await dependencies.prompts.selectOption({
-    choices: createScopeChoices(recommendedScope, request.insideGitRepository),
-    defaultValue: recommendedScope,
-    message: "Where should GonkaGate be activated for Kilo on this machine?",
-  });
+  if (
+    request.previousManagedScope !== undefined &&
+    request.previousManagedScope !== recommendedScope
+  ) {
+    return await dependencies.prompts.selectOption({
+      choices: createScopeChoices(
+        recommendedScope,
+        request.insideGitRepository,
+      ),
+      defaultValue: recommendedScope,
+      message: createScopeChangeConfirmationMessage(
+        request.previousManagedScope,
+        recommendedScope,
+      ),
+    });
+  }
+
+  return recommendedScope;
 }
 
 function createModelChoice(
@@ -155,6 +169,17 @@ function createScopeChoices(
       value: "user",
     },
   ];
+}
+
+function createScopeChangeConfirmationMessage(
+  previousManagedScope: InstallScope,
+  recommendedScope: InstallScope,
+): string {
+  return `The last installer run used ${formatScopeLabel(previousManagedScope)} activation. This run recommends ${formatScopeLabel(recommendedScope)}. Which scope should GonkaGate use now?`;
+}
+
+function formatScopeLabel(scope: InstallScope): string {
+  return scope === "project" ? '"this repository"' : '"this machine"';
 }
 
 function requireValidatedModel(

@@ -73,6 +73,7 @@ export function prepareInstallSession(
 
 export function createSuccessfulInstallResult(
   session: PreparedInstallSession,
+  notices?: readonly string[],
 ): InstalledInstallResult {
   return {
     context: createInstallFlowContext(),
@@ -81,6 +82,7 @@ export function createSuccessfulInstallResult(
     modelDisplayName: session.summary.modelDisplayName,
     modelKey: session.summary.modelKey,
     modelRef: session.summary.modelRef,
+    notices,
     ok: true,
     providerId: GONKAGATE_PROVIDER_ID,
     scope: session.summary.scope,

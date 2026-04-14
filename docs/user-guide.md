@@ -57,11 +57,15 @@ The installer will then:
 1. Detect `kilo`, or fall back to `kilocode`.
 2. Check the exact supported Kilo profile.
 3. Offer the curated GonkaGate model choice.
-4. Ask whether setup should apply to the current machine or the current
-   project.
+4. Choose the recommended scope automatically:
+   - inside a git repository: `project`
+   - outside a repository: `user`
 5. Prompt for the GonkaGate API key using a hidden input.
 6. Write the managed config and verify the result.
 7. Return you to normal `kilo` usage.
+
+Interactive reruns ask about scope only when the previous installer-managed
+scope differs from the new recommendation.
 
 After it succeeds, go back to your usual CLI:
 
@@ -78,8 +82,8 @@ The installer supports two scopes:
 
 Recommended rule of thumb:
 
-- inside a git repository, choose `project`
-- outside a repository, choose `user`
+- inside a git repository, the installer defaults to `project`
+- outside a repository, the installer defaults to `user`
 
 Important limit:
 
@@ -112,6 +116,9 @@ local setup.
 
 When you run non-interactively, pass `--scope` or `--yes`.
 
+If you want the installer to clear Kilo's current global UI-selected model
+after setup when possible, add `--clear-kilo-model-cache`.
+
 ### Non-interactive setup with stdin
 
 ```bash
@@ -139,6 +146,7 @@ Use `--json` when another tool needs a machine-readable result.
 --scope <user|project>
 --cwd <path>
 --api-key-stdin
+--clear-kilo-model-cache
 --yes
 --json
 --version
@@ -151,6 +159,8 @@ What they are for:
 - `--scope`: choose `user` or `project` without an interactive prompt
 - `--cwd`: change the directory used for project-scope path resolution
 - `--api-key-stdin`: read the API key from standard input
+- `--clear-kilo-model-cache`: clear Kilo's cached current UI model when the
+  installer can reach it safely
 - `--yes`: accept recommended defaults where the installer can do so safely
 - `--json`: emit machine-readable output
 
@@ -184,6 +194,11 @@ It is safe to rerun the installer when you need to:
 The installer is designed to preserve unrelated Kilo config and remove only
 installer-owned stale GonkaGate activation when scope changes.
 
+For `project` installs, the result can also include a notice about Kilo's
+global UI model cache in `~/.local/state/kilo/model.json`, because Kilo may
+reuse that last selected model in another repository even when the resolved
+config there does not activate GonkaGate.
+
 ## Common Commands
 
 Show help:
@@ -202,6 +217,12 @@ Project setup without prompts:
 
 ```bash
 printf '%s' "$GONKAGATE_API_KEY" | npx @gonkagate/kilo-setup --api-key-stdin --scope project --yes
+```
+
+Project setup with Kilo cache cleanup:
+
+```bash
+printf '%s' "$GONKAGATE_API_KEY" | npx @gonkagate/kilo-setup --api-key-stdin --scope project --clear-kilo-model-cache --yes
 ```
 
 User-level setup without prompts:

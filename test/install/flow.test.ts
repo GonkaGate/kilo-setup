@@ -9,6 +9,7 @@ import {
 import {
   createStubbedTestInstallDependencies,
   type StubInstallFs,
+  type TestInstallFsFileSeed,
 } from "./test-deps.js";
 import {
   createEmptyTestModelCatalog,
@@ -35,9 +36,12 @@ function createResolvedConfigFixture(
 function createFlowDependencies(
   options: {
     env?: NodeJS.ProcessEnv;
+    interactive?: boolean;
     models?: "empty" | "validated";
     repository?: boolean;
     resolvedConfig?: string;
+    seedFiles?: readonly TestInstallFsFileSeed[];
+    selections?: string[];
   } = {},
 ) {
   return createStubbedTestInstallDependencies({
@@ -68,13 +72,21 @@ function createFlowDependencies(
           ? createEmptyTestModelCatalog()
           : createValidatedTestModelCatalog(),
     },
+    prompts: {
+      kind: "stub",
+      secret: "gp-flow-secret",
+      selections: options.selections,
+    },
     runtime: {
       cwd: "/workspace/project",
       env: {
         GONKAGATE_API_KEY: "gp-flow-secret",
         ...options.env,
       },
+      stdinIsTTY: options.interactive ?? false,
+      stdoutIsTTY: options.interactive ?? false,
     },
+    seedFiles: options.seedFiles,
     seedDirectories: options.repository
       ? [
           {
@@ -100,6 +112,7 @@ test("runInstallFlow stops before writes when no validated model is available", 
   const result = await runInstallFlow(
     {
       apiKeyStdin: false,
+      clearKiloModelCache: false,
       json: true,
       yes: true,
     },
@@ -130,6 +143,7 @@ test("runInstallFlow rolls managed writes back when durable verification fails",
   const result = await runInstallFlow(
     {
       apiKeyStdin: false,
+      clearKiloModelCache: false,
       json: true,
       yes: true,
     },
@@ -161,6 +175,7 @@ test("runInstallFlow keeps durable writes when only current-session verification
   const result = await runInstallFlow(
     {
       apiKeyStdin: false,
+      clearKiloModelCache: false,
       json: true,
       yes: true,
     },
@@ -207,6 +222,7 @@ test("runInstallFlow keeps durable writes when a Kilo terminal session carries a
   const result = await runInstallFlow(
     {
       apiKeyStdin: false,
+      clearKiloModelCache: false,
       json: true,
       yes: true,
     },
@@ -253,6 +269,7 @@ test("runInstallFlow still rolls managed writes back when KILO_CONFIG blocks dur
   const result = await runInstallFlow(
     {
       apiKeyStdin: false,
+      clearKiloModelCache: false,
       json: true,
       yes: true,
     },
@@ -265,4 +282,120 @@ test("runInstallFlow still rolls managed writes back when KILO_CONFIG blocks dur
   assert.equal(fs.readText(managedPaths.userConfigDefaultPath), undefined);
   assert.equal(fs.readText(managedPaths.projectConfigDefaultPath), undefined);
   assert.equal(fs.readText(managedPaths.installStatePath), undefined);
+});
+
+test("runInstallFlow adds a project-scope notice about Kilo's global UI model cache", async () => {
+  const result = await runInstallFlow(
+    {
+      apiKeyStdin: false,
+      clearKiloModelCache: false,
+      json: true,
+      yes: true,
+    },
+    createFlowDependencies({
+      repository: true,
+    }),
+  );
+
+  assert.equal(result.status, "installed");
+  assert.match(
+    result.notices?.[0] ?? "",
+    /last UI-selected model across repositories/i,
+  );
+});
+
+test("runInstallFlow can clear Kilo's cached current model when explicitly requested", async () => {
+  const dependencies = createFlowDependencies({
+    repository: true,
+    seedFiles: [
+      {
+        contents: `{
+  "model": {
+    "code": {
+      "providerID": "gonkagate",
+      "modelID": "${TEST_VALIDATED_MODEL.key}"
+    }
+  },
+  "recent": [],
+  "favorite": [],
+  "variant": {}
+}
+`,
+        path: "/home/test/.local/state/kilo/model.json",
+      },
+    ],
+  });
+  const fs = dependencies.fs as StubInstallFs;
+
+  const result = await runInstallFlow(
+    {
+      apiKeyStdin: false,
+      clearKiloModelCache: true,
+      json: true,
+      yes: true,
+    },
+    dependencies,
+  );
+
+  assert.equal(result.status, "installed");
+  assert.match(
+    result.notices?.[0] ?? "",
+    /Cleared Kilo's cached last UI-selected model/i,
+  );
+  assert.doesNotMatch(
+    fs.readText("/home/test/.local/state/kilo/model.json") ?? "",
+    /"providerID": "gonkagate"/,
+  );
+  assert.match(
+    fs.readText("/home/test/.local/state/kilo/model.json") ?? "",
+    /"model": \{\}/,
+  );
+});
+
+test("runInstallFlow offers to clear an existing GonkaGate cache during interactive project installs", async () => {
+  const dependencies = createFlowDependencies({
+    interactive: true,
+    repository: true,
+    seedFiles: [
+      {
+        contents: `{
+  "model": {
+    "code": {
+      "providerID": "gonkagate",
+      "modelID": "${TEST_VALIDATED_MODEL.key}"
+    }
+  },
+  "recent": [],
+  "favorite": [],
+  "variant": {}
+}
+`,
+        path: "/home/test/.local/state/kilo/model.json",
+      },
+    ],
+    selections: ["clear"],
+  });
+  const fs = dependencies.fs as StubInstallFs;
+
+  const result = await runInstallFlow(
+    {
+      apiKeyStdin: false,
+      clearKiloModelCache: false,
+      json: true,
+      modelKey: TEST_VALIDATED_MODEL.key,
+      scope: "project",
+      yes: false,
+    },
+    dependencies,
+  );
+
+  assert.equal(result.status, "installed");
+  assert.match(
+    result.notices?.[0] ?? "",
+    /Cleared Kilo's cached last UI-selected model/i,
+  );
+  assert.doesNotMatch(
+    fs.readText("/home/test/.local/state/kilo/model.json") ?? "",
+    /"providerID": "gonkagate"/,
+  );
 });

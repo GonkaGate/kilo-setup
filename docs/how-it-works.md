@@ -39,26 +39,31 @@ Current public limit:
 1. Check that `kilo` is available, or fall back to `kilocode`.
 2. Verify the exact supported compatibility profile: `@kilocode/cli@7.2.0`.
 3. Resolve the curated model choice and scope.
-4. Recommend `project` scope inside a git repository and `user` scope
-   otherwise.
-5. Accept a GonkaGate API key through:
+4. Use the recommended scope automatically in the default interactive flow:
+   - `project` inside a git repository
+   - `user` outside a repository
+5. On interactive reruns, ask about scope only when the previous
+   installer-managed scope differs from the new recommendation.
+6. Accept a GonkaGate API key through:
    - a hidden interactive prompt
    - `GONKAGATE_API_KEY`
    - `--api-key-stdin`
-6. Save the secret only under `~/.gonkagate/kilo/api-key`.
-7. Write or update the user-level provider definition.
-8. When `project` scope is chosen, write only activation settings into
+7. Save the secret only under `~/.gonkagate/kilo/api-key`.
+8. Write or update the user-level provider definition.
+9. When `project` scope is chosen, write only activation settings into
    `.kilo/kilo.jsonc`.
-9. On rerun, remove only installer-owned stale GonkaGate activation from the
-   old location and preserve unrelated Kilo config.
-10. Verify the durable intended Kilo outcome with the local resolver and use
+10. On rerun, remove only installer-owned stale GonkaGate activation from the
+    old location and preserve unrelated Kilo config.
+11. Verify the durable intended Kilo outcome with the local resolver and use
     the XDG-isolated oracle as a compatibility check.
-11. If `KILO_CONFIG_CONTENT` is active, or the installer is running inside an
+12. If `KILO_CONFIG_CONTENT` is active, or the installer is running inside an
     active `kilo` terminal session with runtime config overrides, verify the
     current session separately.
-12. Report redacted blockers or mismatches instead of printing raw resolved
+13. For `project` installs, surface Kilo global UI-model cache notices and
+    optionally clear the current cached model when the user requests it.
+14. Report redacted blockers or mismatches instead of printing raw resolved
     config.
-13. Finish by sending the user back to plain `kilo`.
+15. Finish by sending the user back to plain `kilo`.
 
 ## Why User-Level Provider Ownership
 
@@ -97,6 +102,10 @@ That means:
 - blocker attribution is guaranteed only for locally inspectable layers
 - if the sandbox oracle diverges without a local explanation, the runtime
   reports inferred non-local influence rather than claiming success
+- Kilo can still remember the last interactively selected UI model in
+  `~/.local/state/kilo/model.json`; that upstream state is not an
+  installer-managed config layer and is outside the current verification
+  contract
 
 ## Current Product Limits
 

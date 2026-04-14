@@ -18,6 +18,7 @@ import {
   formatKiloModelRef,
 } from "../src/install/managed-provider-config.js";
 import { createStubbedTestInstallDependencies } from "./install/test-deps.js";
+import type { TestInstallFsFileSeed } from "./install/test-deps.js";
 import { escapeRegExp, repoRoot } from "./contract-helpers.js";
 
 const MODEL_KEY = "qwen3-235b-a22b-instruct-2507-fp8" as const;
@@ -90,6 +91,7 @@ function createCliDependencies(
     promptSecret?: string;
     repository?: boolean;
     resolvedConfig?: string;
+    seedFiles?: readonly TestInstallFsFileSeed[];
     selectOption?: TestSelectOption;
   } = {},
 ) {
@@ -139,6 +141,7 @@ function createCliDependencies(
       stdinIsTTY: options.interactive ?? false,
       stdoutIsTTY: options.interactive ?? false,
     },
+    seedFiles: options.seedFiles,
     seedDirectories: options.repository
       ? [
           {
@@ -153,6 +156,7 @@ test("parseCliOptions reads supported runtime flags", () => {
   const options = parseCliOptions([
     "--scope",
     "project",
+    "--clear-kilo-model-cache",
     "--model",
     MODEL_KEY,
     "--cwd",
@@ -163,6 +167,7 @@ test("parseCliOptions reads supported runtime flags", () => {
   ]);
 
   assert.equal(options.scope, "project");
+  assert.equal(options.clearKiloModelCache, true);
   assert.equal(options.modelKey, MODEL_KEY);
   assert.equal(options.cwd, "/tmp/project");
   assert.equal(options.yes, true);
@@ -207,6 +212,7 @@ test("CLI wrapper exposes the runtime help surface", () => {
     helpResult.stdout,
     /Current transport target: chat\/completions/,
   );
+  assert.match(helpResult.stdout, /--clear-kilo-model-cache/);
 });
 
 test("interactive runs show the public model picker even when one validated model is available", async () => {
@@ -240,9 +246,53 @@ test("interactive runs show the public model picker even when one validated mode
   assert.deepEqual(promptChoices[0], [
     "Qwen3 235B A22B Instruct 2507 FP8 (Recommended)",
   ]);
+  assert.equal(promptMessages.length, 1);
+});
+
+test("interactive reruns only ask about scope when the previous managed scope differs", async () => {
+  const promptMessages: string[] = [];
+  const stdout = createBufferWriter();
+  const stderr = createBufferWriter();
+  const dependencies = createCliDependencies({
+    interactive: true,
+    promptSecret: "gp-from-prompt",
+    repository: true,
+    seedFiles: [
+      {
+        contents: `{
+  "compatibilityAuditVersion": "2026-04-14",
+  "configTargets": {
+    "user": "/home/test/.config/kilo/kilo.jsonc"
+  },
+  "currentTransport": "chat_completions",
+  "installerPackageName": "@gonkagate/kilo-setup",
+  "installerVersion": "0.2.4",
+  "kiloCommand": "kilo",
+  "kiloVersion": "7.2.0",
+  "selectedModelKey": "${MODEL_KEY}",
+  "selectedScope": "user"
+}
+`,
+        path: "/home/test/.gonkagate/kilo/install-state.json",
+      },
+    ],
+    selectOption: async (options) => {
+      promptMessages.push(options.message);
+      return options.defaultValue ?? options.choices[0]?.value ?? MODEL_KEY;
+    },
+  });
+
+  const result = await run([], {
+    dependencies,
+    stderr,
+    stdout,
+  });
+
+  assert.equal(result.exitCode, 0);
+  assert.match(promptMessages[0] ?? "", /Choose the GonkaGate model/i);
   assert.match(
     promptMessages[1] ?? "",
-    /Where should GonkaGate be activated for Kilo on this machine/i,
+    /The last installer run used "this machine" activation/i,
   );
 });
 
@@ -417,7 +467,7 @@ test("CLI emits structured JSON failed payloads for resolved-config mismatches",
   assert.match(stdout.contents, /"errorCode": "installation_rolled_back"/);
 });
 
-test("human-readable success output ends with the minimal next step", async () => {
+test("human-readable success output still includes the minimal next step", async () => {
   const stdout = createBufferWriter();
   const stderr = createBufferWriter();
   const dependencies = createCliDependencies({
@@ -436,5 +486,5 @@ test("human-readable success output ends with the minimal next step", async () =
   assert.equal(result.exitCode, 0);
   assert.equal(stderr.contents, "");
   assert.match(stdout.contents, /GonkaGate is configured for Kilo\./);
-  assert.match(stdout.contents, /Run kilo\n$/);
+  assert.match(stdout.contents, /Run kilo/);
 });
