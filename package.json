@@ -1,6 +1,6 @@
 {
   "name": "@gonkagate/kilo-setup",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Setup CLI for configuring local Kilo to use GonkaGate.",
   "type": "module",
   "bin": {
