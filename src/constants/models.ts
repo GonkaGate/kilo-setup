@@ -85,13 +85,15 @@ export const CURATED_MODEL_REGISTRY = Object.freeze({
     displayName: "Qwen3 235B A22B Instruct 2507 FP8",
     limits: {
       context: 262144,
+      output: 8192,
     },
     modelId: "qwen/qwen3-235b-a22b-instruct-2507-fp8",
     recommended: true,
     runtimeCompatibility: {
       notes: [
         "Official GonkaGate model metadata lists this model as available with a 262K context window.",
-        "The installer intentionally omits an explicit limit.output clamp so Kilo and the provider can use their native output-token defaults.",
+        "Official GonkaGate OpenClaw provider guidance lists this model with maxTokens 8192.",
+        "Kilo 7.2.0 rejects custom model entries without a numeric limit.output value, so the installer writes limit.output = 8192 for this validated default.",
       ],
     },
     transport: "chat_completions",

@@ -20,7 +20,7 @@ docs, and tests for these facts:
 - curated public default:
   `qwen/qwen3-235b-a22b-instruct-2507-fp8`
 - curated model limits:
-  `limit.context = 262144`; no installer-owned `limit.output` clamp is written
+  `limit.context = 262144`; `limit.output = 8192`
 - managed secret path: `~/.gonkagate/kilo/api-key`
 - project scope stays secret-free and still depends on a compatible
   user-level `provider.gonkagate` definition on each machine
@@ -35,9 +35,11 @@ on 2026-04-14:
 - the model page lists
   `qwen/qwen3-235b-a22b-instruct-2507-fp8` as available and documents a
   `262K` context window
+- the OpenClaw custom-provider guide documents the same model with
+  `contextWindow: 262144` and `maxTokens: 8192`
 - the API docs describe the supported request path as `POST /v1/chat/completions`
-- the package intentionally does not translate provider-side default
-  `max_tokens` guidance into an installer-enforced output cap
+- the package writes `limit.output = 8192` because Kilo `7.2.0` requires a
+  numeric output limit in custom model config
 
 ## Explicitly Not Shipped Yet
 

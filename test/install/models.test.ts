@@ -13,7 +13,7 @@ test("the default curated model is the shipped validated public default", () => 
   assert.equal(model.adapterPackage, "@ai-sdk/openai-compatible");
   assert.equal(model.validationStatus, "validated");
   assert.equal(model.limits?.context, 262144);
-  assert.equal("output" in (model.limits ?? {}), false);
+  assert.equal(model.limits?.output, 8192);
   assert.deepEqual(getValidatedModelKeys(), [
     "qwen3-235b-a22b-instruct-2507-fp8",
   ]);

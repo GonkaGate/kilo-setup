@@ -24,7 +24,8 @@ not contain raw `kilo debug config` output or real secrets.
     `qwen/qwen3-235b-a22b-instruct-2507-fp8`
 - GonkaGate public model page checked:
   - `qwen/qwen3-235b-a22b-instruct-2507-fp8` context window: `262K`
-  - exact output-token limit was not found in a primary GonkaGate source.
+  - GonkaGate OpenClaw custom-provider guidance documents `maxTokens: 8192`
+    for the same model.
 
 ## Sandboxed Kilo Commands
 

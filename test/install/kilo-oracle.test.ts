@@ -102,3 +102,56 @@ test("createKiloOracleInvocation builds an isolated sandbox environment and mirr
     /project\/model/,
   );
 });
+
+test("createKiloOracleInvocation mirrors global config into the sandbox XDG config tree", async () => {
+  const dependencies = createStubbedTestInstallDependencies({
+    runtime: {
+      cwd: "/workspace/project",
+      env: {},
+      platform: "linux",
+    },
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  await createKiloOracleInvocation(
+    {
+      commandName: "kilo",
+      layers: [
+        {
+          config: {
+            provider: {
+              gonkagate: {
+                options: {
+                  apiKey: "{file:~/.gonkagate/kilo/api-key}",
+                },
+              },
+            },
+          },
+          source: {
+            kind: "file",
+            layer: "global_config",
+            path: "/home/test/.config/kilo/kilo.jsonc",
+          },
+        },
+      ],
+      managedPaths,
+      projectRoot: dependencies.runtime.cwd,
+      sandboxRoot: "/tmp/oracle",
+    },
+    dependencies,
+  );
+
+  assert.match(
+    fs.readText("/tmp/oracle/xdg/config/kilo/kilo.jsonc") ?? "",
+    /gonkagate/,
+  );
+  assert.equal(
+    fs.getEntry("/tmp/oracle/home/.config/kilo/kilo.jsonc"),
+    undefined,
+  );
+});

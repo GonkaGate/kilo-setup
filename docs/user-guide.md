@@ -25,6 +25,7 @@ Today the public package is intentionally narrow:
 - current transport target: `chat/completions`
 - current curated default:
   `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+- managed model limits: `limit.context = 262144`, `limit.output = 8192`
 - no native Windows production claim yet
 
 ## Before You Run It

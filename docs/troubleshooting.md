@@ -5,12 +5,17 @@
 That is no longer the expected stock public result.
 
 The published package now ships
-`qwen/qwen3-235b-a22b-instruct-2507-fp8` as a validated curated default without
-an installer-owned `limit.output` clamp.
+`qwen/qwen3-235b-a22b-instruct-2507-fp8` as a validated curated default with
+installer-managed `limit.output = 8192`.
 
 If you still see `validated_models_unavailable`, you are likely running a
 stale build, a locally modified package, or a fork whose curated registry does
 not include the published default.
+
+If you see a config error mentioning
+`provider.gonkagate.models.qwen3-235b-a22b-instruct-2507-fp8.limit.output`,
+you are likely running a stale build that predates the required Kilo 7.2.0
+output-limit fix.
 
 ## The CLI Says Setup Is Blocked
 
@@ -58,7 +63,9 @@ shell history or process lists. Safe inputs are hidden prompt,
 
 No. The production default uses the local resolver as the durable success gate
 and runs `kilo debug config` only inside an XDG-isolated oracle sandbox with
-fake secret material.
+fake secret material. The sandbox mirrors user-level global config into its XDG
+config tree so the oracle loads the same provider layer that durable
+verification inspected.
 
 Real-path Kilo verification is not part of the current production contract.
 
