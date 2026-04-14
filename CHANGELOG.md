@@ -17,6 +17,14 @@
   config tree, which could falsely trigger rollback with
   `inferred_non_local` verification blockers.
 
+## [0.3.0](https://github.com/GonkaGate/kilo-setup/compare/v0.2.4...v0.3.0) (2026-04-14)
+
+
+### Features
+
+* simplify scope selection and clear kilo model cache ([0278c56](https://github.com/GonkaGate/kilo-setup/commit/0278c56537946d3db1a3e26cbebd2d72c458e015))
+* simplify scope selection and clear kilo model cache ([9d2d473](https://github.com/GonkaGate/kilo-setup/commit/9d2d473f5cf66a464603ba9871e71224875c6565))
+
 ## [0.2.4](https://github.com/GonkaGate/kilo-setup/compare/v0.2.3...v0.2.4) (2026-04-14)
 
 
