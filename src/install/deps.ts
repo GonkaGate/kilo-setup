@@ -3,6 +3,7 @@ import { constants } from "node:fs";
 import {
   access,
   chmod as chmodFs,
+  mkdtemp as mkdtempFs,
   mkdir as mkdirFs,
   readFile as readFileFs,
   rm as rmFs,
@@ -31,6 +32,7 @@ export interface InstallCommandResult {
 
 export interface InstallFs {
   chmod(path: string, mode: number): Promise<void>;
+  mkdtemp(prefix: string): Promise<string>;
   mkdir(
     path: string,
     options?: {
@@ -40,6 +42,13 @@ export interface InstallFs {
   ): Promise<void>;
   pathExists(path: string): Promise<boolean>;
   readFile(path: string, encoding: BufferEncoding): Promise<string>;
+  removeDirectory(
+    path: string,
+    options?: {
+      force?: boolean;
+      recursive?: boolean;
+    },
+  ): Promise<void>;
   removeFile(path: string): Promise<void>;
   writeFile(
     path: string,
@@ -101,6 +110,7 @@ export interface InstallRuntimeEnvironment {
   homeDir: string;
   platform: NodeJS.Platform;
   stdinIsTTY: boolean;
+  tempDir: string;
   stdoutIsTTY: boolean;
 }
 
@@ -145,6 +155,10 @@ async function mkdir(
   await mkdirFs(path, options);
 }
 
+async function mkdtemp(prefix: string): Promise<string> {
+  return await mkdtempFs(prefix);
+}
+
 async function readFile(
   path: string,
   encoding: BufferEncoding,
@@ -155,6 +169,19 @@ async function readFile(
 async function removeFile(path: string): Promise<void> {
   await rmFs(path, {
     force: false,
+  });
+}
+
+async function removeDirectory(
+  path: string,
+  options?: {
+    force?: boolean;
+    recursive?: boolean;
+  },
+): Promise<void> {
+  await rmFs(path, {
+    force: options?.force ?? false,
+    recursive: options?.recursive ?? false,
   });
 }
 
@@ -265,9 +292,11 @@ async function selectOption<TValue extends string>(
 
 const DEFAULT_INSTALL_FS: InstallFs = {
   chmod,
+  mkdtemp,
   mkdir,
   pathExists,
   readFile,
+  removeDirectory,
   removeFile,
   writeFile,
   writeFileAtomic: writeFileAtomically,
@@ -307,6 +336,7 @@ export function createNodeInstallDependencies(
       homeDir: overrides.runtime?.homeDir ?? os.homedir(),
       platform: overrides.runtime?.platform ?? process.platform,
       stdinIsTTY: overrides.runtime?.stdinIsTTY ?? process.stdin.isTTY ?? false,
+      tempDir: overrides.runtime?.tempDir ?? os.tmpdir(),
       stdoutIsTTY:
         overrides.runtime?.stdoutIsTTY ?? process.stdout.isTTY ?? false,
     },

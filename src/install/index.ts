@@ -187,7 +187,6 @@ async function verifyPreparedInstall(
       kiloCommand: installFlow.context.kilo.command,
       managedPaths: installFlow.context.workspace.managedPaths,
       model: installFlow.model.key,
-      oracleSandboxRoot: installFlow.context.workspace.projectRoot,
       projectRoot: installFlow.context.workspace.projectRoot,
       scope: installFlow.summary.scope,
     },

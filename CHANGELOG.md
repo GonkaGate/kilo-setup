@@ -16,6 +16,10 @@
   user-level global Kilo config into `HOME/.config` instead of the sandbox XDG
   config tree, which could falsely trigger rollback with
   `inferred_non_local` verification blockers.
+- Fixed oracle verification so temporary sandbox trees no longer appear as
+  untracked `home/`, `xdg/`, `npm-cache`, or mirrored `workspace/` paths
+  inside the target repository; the sandbox now stages outside the repo and is
+  cleaned up after verification.
 
 ## [0.2.4](https://github.com/GonkaGate/kilo-setup/compare/v0.2.3...v0.2.4) (2026-04-14)
 

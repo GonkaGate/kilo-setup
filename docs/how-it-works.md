@@ -93,7 +93,9 @@ and the canonical managed secret binding. After the durable resolver matches,
 the runtime runs `kilo debug config` only inside an XDG-isolated sandbox with
 fake secret material and compares that oracle output against the intended
 contract. Mirrored global config is written into the sandbox XDG config tree so
-the oracle sees the same user-level provider layer as the local resolver.
+the oracle sees the same user-level provider layer as the local resolver. That
+sandbox is staged in temporary storage outside the repository and cleaned up
+after verification.
 
 That means:
 
