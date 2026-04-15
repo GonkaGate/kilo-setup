@@ -96,6 +96,68 @@ test("verifyEffectiveKiloConfig succeeds when local resolver and oracle agree on
   );
 });
 
+test("verifyEffectiveKiloConfig prefers the detected local kilo oracle command on the healthy path", async () => {
+  const managedConfigDocument = createVerifiedConfigDocument();
+  const dependencies = createStubbedTestInstallDependencies({
+    commandBehaviors: {
+      "kilo debug config": {
+        kind: "result",
+        result: {
+          exitCode: 0,
+          signal: null,
+          stderr: "",
+          stdout: managedConfigDocument,
+        },
+      },
+    },
+    runtime: {
+      cwd: "/workspace/project",
+      env: {},
+    },
+    seedFiles: [
+      {
+        contents:
+          JSON.stringify(
+            {
+              provider: {
+                gonkagate: buildManagedProviderConfig(
+                  "qwen3-235b-a22b-instruct-2507-fp8",
+                ),
+              },
+            },
+            null,
+            2,
+          ) + "\n",
+        path: "/home/test/.config/kilo/kilo.jsonc",
+      },
+      {
+        contents: `{ "model": "${formatKiloModelRef(
+          "qwen3-235b-a22b-instruct-2507-fp8",
+        )}" }\n`,
+        path: "/workspace/project/.kilo/kilo.jsonc",
+      },
+    ],
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+
+  const result = await verifyEffectiveKiloConfig(
+    {
+      kiloCommand: "kilo",
+      managedPaths,
+      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      projectRoot: dependencies.runtime.cwd,
+      scope: "project",
+    },
+    dependencies,
+  );
+
+  assert.equal(result.ok, true);
+});
+
 test("verifyEffectiveKiloConfig keeps oracle sandbox artifacts out of the repository and cleans them up", async () => {
   const managedConfigDocument = createVerifiedConfigDocument();
   const dependencies = createStubbedTestInstallDependencies({
