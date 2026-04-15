@@ -1,7 +1,7 @@
 export const CONTRACT_METADATA = {
   binName: "kilo-setup",
   binPath: "bin/gonkagate-kilo.js",
-  cliVersion: "0.3.1", // x-release-please-version
+  cliVersion: "0.3.2", // x-release-please-version
   packageName: "@gonkagate/kilo-setup",
   publicEntrypoint: "npx @gonkagate/kilo-setup",
   publicState:

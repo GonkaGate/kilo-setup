@@ -25,6 +25,14 @@
   falling back to the pinned `npm exec` oracle path when the direct launch
   fails.
 
+## [0.3.2](https://github.com/GonkaGate/kilo-setup/compare/v0.3.1...v0.3.2) (2026-04-15)
+
+
+### Bug Fixes
+
+* speed up sandbox oracle verification ([a7e1a8f](https://github.com/GonkaGate/kilo-setup/commit/a7e1a8fe107288bd837a5b9668893b8686f7b6ac))
+* speed up sandbox oracle verification ([3ea773c](https://github.com/GonkaGate/kilo-setup/commit/3ea773c4039380f5cab8527c861455a45d9daa10))
+
 ## [0.3.1](https://github.com/GonkaGate/kilo-setup/compare/v0.3.0...v0.3.1) (2026-04-15)
 
 
