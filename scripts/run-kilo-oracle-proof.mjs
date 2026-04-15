@@ -12,6 +12,10 @@ import {
 import { resolveManagedPaths } from "../dist/install/paths.js";
 import { resolveDurableLocalKiloConfig } from "../dist/install/verify-layers.js";
 import { tryParseJsoncObject } from "../dist/install/jsonc.js";
+import {
+  KILO_INVESTIGATED_VERSION,
+  KILO_PACKAGE_NAME,
+} from "../dist/install/kilo.js";
 
 const kiloCommand = process.argv[2];
 const supportedCommands = new Set(["kilo", "kilocode"]);
@@ -73,8 +77,8 @@ try {
     dependencies,
   );
   const realPathSnapshotsBefore = await captureRealPathSnapshots();
-  const oracleResult = await runOracleInvocation(invocation, dependencies);
-  const parsedOutput = tryParseJsoncObject(oracleResult.stdout);
+  const oracleOutput = await runOracleInvocation(invocation, dependencies);
+  const parsedOutput = tryParseJsoncObject(oracleOutput);
 
   if (!parsedOutput.ok) {
     throw new Error(
@@ -160,25 +164,6 @@ async function seedFixtureFiles() {
   );
 }
 
-async function runOracleInvocation(invocation, dependencies) {
-  const result = await dependencies.commands.run(
-    invocation.command,
-    invocation.args,
-    {
-      cwd: invocation.cwd,
-      env: invocation.env,
-    },
-  );
-
-  if (result.exitCode !== 0) {
-    throw new Error(
-      `Sandbox oracle command failed with exit code ${result.exitCode}${result.signal ? ` and signal ${result.signal}` : ""}. stderr length=${result.stderr.length}.`,
-    );
-  }
-
-  return result;
-}
-
 async function captureRealPathSnapshots() {
   const snapshots = new Map();
 
@@ -187,6 +172,79 @@ async function captureRealPathSnapshots() {
   }
 
   return snapshots;
+}
+
+async function runOracleInvocation(invocation, dependencies) {
+  const packageInvocation = {
+    ...invocation,
+    command: "npm",
+    args: [
+      "exec",
+      "--yes",
+      "--package",
+      `${KILO_PACKAGE_NAME}@${KILO_INVESTIGATED_VERSION}`,
+      "--",
+      kiloCommand,
+      "debug",
+      "config",
+    ],
+  };
+  const packageAttempt = await executeOracleInvocation(
+    packageInvocation,
+    dependencies,
+  );
+
+  if (packageAttempt.ok) {
+    return packageAttempt.stdout;
+  }
+
+  throw new Error(
+    `Sandbox oracle package invocation failed. ${formatOracleFailure("package", packageAttempt)}`,
+  );
+}
+
+async function executeOracleInvocation(invocation, dependencies) {
+  try {
+    const result = await dependencies.commands.run(
+      invocation.command,
+      invocation.args,
+      {
+        cwd: invocation.cwd,
+        env: invocation.env,
+      },
+    );
+
+    if (result.exitCode !== 0) {
+      return {
+        args: invocation.args,
+        command: invocation.command,
+        exitCode: result.exitCode,
+        ok: false,
+        signal: result.signal,
+        stderrLength: result.stderr.length,
+      };
+    }
+
+    return {
+      ok: true,
+      stdout: result.stdout,
+    };
+  } catch (error) {
+    return {
+      args: invocation.args,
+      command: invocation.command,
+      error,
+      ok: false,
+    };
+  }
+}
+
+function formatOracleFailure(label, attempt) {
+  if ("error" in attempt) {
+    return `${label} invocation ${attempt.command} ${attempt.args.join(" ")} threw ${String(attempt.error)}.`;
+  }
+
+  return `${label} invocation ${attempt.command} ${attempt.args.join(" ")} failed with exit code ${attempt.exitCode}${attempt.signal ? ` and signal ${attempt.signal}` : ""}. stderr length=${attempt.stderrLength}.`;
 }
 
 function collectRealPathCandidates() {
