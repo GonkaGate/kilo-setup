@@ -1,39 +1,27 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/readme/kilo-setup-hero-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="./assets/readme/kilo-setup-hero-light.svg">
-    <img src="./assets/readme/kilo-setup-hero-light.svg" alt="GonkaGate Kilo Setup hero banner">
-  </picture>
+<p>
+  <img src="https://gonkagate.com/gonka-ai-logo.svg" alt="GonkaGate logo" width="24" height="24">
+  <strong>GonkaGate OSS</strong>
 </p>
 
-<p align="center">
-  <strong>Configure local <code>kilo</code> for GonkaGate in one safe <code>npx</code> command.</strong>
-</p>
+# kilo-setup
 
-<p align="center">
-  <code>npx @gonkagate/kilo-setup</code>
-</p>
+Set up local `kilo` to use GonkaGate in one safe `npx` command.
 
-<p align="center">
-  <a href="#shortest-start-path">Quick start</a>
-  ·
-  <a href="#user-vs-project-scope"><code>user</code> vs <code>project</code></a>
-  ·
-  <a href="./docs/how-it-works.md">How it works</a>
-  ·
-  <a href="./docs/security.md">Security</a>
-  ·
-  <a href="./docs/troubleshooting.md">Troubleshooting</a>
-  ·
-  <a href="./LICENSE">License</a>
-</p>
+```bash
+npx @gonkagate/kilo-setup
+```
 
-<p align="center">
-  <img alt="package" src="https://img.shields.io/badge/package-%40gonkagate%2Fkilo--setup-1f6feb?style=flat-square">
-  <img alt="node version" src="https://img.shields.io/badge/node-%3E%3D22.14.0-0f766e?style=flat-square">
-  <img alt="kilo profile" src="https://img.shields.io/badge/kilo-7.2.0-111827?style=flat-square">
-  <img alt="license" src="https://img.shields.io/badge/license-Apache--2.0-334155?style=flat-square">
-</p>
+[Quick start](#shortest-start-path) ·
+[`user` vs `project`](#user-vs-project-scope) ·
+[How it works](./docs/how-it-works.md) ·
+[Security](./docs/security.md) ·
+[Troubleshooting](./docs/troubleshooting.md) ·
+[License](./LICENSE)
+
+![Package](https://img.shields.io/badge/package-%40gonkagate%2Fkilo--setup-6E63FF?style=flat-square)
+![Node](https://img.shields.io/badge/node-%3E%3D22.14.0-4DA2FF?style=flat-square)
+![Kilo](https://img.shields.io/badge/kilo-7.2.0-35D6FF?style=flat-square)
+![License](https://img.shields.io/badge/license-Apache--2.0-2A2A2A?style=flat-square)
 
 ## Overview
 
