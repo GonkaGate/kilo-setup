@@ -30,7 +30,8 @@ Current honest state:
   selection, while staying explicit that Kilo can recreate that cache later
 - the XDG-isolated oracle now mirrors user-level global Kilo config into the
   sandbox XDG config tree so project-scope verification matches the local
-  resolver on supported `@kilocode/cli@7.2.0` installs
+  resolver on supported `@kilocode/cli@7.2.0` installs, and that temporary
+  sandbox now stages outside the repository with cleanup after verification
 - the stock public build now ships one validated curated default,
   `qwen/qwen3-235b-a22b-instruct-2507-fp8`, with installer-managed
   `limit.output = 8192` for Kilo `7.2.0` compatibility

@@ -25,7 +25,6 @@ export interface EffectiveKiloConfigVerificationRequest {
   kiloCommand: KiloCommandName;
   managedPaths: ManagedPaths;
   model: CuratedModelKey;
-  oracleSandboxRoot: string;
   projectRoot: string;
   scope: InstallScope;
 }
@@ -75,7 +74,6 @@ export async function verifyEffectiveKiloConfig(
       layers: durableResolution.layers,
       managedPaths: request.managedPaths,
       projectRoot: request.projectRoot,
-      sandboxRoot: request.oracleSandboxRoot,
     },
     dependencies,
   );
@@ -101,16 +99,12 @@ export async function verifyEffectiveKiloConfig(
 }
 
 export async function verifyCurrentSessionKiloConfig(
-  request: Omit<
-    EffectiveKiloConfigVerificationRequest,
-    "kiloCommand" | "oracleSandboxRoot"
-  >,
+  request: Omit<EffectiveKiloConfigVerificationRequest, "kiloCommand">,
   dependencies: InstallDependencies,
 ): Promise<EffectiveConfigVerificationSuccess> {
   const verificationRequest = toLayerInspectionRequest({
     ...request,
     kiloCommand: "kilo",
-    oracleSandboxRoot: request.projectRoot,
   });
   const verificationPolicy = createResolvedConfigVerificationPolicy(
     request.model,

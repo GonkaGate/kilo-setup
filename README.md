@@ -196,7 +196,9 @@ uses the local resolver as the durable verifier and keeps the XDG-isolated
 `kilo debug config` oracle as a compatibility check with fake secrets. Inside
 that sandbox, mirrored global Kilo config is written into the sandbox XDG
 config tree so Kilo loads the same user-level provider layer the local
-resolver inspected.
+resolver inspected. The oracle sandbox is created in temporary storage outside
+the repository and is cleaned up after verification, so setup should not leave
+`home/`, `xdg/`, `npm-cache`, or mirrored `workspace/` trees in git.
 
 ## Need More Detail?
 

@@ -87,9 +87,21 @@ No. The production default uses the local resolver as the durable success gate
 and runs `kilo debug config` only inside an XDG-isolated oracle sandbox with
 fake secret material. The sandbox mirrors user-level global config into its XDG
 config tree so the oracle loads the same provider layer that durable
-verification inspected.
+verification inspected. Current builds create that sandbox in temporary
+storage outside the repository and clean it up after verification.
 
 Real-path Kilo verification is not part of the current production contract.
+
+## Why Did Git Show `home/`, `xdg/`, `npm-cache`, Or `workspace/` After Running The Installer?
+
+Those paths are oracle-sandbox staging trees, not intended durable repo files.
+
+Current builds create the oracle sandbox outside the repository and clean it up
+after verification, so those directories should not appear in git status.
+
+If you still see them, you are likely running a stale local build. Remove the
+stray untracked directories and rerun with an updated package or rebuilt local
+checkout.
 
 ## What About Native Windows?
 

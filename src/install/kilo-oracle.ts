@@ -18,13 +18,17 @@ import {
 
 const FAKE_SECRET_VALUE = "gp-fake-kilo-oracle-secret";
 const ORACLE_MACHINE_ID = "kilo-setup-oracle-machine";
+const ORACLE_SANDBOX_PREFIX = "gonkagate-kilo-oracle-";
 
 export interface KiloOracleRequest {
   commandName: KiloCommandName;
   managedPaths: ManagedPaths;
   projectRoot: string;
-  sandboxRoot: string;
   layers: readonly EffectiveConfigVerificationLayerSnapshot[];
+}
+
+interface KiloOracleInvocationRequest extends KiloOracleRequest {
+  sandboxRoot: string;
 }
 
 export interface KiloOracleInvocation {
@@ -36,7 +40,7 @@ export interface KiloOracleInvocation {
 }
 
 export async function createKiloOracleInvocation(
-  request: KiloOracleRequest,
+  request: KiloOracleInvocationRequest,
   dependencies: InstallDependencies,
 ): Promise<KiloOracleInvocation> {
   const layout = createKiloOracleSandboxLayout(
@@ -123,9 +127,17 @@ export async function runKiloOracle(
   request: KiloOracleRequest,
   dependencies: InstallDependencies,
 ): Promise<string> {
-  const invocation = await createKiloOracleInvocation(request, dependencies);
+  const sandboxRoot = await createKiloOracleSandboxRoot(request, dependencies);
+  let invocation: KiloOracleInvocation | undefined;
 
   try {
+    invocation = await createKiloOracleInvocation(
+      {
+        ...request,
+        sandboxRoot,
+      },
+      dependencies,
+    );
     const result = await dependencies.commands.run(
       invocation.command,
       invocation.args,
@@ -156,10 +168,16 @@ export async function runKiloOracle(
     }
 
     throw createInstallError("effective_config_oracle_command_failed", {
-      args: invocation.args,
+      args: invocation?.args ?? [],
       cause: error,
-      command: invocation.command,
+      command: invocation?.command ?? "npm",
     });
+  } finally {
+    await removeKiloOracleSandbox(
+      request.projectRoot,
+      sandboxRoot,
+      dependencies,
+    );
   }
 }
 
@@ -407,4 +425,80 @@ async function writeSandboxFile(
   await dependencies.fs.writeFile(path, contents, {
     encoding: "utf8",
   });
+}
+
+async function createKiloOracleSandboxRoot(
+  request: KiloOracleRequest,
+  dependencies: InstallDependencies,
+): Promise<string> {
+  const parentDirectory = resolveKiloOracleSandboxParentDirectory(
+    request,
+    dependencies,
+  );
+  const pathApi = getInstallPathApi(dependencies.runtime.platform);
+
+  await dependencies.fs.mkdir(parentDirectory, {
+    recursive: true,
+  });
+
+  return await dependencies.fs.mkdtemp(
+    pathApi.join(parentDirectory, ORACLE_SANDBOX_PREFIX),
+  );
+}
+
+function resolveKiloOracleSandboxParentDirectory(
+  request: KiloOracleRequest,
+  dependencies: InstallDependencies,
+): string {
+  const platform = dependencies.runtime.platform;
+  const pathApi = getInstallPathApi(platform);
+  const normalizedProjectRoot = normalizeInstallPath(
+    request.projectRoot,
+    platform,
+  );
+  const candidates = [
+    dependencies.runtime.tempDir,
+    pathApi.join(request.managedPaths.managedRootDirectory, "tmp"),
+    pathApi.dirname(normalizedProjectRoot),
+  ];
+
+  for (const candidate of candidates) {
+    const normalizedCandidate = normalizeInstallPath(candidate, platform);
+
+    if (
+      normalizedCandidate !== normalizedProjectRoot &&
+      !isPathInside(normalizedProjectRoot, normalizedCandidate, platform)
+    ) {
+      return normalizedCandidate;
+    }
+  }
+
+  return normalizeInstallPath(pathApi.dirname(normalizedProjectRoot), platform);
+}
+
+async function removeKiloOracleSandbox(
+  projectRoot: string,
+  sandboxRoot: string,
+  dependencies: InstallDependencies,
+): Promise<void> {
+  const platform = dependencies.runtime.platform;
+  const normalizedProjectRoot = normalizeInstallPath(projectRoot, platform);
+  const normalizedSandboxRoot = normalizeInstallPath(sandboxRoot, platform);
+
+  if (
+    normalizedSandboxRoot === normalizedProjectRoot ||
+    isPathInside(normalizedProjectRoot, normalizedSandboxRoot, platform)
+  ) {
+    return;
+  }
+
+  try {
+    await dependencies.fs.removeDirectory(normalizedSandboxRoot, {
+      force: true,
+      recursive: true,
+    });
+  } catch {
+    // Best-effort cleanup keeps temp oracle state out of durable paths without
+    // turning sandbox teardown into a user-visible installation failure.
+  }
 }

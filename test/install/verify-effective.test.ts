@@ -10,7 +10,10 @@ import {
   verifyEffectiveKiloConfig,
 } from "../../src/install/verify-effective.js";
 import { expectInstallErrorCode } from "./test-helpers.js";
-import { createStubbedTestInstallDependencies } from "./test-deps.js";
+import {
+  createStubbedTestInstallDependencies,
+  type StubInstallFs,
+} from "./test-deps.js";
 
 function createVerifiedConfigDocument() {
   return JSON.stringify(
@@ -80,7 +83,6 @@ test("verifyEffectiveKiloConfig succeeds when local resolver and oracle agree on
       kiloCommand: "kilo",
       managedPaths,
       model: "qwen3-235b-a22b-instruct-2507-fp8",
-      oracleSandboxRoot: "/tmp/oracle",
       projectRoot: dependencies.runtime.cwd,
       scope: "project",
     },
@@ -91,6 +93,149 @@ test("verifyEffectiveKiloConfig succeeds when local resolver and oracle agree on
   assert.equal(
     result.target.modelRef,
     "gonkagate/qwen3-235b-a22b-instruct-2507-fp8",
+  );
+});
+
+test("verifyEffectiveKiloConfig keeps oracle sandbox artifacts out of the repository and cleans them up", async () => {
+  const managedConfigDocument = createVerifiedConfigDocument();
+  const dependencies = createStubbedTestInstallDependencies({
+    commandBehaviors: {
+      "npm exec --yes --package @kilocode/cli@7.2.0 -- kilo debug config": {
+        kind: "result",
+        result: {
+          exitCode: 0,
+          signal: null,
+          stderr: "",
+          stdout: managedConfigDocument,
+        },
+      },
+    },
+    runtime: {
+      cwd: "/workspace/project",
+      env: {},
+      tempDir: "/tmp/kilo-setup-tests",
+    },
+    seedFiles: [
+      {
+        contents:
+          JSON.stringify(
+            {
+              provider: {
+                gonkagate: buildManagedProviderConfig(
+                  "qwen3-235b-a22b-instruct-2507-fp8",
+                ),
+              },
+            },
+            null,
+            2,
+          ) + "\n",
+        path: "/home/test/.config/kilo/kilo.jsonc",
+      },
+      {
+        contents: `{ "model": "${formatKiloModelRef(
+          "qwen3-235b-a22b-instruct-2507-fp8",
+        )}" }\n`,
+        path: "/workspace/project/.kilo/kilo.jsonc",
+      },
+    ],
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  await verifyEffectiveKiloConfig(
+    {
+      kiloCommand: "kilo",
+      managedPaths,
+      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      projectRoot: dependencies.runtime.cwd,
+      scope: "project",
+    },
+    dependencies,
+  );
+
+  assert.equal(fs.getEntry("/workspace/project/home"), undefined);
+  assert.equal(fs.getEntry("/workspace/project/xdg"), undefined);
+  assert.equal(fs.getEntry("/workspace/project/npm-cache"), undefined);
+  assert.equal(fs.getEntry("/workspace/project/workspace"), undefined);
+  assert.equal(
+    fs.getEntry("/tmp/kilo-setup-tests/gonkagate-kilo-oracle-000000"),
+    undefined,
+  );
+});
+
+test("verifyEffectiveKiloConfig falls back when the runtime temp dir points inside the repository", async () => {
+  const managedConfigDocument = createVerifiedConfigDocument();
+  const dependencies = createStubbedTestInstallDependencies({
+    commandBehaviors: {
+      "npm exec --yes --package @kilocode/cli@7.2.0 -- kilo debug config": {
+        kind: "result",
+        result: {
+          exitCode: 0,
+          signal: null,
+          stderr: "",
+          stdout: managedConfigDocument,
+        },
+      },
+    },
+    runtime: {
+      cwd: "/workspace/project",
+      env: {},
+      tempDir: "/workspace/project/tmp",
+    },
+    seedFiles: [
+      {
+        contents:
+          JSON.stringify(
+            {
+              provider: {
+                gonkagate: buildManagedProviderConfig(
+                  "qwen3-235b-a22b-instruct-2507-fp8",
+                ),
+              },
+            },
+            null,
+            2,
+          ) + "\n",
+        path: "/home/test/.config/kilo/kilo.jsonc",
+      },
+      {
+        contents: `{ "model": "${formatKiloModelRef(
+          "qwen3-235b-a22b-instruct-2507-fp8",
+        )}" }\n`,
+        path: "/workspace/project/.kilo/kilo.jsonc",
+      },
+    ],
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  await verifyEffectiveKiloConfig(
+    {
+      kiloCommand: "kilo",
+      managedPaths,
+      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      projectRoot: dependencies.runtime.cwd,
+      scope: "project",
+    },
+    dependencies,
+  );
+
+  assert.equal(fs.getEntry("/workspace/project/tmp"), undefined);
+  assert.equal(
+    fs.getEntry("/home/test/.gonkagate/kilo/tmp")?.kind,
+    "directory",
+  );
+  assert.equal(
+    fs.getEntry("/home/test/.gonkagate/kilo/tmp/gonkagate-kilo-oracle-000000"),
+    undefined,
   );
 });
 
@@ -214,7 +359,6 @@ test("verifyEffectiveKiloConfig reports inferred non-local influence when the or
         kiloCommand: "kilo",
         managedPaths,
         model: "qwen3-235b-a22b-instruct-2507-fp8",
-        oracleSandboxRoot: "/tmp/oracle",
         projectRoot: dependencies.runtime.cwd,
         scope: "project",
       },

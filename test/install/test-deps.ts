@@ -111,6 +111,7 @@ const DEFAULT_TEST_INSTALL_RUNTIME: InstallRuntimeEnvironment = {
   homeDir: "/home/test",
   platform: "linux",
   stdinIsTTY: false,
+  tempDir: "/tmp",
   stdoutIsTTY: false,
 };
 
@@ -123,6 +124,7 @@ export function createStubInstallFs(
   } = {},
 ): StubInstallFs {
   const entries = new Map<string, InMemoryInstallFsEntry>();
+  let tempDirectoryCounter = 0;
   const platform = options.platform ?? "linux";
   const pathApi = getInstallPathApi(platform);
 
@@ -138,6 +140,18 @@ export function createStubInstallFs(
         kind: "directory",
       });
     }
+  }
+
+  function isPathEqualOrInside(
+    parentPath: string,
+    candidatePath: string,
+  ): boolean {
+    const relativePath = pathApi.relative(parentPath, candidatePath);
+
+    return (
+      relativePath.length === 0 ||
+      (!relativePath.startsWith("..") && !pathApi.isAbsolute(relativePath))
+    );
   }
 
   function createParentDirectories(pathValue: string): void {
@@ -280,6 +294,18 @@ export function createStubInstallFs(
 
       return entry === undefined ? undefined : { ...entry };
     },
+    async mkdtemp(prefix) {
+      const normalizedPrefix = normalizePath(prefix);
+      const tempDirectoryPath = `${normalizedPrefix}${String(
+        tempDirectoryCounter,
+      ).padStart(6, "0")}`;
+
+      tempDirectoryCounter += 1;
+      seedDirectory(pathApi.dirname(normalizedPrefix));
+      seedDirectory(tempDirectoryPath);
+
+      return tempDirectoryPath;
+    },
     async mkdir(pathValue, options) {
       if (options?.recursive) {
         seedDirectory(pathValue, options.mode);
@@ -315,6 +341,40 @@ export function createStubInstallFs(
       }
 
       return entry.contents;
+    },
+    async removeDirectory(pathValue, options) {
+      const normalizedPath = normalizePath(pathValue);
+      const entry = entries.get(normalizedPath);
+
+      if (entry === undefined) {
+        if (options?.force) {
+          return;
+        }
+
+        throw new Error(`ENOENT: ${pathValue}`);
+      }
+
+      if (entry.kind !== "directory") {
+        throw new Error(`ENOTDIR: ${pathValue}`);
+      }
+
+      if (!options?.recursive) {
+        const hasChildren = [...entries.keys()].some(
+          (candidatePath) =>
+            candidatePath !== normalizedPath &&
+            isPathEqualOrInside(normalizedPath, candidatePath),
+        );
+
+        if (hasChildren) {
+          throw new Error(`ENOTEMPTY: ${pathValue}`);
+        }
+      }
+
+      for (const candidatePath of [...entries.keys()]) {
+        if (isPathEqualOrInside(normalizedPath, candidatePath)) {
+          entries.delete(candidatePath);
+        }
+      }
     },
     async removeFile(pathValue) {
       const normalizedPath = normalizePath(pathValue);
@@ -355,6 +415,7 @@ export function createTestInstallRuntime(
     homeDir: overrides.homeDir ?? DEFAULT_TEST_INSTALL_RUNTIME.homeDir,
     platform: overrides.platform ?? DEFAULT_TEST_INSTALL_RUNTIME.platform,
     stdinIsTTY: overrides.stdinIsTTY ?? DEFAULT_TEST_INSTALL_RUNTIME.stdinIsTTY,
+    tempDir: overrides.tempDir ?? DEFAULT_TEST_INSTALL_RUNTIME.tempDir,
     stdoutIsTTY:
       overrides.stdoutIsTTY ?? DEFAULT_TEST_INSTALL_RUNTIME.stdoutIsTTY,
   };

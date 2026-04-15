@@ -50,7 +50,8 @@ proven.
   entrypoint errors
 - use the local resolver as the durable success gate
 - use the XDG-isolated `kilo debug config` oracle only as a compatibility check
-  with fake secrets
+  with fake secrets inside temporary storage outside the repository, and clean
+  that sandbox up after verification
 - do not claim real-path Kilo verification as the production default
 
 The current runtime already rejects plain `--api-key`, keeps stock public runs
