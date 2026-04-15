@@ -1,0 +1,88 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">GonkaGate Kilo Setup README hero banner dark</title>
+  <desc id="desc">Dark banner showing the GonkaGate Kilo Setup title, value proposition, install command, and a safe configuration preview.</desc>
+  <defs>
+    <linearGradient id="bg" x1="80" y1="60" x2="1220" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111E"/>
+      <stop offset="1" stop-color="#132845"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="750" y1="120" x2="1100" y2="500" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F1C31"/>
+      <stop offset="1" stop-color="#172E52"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="140" y1="120" x2="480" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#63E6E2"/>
+      <stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+    <filter id="blur" x="0" y="0" width="1280" height="640" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="56"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" rx="32" fill="url(#bg)"/>
+  <g filter="url(#blur)" opacity="0.22">
+    <circle cx="290" cy="120" r="110" fill="#3B82F6"/>
+    <circle cx="1060" cy="520" r="120" fill="#63E6E2"/>
+    <circle cx="930" cy="140" r="90" fill="#22C55E"/>
+  </g>
+  <rect x="48" y="48" width="1184" height="544" rx="28" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+
+  <rect x="92" y="96" width="126" height="42" rx="21" fill="rgba(99,230,226,0.14)" stroke="rgba(99,230,226,0.45)"/>
+  <text x="155" y="122" text-anchor="middle" fill="#9AEFEB" font-size="18" font-family="Helvetica, Arial, sans-serif" font-weight="700">OSS README</text>
+
+  <g transform="translate(96 154)">
+    <rect width="66" height="66" rx="18" fill="url(#accent)"/>
+    <path d="M20 21.5H46.5V30H28.5V38.5H43.5V47H20V21.5Z" fill="#07111E"/>
+    <path d="M42 21.5H50.5V47H42V21.5Z" fill="#07111E"/>
+    <text x="86" y="27" fill="#EAF2FF" font-size="20" font-family="Helvetica, Arial, sans-serif" font-weight="700" letter-spacing="1.8">GONKAGATE</text>
+    <text x="86" y="70" fill="#FFFFFF" font-size="52" font-family="Helvetica, Arial, sans-serif" font-weight="800">Kilo Setup</text>
+  </g>
+
+  <text x="96" y="282" fill="#D8E5FF" font-size="25" font-family="Helvetica, Arial, sans-serif" font-weight="500">
+    Set up local kilo for GonkaGate.
+  </text>
+
+  <text x="96" y="334" fill="#93A8CC" font-size="20" font-family="Helvetica, Arial, sans-serif">
+    Safe, secret-aware, and verified.
+  </text>
+
+  <rect x="96" y="378" width="452" height="72" rx="22" fill="rgba(7,17,30,0.56)" stroke="rgba(255,255,255,0.12)"/>
+  <circle cx="132" cy="414" r="8" fill="#63E6E2"/>
+  <text x="160" y="423" fill="#F8FBFF" font-size="28" font-family="Courier New, monospace" font-weight="700">npx @gonkagate/kilo-setup</text>
+
+  <g transform="translate(96 492)">
+    <rect width="168" height="38" rx="19" fill="rgba(255,255,255,0.08)"/>
+    <text x="84" y="25" text-anchor="middle" fill="#DBEAFE" font-size="18" font-family="Helvetica, Arial, sans-serif" font-weight="700">kilo 7.2.0 profile</text>
+    <rect x="182" width="176" height="38" rx="19" fill="rgba(255,255,255,0.08)"/>
+    <text x="270" y="25" text-anchor="middle" fill="#DBEAFE" font-size="18" font-family="Helvetica, Arial, sans-serif" font-weight="700">project + user scope</text>
+    <rect x="376" width="154" height="38" rx="19" fill="rgba(255,255,255,0.08)"/>
+    <text x="453" y="25" text-anchor="middle" fill="#DBEAFE" font-size="18" font-family="Helvetica, Arial, sans-serif" font-weight="700">secret-safe</text>
+  </g>
+
+  <g transform="translate(722 114)">
+    <rect width="454" height="388" rx="28" fill="url(#panel)" stroke="rgba(255,255,255,0.10)"/>
+    <rect x="28" y="26" width="398" height="46" rx="16" fill="rgba(255,255,255,0.05)"/>
+    <circle cx="54" cy="49" r="6" fill="#FB7185"/>
+    <circle cx="74" cy="49" r="6" fill="#FBBF24"/>
+    <circle cx="94" cy="49" r="6" fill="#22C55E"/>
+    <text x="122" y="55" fill="#DCE9FF" font-size="20" font-family="Helvetica, Arial, sans-serif" font-weight="700">managed kilo config</text>
+
+    <rect x="28" y="94" width="398" height="120" rx="18" fill="rgba(7,17,30,0.46)" stroke="rgba(99,230,226,0.20)"/>
+    <text x="52" y="126" fill="#63E6E2" font-size="17" font-family="Courier New, monospace">provider = "gonkagate"</text>
+    <text x="52" y="157" fill="#F8FBFF" font-size="17" font-family="Courier New, monospace">model = "qwen/qwen3-235b..."</text>
+    <text x="52" y="188" fill="#B7C7E8" font-size="17" font-family="Courier New, monospace">limit.output = 8192</text>
+
+    <rect x="28" y="236" width="190" height="124" rx="18" fill="rgba(255,255,255,0.05)"/>
+    <text x="52" y="268" fill="#9AEFEB" font-size="16" font-family="Helvetica, Arial, sans-serif" font-weight="700">repo stays clean</text>
+    <text x="52" y="298" fill="#D6E4FF" font-size="15" font-family="Helvetica, Arial, sans-serif">.kilo/kilo.jsonc</text>
+    <text x="52" y="323" fill="#93A8CC" font-size="14" font-family="Helvetica, Arial, sans-serif">activation only</text>
+
+    <rect x="236" y="236" width="190" height="124" rx="18" fill="rgba(255,255,255,0.05)"/>
+    <text x="260" y="268" fill="#9AEFEB" font-size="16" font-family="Helvetica, Arial, sans-serif" font-weight="700">secret location</text>
+    <text x="260" y="298" fill="#D6E4FF" font-size="15" font-family="Helvetica, Arial, sans-serif">~/.gonkagate/kilo</text>
+    <text x="260" y="323" fill="#93A8CC" font-size="14" font-family="Helvetica, Arial, sans-serif">owner-only file</text>
+
+    <rect x="28" y="324" width="398" height="36" rx="18" fill="rgba(99,230,226,0.12)" stroke="rgba(99,230,226,0.22)"/>
+    <text x="227" y="348" text-anchor="middle" fill="#EAFDFD" font-size="16" font-family="Helvetica, Arial, sans-serif" font-weight="700">verified against effective kilo config</text>
+  </g>
+</svg>
