@@ -21,6 +21,13 @@
   inside the target repository; the sandbox now stages outside the repo and is
   cleaned up after verification.
 
+## [0.3.1](https://github.com/GonkaGate/kilo-setup/compare/v0.3.0...v0.3.1) (2026-04-15)
+
+
+### Bug Fixes
+
+* keep kilo oracle sandbox out of project trees ([f4e57c1](https://github.com/GonkaGate/kilo-setup/commit/f4e57c1af619bf3847e41e711d2274621901ee90))
+
 ## [0.3.0](https://github.com/GonkaGate/kilo-setup/compare/v0.2.4...v0.3.0) (2026-04-14)
 
 
