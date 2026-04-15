@@ -1,6 +1,6 @@
 import type { KiloCommandName } from "./contracts.js";
 import type { InstallDependencies } from "./deps.js";
-import { createInstallError } from "./errors.js";
+import { createInstallError, isInstallErrorCode } from "./errors.js";
 import {
   KILO_CONFIG_DIR_ENV_VAR,
   KILO_CONFIG_ENV_VAR,
@@ -98,17 +98,8 @@ export async function createKiloOracleInvocation(
   );
 
   return {
-    args: [
-      "exec",
-      "--yes",
-      "--package",
-      `${KILO_PACKAGE_NAME}@${KILO_INVESTIGATED_VERSION}`,
-      "--",
-      request.commandName,
-      "debug",
-      "config",
-    ],
-    command: "npm",
+    args: ["debug", "config"],
+    command: request.commandName,
     cwd: layout.projectRoot,
     env: createKiloOracleEnvironment(
       dependencies.runtime.env,
@@ -121,6 +112,61 @@ export async function createKiloOracleInvocation(
     ),
     sandboxRoot: request.sandboxRoot,
   };
+}
+
+function createKiloOraclePackageInvocation(
+  request: KiloOracleRequest,
+  invocation: KiloOracleInvocation,
+): KiloOracleInvocation {
+  return {
+    ...invocation,
+    args: [
+      "exec",
+      "--yes",
+      "--package",
+      `${KILO_PACKAGE_NAME}@${KILO_INVESTIGATED_VERSION}`,
+      "--",
+      request.commandName,
+      "debug",
+      "config",
+    ],
+    command: "npm",
+  };
+}
+
+async function executeKiloOracleInvocation(
+  invocation: KiloOracleInvocation,
+  dependencies: InstallDependencies,
+): Promise<string> {
+  let result;
+
+  try {
+    result = await dependencies.commands.run(
+      invocation.command,
+      invocation.args,
+      {
+        cwd: invocation.cwd,
+        env: invocation.env,
+      },
+    );
+  } catch (error) {
+    throw createInstallError("effective_config_oracle_command_failed", {
+      args: invocation.args,
+      cause: error,
+      command: invocation.command,
+    });
+  }
+
+  if (result.exitCode !== 0) {
+    throw createInstallError("effective_config_oracle_command_failed", {
+      args: invocation.args,
+      command: invocation.command,
+      exitCode: result.exitCode,
+      signal: result.signal,
+    });
+  }
+
+  return result.stdout;
 }
 
 export async function runKiloOracle(
@@ -138,32 +184,46 @@ export async function runKiloOracle(
       },
       dependencies,
     );
-    const result = await dependencies.commands.run(
-      invocation.command,
-      invocation.args,
-      {
-        cwd: invocation.cwd,
-        env: invocation.env,
-      },
-    );
+    try {
+      return await executeKiloOracleInvocation(invocation, dependencies);
+    } catch (error) {
+      if (
+        !isInstallErrorCode(error, "effective_config_oracle_command_failed")
+      ) {
+        throw error;
+      }
 
-    if (result.exitCode !== 0) {
-      throw createInstallError("effective_config_oracle_command_failed", {
-        args: invocation.args,
-        command: invocation.command,
-        exitCode: result.exitCode,
-        signal: result.signal,
-      });
+      const fallbackInvocation = createKiloOraclePackageInvocation(
+        request,
+        invocation,
+      );
+
+      try {
+        return await executeKiloOracleInvocation(
+          fallbackInvocation,
+          dependencies,
+        );
+      } catch (fallbackError) {
+        if (
+          isInstallErrorCode(
+            fallbackError,
+            "effective_config_oracle_command_failed",
+          )
+        ) {
+          throw createInstallError("effective_config_oracle_command_failed", {
+            args: fallbackError.details.args,
+            cause: error,
+            command: fallbackError.details.command,
+            exitCode: fallbackError.details.exitCode,
+            signal: fallbackError.details.signal,
+          });
+        }
+
+        throw fallbackError;
+      }
     }
-
-    return result.stdout;
   } catch (error) {
-    if (
-      error instanceof Error &&
-      "code" in error &&
-      (error as { code?: string }).code ===
-        "effective_config_oracle_command_failed"
-    ) {
+    if (isInstallErrorCode(error, "effective_config_oracle_command_failed")) {
       throw error;
     }
 

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createKiloOracleInvocation } from "../../src/install/kilo-oracle.js";
+import {
+  createKiloOracleInvocation,
+  runKiloOracle,
+} from "../../src/install/kilo-oracle.js";
 import { resolveManagedPaths } from "../../src/install/paths.js";
 import {
   createStubbedTestInstallDependencies,
@@ -81,8 +84,8 @@ test("createKiloOracleInvocation builds an isolated sandbox environment and mirr
     dependencies,
   );
 
-  assert.equal(invocation.command, "npm");
-  assert.deepEqual(invocation.args.slice(-3), ["kilo", "debug", "config"]);
+  assert.equal(invocation.command, "kilo");
+  assert.deepEqual(invocation.args, ["debug", "config"]);
   assert.equal(invocation.env.HOME, "/tmp/oracle/home");
   assert.equal(
     invocation.env.KILO_CONFIG,
@@ -152,6 +155,60 @@ test("createKiloOracleInvocation mirrors global config into the sandbox XDG conf
   );
   assert.equal(
     fs.getEntry("/tmp/oracle/home/.config/kilo/kilo.jsonc"),
+    undefined,
+  );
+});
+
+test("runKiloOracle falls back to the pinned package oracle when the direct local command cannot run", async () => {
+  const dependencies = createStubbedTestInstallDependencies({
+    commandBehaviors: {
+      "npm exec --yes --package @kilocode/cli@7.2.0 -- kilo debug config": {
+        kind: "result",
+        result: {
+          exitCode: 0,
+          signal: null,
+          stderr: "",
+          stdout: '{ "model": "project/model" }\n',
+        },
+      },
+    },
+    runtime: {
+      cwd: "/workspace/project",
+      env: {},
+      tempDir: "/tmp/kilo-setup-tests",
+    },
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  const stdout = await runKiloOracle(
+    {
+      commandName: "kilo",
+      layers: [
+        {
+          config: {
+            model: "project/model",
+          },
+          source: {
+            kind: "file",
+            layer: "project_directory_config",
+            path: "/workspace/project/.kilo/kilo.jsonc",
+          },
+        },
+      ],
+      managedPaths,
+      projectRoot: dependencies.runtime.cwd,
+    },
+    dependencies,
+  );
+
+  assert.match(stdout, /project\/model/);
+  assert.equal(
+    fs.getEntry("/tmp/kilo-setup-tests/gonkagate-kilo-oracle-000000"),
     undefined,
   );
 });

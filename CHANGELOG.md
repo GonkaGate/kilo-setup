@@ -20,6 +20,10 @@
   untracked `home/`, `xdg/`, `npm-cache`, or mirrored `workspace/` paths
   inside the target repository; the sandbox now stages outside the repo and is
   cleaned up after verification.
+- Reduced the pause after API-key entry by preferring the already-detected
+  local `kilo`/`kilocode` `7.2.0` binary for the sandbox oracle and only
+  falling back to the pinned `npm exec` oracle path when the direct launch
+  fails.
 
 ## [0.3.0](https://github.com/GonkaGate/kilo-setup/compare/v0.2.4...v0.3.0) (2026-04-14)
 
