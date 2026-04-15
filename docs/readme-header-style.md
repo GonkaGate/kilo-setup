@@ -7,7 +7,7 @@ repositories and includes a concrete `kilo-setup` example.
 
 Use one consistent pattern across public repositories:
 
-1. small official GonkaGate logo or plain brand marker
+1. small official GonkaGate logo
 2. repository name as the main heading
 3. one sentence with the value proposition
 4. one primary command or CTA
@@ -45,7 +45,7 @@ What it should feel like:
 
 Recommended structure:
 
-1. small official logo or `GonkaGate OSS` marker
+1. small official logo
 2. repository name
 3. one-line value proposition
 4. one visible command or install snippet
@@ -71,7 +71,7 @@ Use those only when the repo specifically benefits from them.
 
 ### Safe defaults
 
-- official logo asset from GonkaGate
+- official GonkaGate logo asset committed into the repo
 - `Shields.io` for badges
 - GitHub Markdown plus minimal inline HTML
 
@@ -98,7 +98,7 @@ variants.
 
 Use this for installer, CLI, SDK, proxy, backend, or tooling repos.
 
-- small brand marker
+- small logo
 - repo name
 - value prop
 - command
@@ -111,7 +111,7 @@ This should be the default variant.
 
 Use this when the screenshot itself sells the repo.
 
-- small brand marker
+- small logo
 - repo name
 - value prop
 - screenshot or GIF under the fold, not in the header
@@ -122,7 +122,7 @@ Use this when the screenshot itself sells the repo.
 
 Use this for directories, collections, or reference repos.
 
-- small brand marker
+- small logo
 - repo name
 - one-sentence framing
 - quick navigation row
@@ -162,8 +162,7 @@ Recommended top-of-README snippet:
 
 ````md
 <p>
-  <img src="https://gonkagate.com/gonka-ai-logo.svg" alt="GonkaGate logo" width="24" height="24">
-  <strong>GonkaGate OSS</strong>
+  <img src="./assets/readme/gonkagate-logo.png" alt="GonkaGate logo" width="28" height="28">
 </p>
 
 # kilo-setup
@@ -209,4 +208,4 @@ npx @gonkagate/kilo-setup
 - [Shields.io Docs](https://shields.io/docs)
 - [Shields.io Static Badges](https://shields.io/docs/static-badges)
 - [GonkaGate website](https://gonkagate.com/en)
-- [GonkaGate logo](https://gonkagate.com/gonka-ai-logo.svg)
+- local GonkaGate logo asset copied from the frontend brand assets

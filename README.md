@@ -1,6 +1,5 @@
 <p>
-  <img src="https://gonkagate.com/gonka-ai-logo.svg" alt="GonkaGate logo" width="24" height="24">
-  <strong>GonkaGate OSS</strong>
+  <img src="./assets/readme/gonkagate-logo.png" alt="GonkaGate logo" width="28" height="28">
 </p>
 
 # kilo-setup
