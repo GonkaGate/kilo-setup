@@ -25,6 +25,14 @@
   falling back to the pinned `npm exec` oracle path when the direct launch
   fails.
 
+## [0.3.3](https://github.com/GonkaGate/kilo-setup/compare/v0.3.2...v0.3.3) (2026-04-15)
+
+
+### Bug Fixes
+
+* restore windows oracle proof package invocation ([04cffc2](https://github.com/GonkaGate/kilo-setup/commit/04cffc2f86f9563efb7c766f7379e9c394421244))
+* restore windows oracle proof package invocation ([9c57732](https://github.com/GonkaGate/kilo-setup/commit/9c57732de9143696bf08bdb38a17b34fdd311c76))
+
 ## [0.3.2](https://github.com/GonkaGate/kilo-setup/compare/v0.3.1...v0.3.2) (2026-04-15)
 
 
