@@ -22,6 +22,14 @@ npx @gonkagate/kilo-setup
 [![X](https://img.shields.io/badge/X-%40gonkagate-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/gonkagate)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-GonkaGate-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/gonkagate)
 
+## See It In Action
+
+From API key to a working `kilo` setup in one short walkthrough:
+
+[![See the installer in action](https://raw.githubusercontent.com/GonkaGate/kilo-setup/main/.github/assets/gonkagate-kilo-setup-demo.gif)](https://raw.githubusercontent.com/GonkaGate/kilo-setup/main/.github/assets/gonkagate-kilo-setup-demo.mp4)
+
+Need an API key first? [Get one on GonkaGate](https://gonkagate.com/en/register).
+
 ## Overview
 
 `@gonkagate/kilo-setup` is for people who already have Kilo installed and want
