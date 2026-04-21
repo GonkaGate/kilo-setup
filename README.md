@@ -1,7 +1,3 @@
-<p>
-  <img src="./assets/readme/gonkagate-logo.png" alt="GonkaGate logo" width="28" height="28">
-</p>
-
 # kilo-setup
 
 Set up local `kilo` to use GonkaGate in one `npx` command.
