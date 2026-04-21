@@ -18,3 +18,7 @@ PRIMARY COMMAND OR CTA
 ![Package](https://img.shields.io/badge/package-PACKAGE_NAME-6E63FF?style=flat-square)
 ![Runtime](https://img.shields.io/badge/runtime-RUNTIME_VERSION-4DA2FF?style=flat-square)
 ![License](https://img.shields.io/badge/license-LICENSE_NAME-2A2A2A?style=flat-square)
+
+[![Website](https://img.shields.io/badge/Website-PRODUCT_SITE-111827?style=flat-square)](PRODUCT_SITE_URL)
+[![Docs](https://img.shields.io/badge/Docs-Reference-2563EB?style=flat-square)](DOCS_URL)
+[![Get%20Access](https://img.shields.io/badge/Get%20Access-SIGNUP-F97316?style=flat-square)](SIGNUP_URL)

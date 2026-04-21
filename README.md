@@ -4,7 +4,7 @@
 
 # kilo-setup
 
-Set up local `kilo` to use GonkaGate in one safe `npx` command.
+Set up local `kilo` to use GonkaGate in one `npx` command.
 
 ```bash
 npx @gonkagate/kilo-setup
@@ -22,19 +22,20 @@ npx @gonkagate/kilo-setup
 ![Kilo](https://img.shields.io/badge/kilo-7.2.0-35D6FF?style=flat-square)
 ![License](https://img.shields.io/badge/license-Apache--2.0-2A2A2A?style=flat-square)
 
+[![Website](https://img.shields.io/badge/Website-gonkagate.com-111827?style=flat-square)](https://gonkagate.com/en)
+[![Docs](https://img.shields.io/badge/Docs-API%20Guides-2563EB?style=flat-square)](https://gonkagate.com/en/docs)
+[![API%20Key](https://img.shields.io/badge/API%20Key-Dashboard-F97316?style=flat-square)](https://gonkagate.com/en/register)
+[![Telegram](https://img.shields.io/badge/Telegram-%40gonkagate-229ED9?style=flat-square&logo=telegram&logoColor=white)](https://t.me/gonkagate)
+[![Blog](https://img.shields.io/badge/Blog-Forem-0F172A?style=flat-square&logo=forem&logoColor=white)](https://forem.com/gonkagate_team)
+
 ## Overview
 
 `@gonkagate/kilo-setup` is for people who already have Kilo installed and want
 the shortest safe path to GonkaGate without hand-editing Kilo config, putting
 secrets into a repository, or learning Kilo provider internals first.
 
-Need context first?
-
-- [GonkaGate website](https://gonkagate.com/en) for the product overview.
-- [GonkaGate docs](https://gonkagate.com/en/docs) for API docs, quickstart,
-  and reference guides.
-- [Dashboard / sign up / get API key](https://gonkagate.com/en/register) if
-  you still need a `gp-...` key.
+Prefer product links first? The resource buttons above jump to the website,
+docs, API-key dashboard, Telegram updates, and the public blog.
 
 ## Why This Exists
 

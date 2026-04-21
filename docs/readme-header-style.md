@@ -146,6 +146,8 @@ Keep badges curated. Good defaults:
 - supported runtime baseline
 - license
 - CI status
+- optional product-owned resource links when they help users leave GitHub for
+  the right next step
 
 Usually avoid:
 
@@ -167,7 +169,7 @@ Recommended top-of-README snippet:
 
 # kilo-setup
 
-Set up local `kilo` to use GonkaGate in one safe `npx` command.
+Set up local `kilo` to use GonkaGate in one `npx` command.
 
 ```bash
 npx @gonkagate/kilo-setup
@@ -184,6 +186,12 @@ npx @gonkagate/kilo-setup
 ![Node](https://img.shields.io/badge/node-%3E%3D22.14.0-4DA2FF?style=flat-square)
 ![Kilo](https://img.shields.io/badge/kilo-7.2.0-35D6FF?style=flat-square)
 ![License](https://img.shields.io/badge/license-Apache--2.0-2A2A2A?style=flat-square)
+
+[![Website](https://img.shields.io/badge/Website-gonkagate.com-111827?style=flat-square)](https://gonkagate.com/en)
+[![Docs](https://img.shields.io/badge/Docs-API%20Guides-2563EB?style=flat-square)](https://gonkagate.com/en/docs)
+[![API%20Key](https://img.shields.io/badge/API%20Key-Dashboard-F97316?style=flat-square)](https://gonkagate.com/en/register)
+[![Telegram](https://img.shields.io/badge/Telegram-%40gonkagate-229ED9?style=flat-square&logo=telegram&logoColor=white)](https://t.me/gonkagate)
+[![Blog](https://img.shields.io/badge/Blog-Forem-0F172A?style=flat-square&logo=forem&logoColor=white)](https://forem.com/gonkagate_team)
 ````
 
 ## Why The Example Works For `kilo-setup`
@@ -191,7 +199,9 @@ npx @gonkagate/kilo-setup
 - it preserves the repo's current honest and contract-driven positioning
 - it surfaces the single command earlier
 - it stays branded without relying on AI-generated art
-- it avoids vanity widgets and fragile banner assets
+- it keeps first-party resource links close to the CTA without turning into a
+  vanity badge wall
+- it avoids fragile banner assets
 
 ## Suggested Rollout
 
