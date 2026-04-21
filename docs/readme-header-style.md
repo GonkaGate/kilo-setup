@@ -154,7 +154,7 @@ Usually avoid:
 - stars
 - downloads
 - Discord online
-- social handles
+- vanity social badges
 
 Those are more useful in community-heavy repos than in product READMEs.
 
@@ -191,7 +191,8 @@ npx @gonkagate/kilo-setup
 [![Docs](https://img.shields.io/badge/Docs-API%20Guides-2563EB?style=flat-square)](https://gonkagate.com/en/docs)
 [![API%20Key](https://img.shields.io/badge/API%20Key-Dashboard-F97316?style=flat-square)](https://gonkagate.com/en/register)
 [![Telegram](https://img.shields.io/badge/Telegram-%40gonkagate-229ED9?style=flat-square&logo=telegram&logoColor=white)](https://t.me/gonkagate)
-[![Blog](https://img.shields.io/badge/Blog-Forem-0F172A?style=flat-square&logo=forem&logoColor=white)](https://forem.com/gonkagate_team)
+[![X](https://img.shields.io/badge/X-%40gonkagate-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/gonkagate)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-GonkaGate-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/gonkagate)
 ````
 
 ## Why The Example Works For `kilo-setup`

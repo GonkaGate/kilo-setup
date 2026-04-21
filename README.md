@@ -26,7 +26,8 @@ npx @gonkagate/kilo-setup
 [![Docs](https://img.shields.io/badge/Docs-API%20Guides-2563EB?style=flat-square)](https://gonkagate.com/en/docs)
 [![API%20Key](https://img.shields.io/badge/API%20Key-Dashboard-F97316?style=flat-square)](https://gonkagate.com/en/register)
 [![Telegram](https://img.shields.io/badge/Telegram-%40gonkagate-229ED9?style=flat-square&logo=telegram&logoColor=white)](https://t.me/gonkagate)
-[![Blog](https://img.shields.io/badge/Blog-Forem-0F172A?style=flat-square&logo=forem&logoColor=white)](https://forem.com/gonkagate_team)
+[![X](https://img.shields.io/badge/X-%40gonkagate-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/gonkagate)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-GonkaGate-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/gonkagate)
 
 ## Overview
 
@@ -35,7 +36,7 @@ the shortest safe path to GonkaGate without hand-editing Kilo config, putting
 secrets into a repository, or learning Kilo provider internals first.
 
 Prefer product links first? The resource buttons above jump to the website,
-docs, API-key dashboard, Telegram updates, and the public blog.
+docs, API-key dashboard, Telegram updates, X, and LinkedIn.
 
 ## Why This Exists
 

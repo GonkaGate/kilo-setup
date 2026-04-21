@@ -22,3 +22,5 @@ PRIMARY COMMAND OR CTA
 [![Website](https://img.shields.io/badge/Website-PRODUCT_SITE-111827?style=flat-square)](PRODUCT_SITE_URL)
 [![Docs](https://img.shields.io/badge/Docs-Reference-2563EB?style=flat-square)](DOCS_URL)
 [![Get%20Access](https://img.shields.io/badge/Get%20Access-SIGNUP-F97316?style=flat-square)](SIGNUP_URL)
+[![X](https://img.shields.io/badge/X-%40PRODUCT_HANDLE-000000?style=flat-square&logo=x&logoColor=white)](X_URL)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-COMPANY-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](LINKEDIN_URL)
