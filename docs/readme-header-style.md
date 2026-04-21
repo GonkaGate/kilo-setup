@@ -11,8 +11,8 @@ Use one consistent pattern across public repositories:
 2. repository name as the main heading
 3. one sentence with the value proposition
 4. one primary command or CTA
-5. one compact row of quick links
-6. one compact row of badges
+5. one compact row of trust badges
+6. one compact row of product-owned resource links when useful
 
 This is the best balance between polish, maintenance cost, and reliability on
 GitHub.
@@ -174,13 +174,6 @@ Set up local `kilo` to use GonkaGate in one `npx` command.
 ```bash
 npx @gonkagate/kilo-setup
 ```
-
-[Quick start](#shortest-start-path) ·
-[`user` vs `project`](#user-vs-project-scope) ·
-[How it works](./docs/how-it-works.md) ·
-[Security](./docs/security.md) ·
-[Troubleshooting](./docs/troubleshooting.md) ·
-[License](./LICENSE)
 
 ![Package](https://img.shields.io/badge/package-%40gonkagate%2Fkilo--setup-6E63FF?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.14.0-4DA2FF?style=flat-square)
