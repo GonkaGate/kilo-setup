@@ -29,10 +29,10 @@ Current public limit:
 - the published contract stays intentionally narrow to exact
   `@kilocode/cli@7.2.0`, `chat/completions`, and non-Windows production claims
 - the curated default is
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8` with `limit.context = 262144`
-  and `limit.output = 8192`
+  `moonshotai/Kimi-K2.6` with `limit.context = 262144` and
+  `limit.output = 8192`
 - broader model claims still require additional proof before they should be
-  added to the public default set
+  added to the validated public choice set
 
 ## Install Flow
 

@@ -86,5 +86,9 @@ function resolveCuratedModel(modelKey: CuratedModelKey): CuratedModel {
     throw new Error(`Unsupported curated model key: ${modelKey}`);
   }
 
+  if (model.validationStatus !== "validated") {
+    throw new Error(`Unvalidated curated model key: ${modelKey}`);
+  }
+
   return model;
 }

@@ -18,7 +18,7 @@ docs, and tests for these facts:
 - exact compatibility claim: `@kilocode/cli@7.2.0`
 - current GonkaGate transport claim: `chat/completions`
 - curated public default:
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+  `moonshotai/Kimi-K2.6`
 - curated model limits:
   `limit.context = 262144`; `limit.output = 8192`
 - managed secret path: `~/.gonkagate/kilo/api-key`
@@ -29,17 +29,17 @@ docs, and tests for these facts:
 
 ## External Evidence Captured
 
-The current default-model contract is backed by official GonkaGate docs checked
-on 2026-04-14:
+The current default-model contract is backed by product direction plus public
+Moonshot metadata checked on 2026-04-29:
 
-- the model page lists
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8` as available and documents a
-  `262K` context window
-- the OpenClaw custom-provider guide documents the same model with
-  `contextWindow: 262144` and `maxTokens: 8192`
+- the Kimi K2.6 model card lists `moonshotai/Kimi-K2.6` and documents a 256K
+  context window
+- the model card documents OpenAI-compatible chat completions access through
+  Moonshot's API
 - the API docs describe the supported request path as `POST /v1/chat/completions`
-- the package writes `limit.output = 8192` because Kilo `7.2.0` requires a
-  numeric output limit in custom model config
+- the package writes `limit.output = 8192` as the installer-managed Kilo
+  compatibility clamp because Kilo `7.2.0` requires a numeric output limit in
+  custom model config
 
 ## Explicitly Not Shipped Yet
 
@@ -64,5 +64,5 @@ repository-only pass:
   `@gonkagate/kilo-setup`
 
 Those items do not change the current package contract: the publishable surface
-remains the exact Kilo baseline, the single curated default, and the current
-non-Windows verification policy documented above.
+remains the exact Kilo baseline, the validated Kimi curated default, and the
+current non-Windows verification policy documented above.

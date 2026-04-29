@@ -32,8 +32,8 @@ Current honest state:
   sandbox XDG config tree so project-scope verification matches the local
   resolver on supported `@kilocode/cli@7.2.0` installs, and that temporary
   sandbox now stages outside the repository with cleanup after verification
-- the stock public build now ships one validated curated default,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, with installer-managed
+- the stock public build now ships `moonshotai/Kimi-K2.6` as the recommended
+  validated curated default, with installer-managed
   `limit.output = 8192` for Kilo `7.2.0` compatibility
 - exact support remains pinned to `@kilocode/cli@7.2.0`; later `7.2.x`
   versions are not implied
@@ -128,9 +128,9 @@ These are implementation facts today:
 - `src/install/` contains shipped Kilo detection, path resolution, secret
   intake, managed config writes, rollback, effective-config verification, and
   orchestration
-- `src/constants/models.ts` now exposes a recommended validated production
-  default with installer-managed `limit.output = 8192` in the written Kilo
-  provider config
+- `src/constants/models.ts` now exposes Kimi K2.6 as the recommended validated
+  production default with installer-managed `limit.output = 8192` in the
+  written Kilo provider config
 - `docs/specs/kilo-setup-prd/spec.md` is the copied Kilo setup PRD
 - `docs/release-readiness.md` records the current production-readiness audit
 - `.github/workflows/release-please.yml` and `.github/workflows/publish.yml`

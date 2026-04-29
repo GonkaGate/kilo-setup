@@ -22,6 +22,6 @@ Current contract documents:
 - [`specs/kilo-setup-prd/spec.md`](./specs/kilo-setup-prd/spec.md): copied Kilo
   setup PRD from the planning repository
 
-This repository ships the Kilo installer runtime with a validated curated Qwen
-default, installer-managed `limit.output = 8192` for Kilo compatibility, and
-support claims that stay pinned to exact `@kilocode/cli@7.2.0`.
+This repository ships the Kilo installer runtime with a validated curated Kimi
+K2.6 default, installer-managed `limit.output = 8192` for Kilo compatibility,
+and support claims that stay pinned to exact `@kilocode/cli@7.2.0`.

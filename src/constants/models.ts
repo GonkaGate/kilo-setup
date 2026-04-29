@@ -80,6 +80,24 @@ export interface CuratedModelIndex<
 }
 
 export const CURATED_MODEL_REGISTRY = Object.freeze({
+  "kimi-k2.6": {
+    adapterPackage: "@ai-sdk/openai-compatible",
+    displayName: "Kimi K2.6",
+    limits: {
+      context: 262144,
+      output: 8192,
+    },
+    modelId: "moonshotai/Kimi-K2.6",
+    recommended: true,
+    runtimeCompatibility: {
+      notes: [
+        "Moonshot model metadata lists Kimi K2.6 with a 256K context window and OpenAI-compatible chat completions access.",
+        "The installer writes limit.output = 8192 as a conservative Kilo 7.2.0 compatibility clamp for this default.",
+      ],
+    },
+    transport: "chat_completions",
+    validationStatus: "validated",
+  },
   "qwen3-235b-a22b-instruct-2507-fp8": {
     adapterPackage: "@ai-sdk/openai-compatible",
     displayName: "Qwen3 235B A22B Instruct 2507 FP8",
@@ -88,7 +106,7 @@ export const CURATED_MODEL_REGISTRY = Object.freeze({
       output: 8192,
     },
     modelId: "qwen/qwen3-235b-a22b-instruct-2507-fp8",
-    recommended: true,
+    recommended: false,
     runtimeCompatibility: {
       notes: [
         "Official GonkaGate model metadata lists this model as available with a 262K context window.",
