@@ -23,13 +23,15 @@ Common reasons:
 
 - `kilo` and `kilocode` are both missing from `PATH`
 - `kilo --version` output could not be parsed safely
-- local Kilo is present, but it is not exact `@kilocode/cli@7.2.0`
+- local Kilo is present, but it is older than `@kilocode/cli >=7.2.0`
 - a higher-precedence Kilo layer such as `KILO_CONFIG`,
   `KILO_CONFIG_DIR`, or `KILO_CONFIG_CONTENT` overrides the intended result
 - provider allow/deny settings still disable `gonkagate`
 
-The repository intentionally does not treat `7.2.5` as patch-compatible with
-`7.2.0` by implication.
+The repository does not pre-block future Kilo releases by version. If a newer
+Kilo release changes config behavior in a way that breaks setup, treat that as
+a compatibility bug to investigate and fix rather than as a version gate to add
+by default.
 
 ## Why Does Project Scope Still Need Setup On Each Machine?
 

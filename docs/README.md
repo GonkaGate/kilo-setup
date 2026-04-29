@@ -24,4 +24,5 @@ Current contract documents:
 
 This repository ships the Kilo installer runtime with a validated curated Kimi
 K2.6 default, installer-managed `limit.output = 8192` for Kilo compatibility,
-and support claims that stay pinned to exact `@kilocode/cli@7.2.0`.
+and a minimum accepted Kilo floor of `@kilocode/cli >=7.2.0` without a preset
+upper version bound.

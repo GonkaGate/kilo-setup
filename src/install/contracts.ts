@@ -31,7 +31,7 @@ export type InstallFlowErrorCode =
   | "kilo_version_unsupported";
 
 export type KiloCommandName = "kilo" | "kilocode";
-export type KiloCompatibilityProfileId = "kilo_cli_7_2_0";
+export type KiloCompatibilityProfileId = "kilo_cli_7_2_plus";
 
 export interface InstallFlowContext {
   configTargets: {

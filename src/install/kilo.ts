@@ -1,4 +1,4 @@
-import { valid } from "semver";
+import { satisfies as satisfiesSemver, valid } from "semver";
 import type {
   BlockedKiloSummary,
   InstallFlowErrorCode,
@@ -9,7 +9,9 @@ import type { InstallDependencies } from "./deps.js";
 
 export const KILO_PACKAGE_NAME = "@kilocode/cli";
 export const KILO_INVESTIGATED_VERSION = "7.2.0";
-export const KILO_MINIMUM_VERSION_STATUS = "proof-gate-pending";
+export const KILO_SUPPORTED_VERSION_RANGE = ">=7.2.0";
+export const KILO_SUPPORTED_VERSION_LABEL = `${KILO_PACKAGE_NAME} ${KILO_SUPPORTED_VERSION_RANGE}`;
+export const KILO_MINIMUM_VERSION_STATUS = "minimum-floor-supported";
 export const KILO_PRIMARY_COMMAND = "kilo";
 export const KILO_FALLBACK_COMMAND = "kilocode";
 export const KILO_CONFIG_ENV_VAR = "KILO_CONFIG";
@@ -22,9 +24,10 @@ export const KILO_PREFERRED_PROJECT_CONFIG = ".kilo/kilo.jsonc";
 export const KILO_MANAGED_STATE_DIRECTORY = "~/.gonkagate/kilo";
 export const KILO_DEBUG_CONFIG_COMMAND = "kilo debug config";
 export const KILO_DEBUG_CONFIG_PURE_SUPPORTED = false;
-export const KILO_COMPATIBILITY_PROFILE_7_2_0 = Object.freeze({
-  id: "kilo_cli_7_2_0",
-  supportedVersion: KILO_INVESTIGATED_VERSION,
+export const KILO_COMPATIBILITY_PROFILE_7_2_PLUS = Object.freeze({
+  id: "kilo_cli_7_2_plus",
+  investigatedVersion: KILO_INVESTIGATED_VERSION,
+  supportedVersionRange: KILO_SUPPORTED_VERSION_RANGE,
 } as const);
 
 export const KILO_LEGACY_CONFIG_FILES = Object.freeze([
@@ -51,7 +54,8 @@ export const KILO_PROJECT_DIRECTORY_NAMES = Object.freeze([
 
 export interface KiloCompatibilityProfile {
   id: string;
-  supportedVersion: string;
+  investigatedVersion: string;
+  supportedVersionRange: string;
 }
 
 export interface KiloDetectionBlocked {
@@ -73,7 +77,7 @@ export type KiloDetectionResult = KiloDetectionBlocked | SupportedKiloDetection;
 
 const KILO_VERSION_PATTERN = /\b(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\b/u;
 const DEFAULT_KILO_COMPATIBILITY_PROFILES = Object.freeze([
-  KILO_COMPATIBILITY_PROFILE_7_2_0,
+  KILO_COMPATIBILITY_PROFILE_7_2_PLUS,
 ] as const satisfies readonly KiloCompatibilityProfile[]);
 
 export function parseKiloVersion(output: string): string | null {
@@ -90,8 +94,10 @@ export function resolveSupportedKiloProfile(
   installedVersion: string,
   profiles: readonly KiloCompatibilityProfile[] = DEFAULT_KILO_COMPATIBILITY_PROFILES,
 ): KiloCompatibilityProfile | undefined {
-  return profiles.find(
-    (profile) => profile.supportedVersion === installedVersion,
+  return profiles.find((profile) =>
+    satisfiesSemver(installedVersion, profile.supportedVersionRange, {
+      includePrerelease: true,
+    }),
   );
 }
 
@@ -104,8 +110,7 @@ export async function detectInstalledKilo(
   if (resolvedCommand === undefined) {
     return {
       errorCode: "kilo_not_found",
-      message:
-        "Kilo CLI was not found on PATH. Install @kilocode/cli@7.2.0 and rerun npx @gonkagate/kilo-setup.",
+      message: `Kilo CLI was not found on PATH. Install ${KILO_SUPPORTED_VERSION_LABEL} and rerun npx @gonkagate/kilo-setup.`,
       ok: false,
     };
   }
@@ -207,7 +212,7 @@ function createBlockedVersionResult(
         command,
         installedVersion,
       },
-      message: `${commandPrefix} ${command} ${installedVersion ?? "unknown"}, but only exact @kilocode/cli@7.2.0 is supported right now.`,
+      message: `${commandPrefix} ${command} ${installedVersion ?? "unknown"}, but supported Kilo versions are ${KILO_SUPPORTED_VERSION_LABEL}.`,
       ok: false,
     };
   }
@@ -223,7 +228,7 @@ function createBlockedVersionResult(
       command,
       installedVersion,
     },
-    message: `Could not determine the installed Kilo version from \`${command} --version\`${fallbackNote}.${signalNote} Install exact @kilocode/cli@7.2.0 or repair the local Kilo CLI and rerun npx @gonkagate/kilo-setup.`,
+    message: `Could not determine the installed Kilo version from \`${command} --version\`${fallbackNote}.${signalNote} Install ${KILO_SUPPORTED_VERSION_LABEL} or repair the local Kilo CLI and rerun npx @gonkagate/kilo-setup.`,
     ok: false,
   };
 }

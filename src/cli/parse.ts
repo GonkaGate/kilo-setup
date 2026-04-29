@@ -110,7 +110,7 @@ Examples:
   printf '%s' "$${GONKAGATE_SECRET_ENV_VAR}" | ${CONTRACT_METADATA.publicEntrypoint} --api-key-stdin --scope project --yes --json
 
 Runtime status:
-  The installer runtime is shipped for Kilo and currently defaults to the validated Kimi K2.6 profile for exact @kilocode/cli@7.2.0 installs.
+  The installer runtime is shipped for Kilo and currently defaults to the validated Kimi K2.6 profile for @kilocode/cli >=7.2.0 installs.
 
 Kilo contract anchors:
   - Primary command: ${KILO_PRIMARY_COMMAND}

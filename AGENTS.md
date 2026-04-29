@@ -30,13 +30,14 @@ Current honest state:
   selection, while staying explicit that Kilo can recreate that cache later
 - the XDG-isolated oracle now mirrors user-level global Kilo config into the
   sandbox XDG config tree so project-scope verification matches the local
-  resolver on supported `@kilocode/cli@7.2.0` installs, and that temporary
-  sandbox now stages outside the repository with cleanup after verification
+  resolver on `@kilocode/cli >=7.2.0` installs, and that temporary sandbox now
+  stages outside the repository with cleanup after verification
 - the stock public build now ships `moonshotai/Kimi-K2.6` as the recommended
   validated curated default, with installer-managed
   `limit.output = 8192` for Kilo `7.2.0` compatibility
-- exact support remains pinned to `@kilocode/cli@7.2.0`; later `7.2.x`
-  versions are not implied
+- Kilo detection now accepts `@kilocode/cli >=7.2.0` without pre-blocking
+  future Kilo releases, while the audited compatibility baseline remains
+  `@kilocode/cli@7.2.0`
 - native Windows production support is not yet claimed because the native
   oracle-safety proof gate is still open
 - repository-side release automation is now checked in through
@@ -84,7 +85,8 @@ These are repo-contract decisions, not casual refactors:
 - future `/v1/responses` support must be a migration, not a present claim
 - primary command: `kilo`
 - fallback alias: `kilocode`
-- exact investigated Kilo compatibility profile: `@kilocode/cli@7.2.0`
+- minimum accepted Kilo compatibility floor: `@kilocode/cli >=7.2.0`
+- audited Kilo compatibility baseline: `@kilocode/cli@7.2.0`
 - Kilo runtime env vars: `KILO_CONFIG`, `KILO_CONFIG_DIR`,
   `KILO_CONFIG_CONTENT`
 - durable global target: `~/.config/kilo/kilo.jsonc`

@@ -15,7 +15,7 @@ docs, and tests for these facts:
 - public entrypoint: `npx @gonkagate/kilo-setup`
 - binary names: `kilo-setup` and `gonkagate-kilo`
 - Kilo command contract: `kilo` first, `kilocode` as fallback
-- exact compatibility claim: `@kilocode/cli@7.2.0`
+- minimum Kilo compatibility floor: `@kilocode/cli >=7.2.0`
 - current GonkaGate transport claim: `chat/completions`
 - curated public default:
   `moonshotai/Kimi-K2.6`
@@ -40,16 +40,20 @@ Moonshot metadata checked on 2026-04-29:
 - the package writes `limit.output = 8192` as the installer-managed Kilo
   compatibility clamp because Kilo `7.2.0` requires a numeric output limit in
   custom model config
+- npm registry metadata checked on 2026-04-29 showed `@kilocode/cli` patch
+  releases in the `7.2.x` line, including `7.2.14`, with both `kilo` and
+  `kilocode` binaries still exposed by the wrapper package
+- future Kilo releases are not pre-blocked by version; observed compatibility
+  breaks should be handled as bugs with targeted fixes
 
 ## Explicitly Not Shipped Yet
 
 The repository must continue to avoid these claims:
 
-- no support claim for Kilo versions beyond exact `7.2.0`
 - no claim that GonkaGate `responses` transport works today
 - no claim that real-path Kilo verification is the production default
 - no claim that native Windows production support is proven
-- no claim that later Kilo patch releases or additional GonkaGate models are
+- no claim that every future Kilo behavior or additional GonkaGate model is
   proven just because the current curated default is shipped
 
 ## Remaining Follow-Up Items
@@ -64,5 +68,6 @@ repository-only pass:
   `@gonkagate/kilo-setup`
 
 Those items do not change the current package contract: the publishable surface
-remains the exact Kilo baseline, the validated Kimi curated default, and the
-current non-Windows verification policy documented above.
+remains the minimum Kilo `7.2.0` floor without an upper version bound, the
+validated Kimi curated default, and the current non-Windows verification policy
+documented above.
