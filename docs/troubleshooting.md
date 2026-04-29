@@ -5,7 +5,7 @@
 That is no longer the expected stock public result.
 
 The published package now ships
-`qwen/qwen3-235b-a22b-instruct-2507-fp8` as a validated curated default with
+`moonshotai/Kimi-K2.6` as the recommended validated curated default with
 installer-managed `limit.output = 8192`.
 
 If you still see `validated_models_unavailable`, you are likely running a
@@ -13,7 +13,7 @@ stale build, a locally modified package, or a fork whose curated registry does
 not include the published default.
 
 If you see a config error mentioning
-`provider.gonkagate.models.qwen3-235b-a22b-instruct-2507-fp8.limit.output`,
+`provider.gonkagate.models.kimi-k2.6.limit.output`,
 you are likely running a stale build that predates the required Kilo 7.2.0
 output-limit fix.
 

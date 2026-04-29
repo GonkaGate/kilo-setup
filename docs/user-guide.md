@@ -24,7 +24,7 @@ Today the public package is intentionally narrow:
 - exact Kilo compatibility target: `@kilocode/cli@7.2.0`
 - current transport target: `chat/completions`
 - current curated default:
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+  `moonshotai/Kimi-K2.6`
 - managed model limits: `limit.context = 262144`, `limit.output = 8192`
 - no native Windows production claim yet
 

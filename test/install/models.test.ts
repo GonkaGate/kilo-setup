@@ -7,20 +7,18 @@ import {
   getValidatedModelKeys,
 } from "../../src/constants/models.js";
 
-test("the default curated model is the shipped validated public default", () => {
-  const model = CURATED_MODEL_REGISTRY["qwen3-235b-a22b-instruct-2507-fp8"];
+test("the default curated model is the shipped validated Kimi public default", () => {
+  const model = CURATED_MODEL_REGISTRY["kimi-k2.6"];
 
   assert.equal(model.adapterPackage, "@ai-sdk/openai-compatible");
   assert.equal(model.validationStatus, "validated");
   assert.equal(model.limits?.context, 262144);
   assert.equal(model.limits?.output, 8192);
   assert.deepEqual(getValidatedModelKeys(), [
+    "kimi-k2.6",
     "qwen3-235b-a22b-instruct-2507-fp8",
   ]);
-  assert.equal(
-    getRecommendedProductionDefaultModel()?.key,
-    "qwen3-235b-a22b-instruct-2507-fp8",
-  );
+  assert.equal(getRecommendedProductionDefaultModel()?.key, "kimi-k2.6");
 });
 
 test("createCuratedModelIndex exposes a recommended production default when a validated model is recommended", () => {

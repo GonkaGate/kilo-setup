@@ -73,7 +73,7 @@ Current public baseline:
 - primary command after setup: `kilo`
 - current transport target: `chat/completions`
 - curated default:
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+  `moonshotai/Kimi-K2.6`
 - installer-managed `limit.output = 8192` for exact `@kilocode/cli@7.2.0`
 - no native Windows production claim yet
 
@@ -200,11 +200,11 @@ This repository intentionally stays narrow today:
 - exact investigated compatibility profile: `@kilocode/cli@7.2.0`
 - current transport target: `chat/completions`
 - current curated default:
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+  `moonshotai/Kimi-K2.6`
 - real-path Kilo verification is not the production default
 - native Windows production support is not claimed yet
-- later Kilo patch releases, extra models, and new flows are not implied just
-  because this package exists
+- later Kilo patch releases, unvalidated extra models, and new flows are not
+  implied just because this package exists
 
 The shipped runtime treats effective Kilo config as the real success gate. It
 uses the local resolver as the durable verifier and keeps the XDG-isolated

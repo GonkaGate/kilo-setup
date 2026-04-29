@@ -124,5 +124,5 @@ test("resolveInstallModel uses the recommended validated default for --yes", asy
     }),
   );
 
-  assert.equal(model.key, "qwen3-235b-a22b-instruct-2507-fp8");
+  assert.equal(model.key, "kimi-k2.6");
 });

@@ -21,16 +21,16 @@ import { createStubbedTestInstallDependencies } from "./install/test-deps.js";
 import type { TestInstallFsFileSeed } from "./install/test-deps.js";
 import { escapeRegExp, repoRoot } from "./contract-helpers.js";
 
-const MODEL_KEY = "qwen3-235b-a22b-instruct-2507-fp8" as const;
+const MODEL_KEY = "kimi-k2.6" as const;
 const VALIDATED_MODEL: RecommendedProductionDefaultCuratedModel = {
   adapterPackage: "@ai-sdk/openai-compatible",
-  displayName: "Qwen3 235B A22B Instruct 2507 FP8",
+  displayName: "Kimi K2.6",
   key: MODEL_KEY,
   limits: {
     context: 262144,
     output: 8192,
   },
-  modelId: "qwen/qwen3-235b-a22b-instruct-2507-fp8",
+  modelId: "moonshotai/Kimi-K2.6",
   recommended: true,
   transport: "chat_completions",
   validationStatus: "validated",
@@ -196,10 +196,7 @@ test("CLI wrapper exposes the runtime help surface", () => {
   assert.equal(helpResult.status, 0);
   assert.match(helpResult.stdout, /Usage: kilo-setup/i);
   assert.match(helpResult.stdout, /Configure Kilo to use GonkaGate/i);
-  assert.match(
-    helpResult.stdout,
-    /validated Qwen3 235B A22B Instruct 2507 FP8/i,
-  );
+  assert.match(helpResult.stdout, /validated Kimi K2\.6/i);
   assert.match(helpResult.stdout, /--scope <scope>/);
   assert.match(helpResult.stdout, /--api-key-stdin/);
   assert.match(helpResult.stdout, /GONKAGATE_API_KEY/);
@@ -243,9 +240,7 @@ test("interactive runs show the public model picker even when one validated mode
     promptMessages[0] ?? "",
     /Choose the GonkaGate model to configure for Kilo/i,
   );
-  assert.deepEqual(promptChoices[0], [
-    "Qwen3 235B A22B Instruct 2507 FP8 (Recommended)",
-  ]);
+  assert.deepEqual(promptChoices[0], ["Kimi K2.6 (Recommended)"]);
   assert.equal(promptMessages.length, 1);
 });
 

@@ -128,37 +128,36 @@ test("constants use Kilo-specific defaults and leave OpenCode env vars out", () 
   assert.doesNotMatch(runtimeSource, /OPENCODE_CONFIG/);
 });
 
-test("curated model registry exposes the shipped validated default", () => {
+test("curated model registry exposes Kimi as the shipped validated default", () => {
+  const kimi = CURATED_MODEL_REGISTRY["kimi-k2.6"];
   const model = CURATED_MODEL_REGISTRY["qwen3-235b-a22b-instruct-2507-fp8"];
+
+  assert.equal(kimi.adapterPackage, "@ai-sdk/openai-compatible");
+  assert.deepEqual(kimi.limits, { context: 262144, output: 8192 });
+  assert.equal(kimi.modelId, "moonshotai/Kimi-K2.6");
+  assert.equal(kimi.recommended, true);
+  assert.equal(kimi.transport, "chat_completions");
+  assert.equal(kimi.validationStatus, "validated");
 
   assert.equal(model.adapterPackage, "@ai-sdk/openai-compatible");
   assert.equal(model.limits?.context, 262144);
   assert.equal(model.limits?.output, 8192);
   assert.equal(model.modelId, "qwen/qwen3-235b-a22b-instruct-2507-fp8");
+  assert.equal(model.recommended, false);
   assert.equal(model.transport, "chat_completions");
   assert.equal(model.validationStatus, "validated");
   assert.deepEqual(getValidatedModelKeys(), [
+    "kimi-k2.6",
     "qwen3-235b-a22b-instruct-2507-fp8",
   ]);
-  assert.equal(
-    getRecommendedProductionDefaultModel()?.key,
-    "qwen3-235b-a22b-instruct-2507-fp8",
-  );
+  assert.equal(getRecommendedProductionDefaultModel()?.key, "kimi-k2.6");
 });
 
 test("managed provider config includes the required Kilo output token limit", () => {
-  const providerConfig = buildManagedProviderConfig(
-    "qwen3-235b-a22b-instruct-2507-fp8",
-  ) as {
+  const providerConfig = buildManagedProviderConfig("kimi-k2.6") as {
     models: Record<string, { limit?: { context?: number; output?: number } }>;
   };
 
-  assert.equal(
-    providerConfig.models["qwen3-235b-a22b-instruct-2507-fp8"]?.limit?.context,
-    262144,
-  );
-  assert.equal(
-    providerConfig.models["qwen3-235b-a22b-instruct-2507-fp8"]?.limit?.output,
-    8192,
-  );
+  assert.equal(providerConfig.models["kimi-k2.6"]?.limit?.context, 262144);
+  assert.equal(providerConfig.models["kimi-k2.6"]?.limit?.output, 8192);
 });
