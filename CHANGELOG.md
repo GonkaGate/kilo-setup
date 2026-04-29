@@ -31,6 +31,14 @@
   falling back to the pinned `npm exec` oracle path when the direct launch
   fails.
 
+## [0.5.1](https://github.com/GonkaGate/kilo-setup/compare/v0.5.0...v0.5.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* show rollback verification blockers ([34a3cc8](https://github.com/GonkaGate/kilo-setup/commit/34a3cc8de0b3199db5fbf1eba1d93b269fcbdba9))
+* show rollback verification blockers ([9d50019](https://github.com/GonkaGate/kilo-setup/commit/9d500194fe8dd1fe74e594d5277d48fa61d937e1))
+
 ## [0.5.0](https://github.com/GonkaGate/kilo-setup/compare/v0.4.0...v0.5.0) (2026-04-29)
 
 
