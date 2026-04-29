@@ -16,7 +16,7 @@ The runtime is implemented and shipped.
 Today the repository ships:
 
 - the public CLI runtime
-- Kilo detection for exact `@kilocode/cli@7.2.0`
+- Kilo detection for `@kilocode/cli >=7.2.0` without a preset upper bound
 - safe secret intake, managed secret persistence, managed Kilo config
   parse/merge/write, rollback, install-state persistence, and redacted result
   rendering
@@ -26,8 +26,9 @@ Today the repository ships:
 
 Current public limit:
 
-- the published contract stays intentionally narrow to exact
-  `@kilocode/cli@7.2.0`, `chat/completions`, and non-Windows production claims
+- the published contract keeps a minimum Kilo floor of
+  `@kilocode/cli >=7.2.0`, `chat/completions`, and non-Windows production
+  claims
 - the curated default is
   `moonshotai/Kimi-K2.6` with `limit.context = 262144` and
   `limit.output = 8192`
@@ -37,7 +38,7 @@ Current public limit:
 ## Install Flow
 
 1. Check that `kilo` is available, or fall back to `kilocode`.
-2. Verify the exact supported compatibility profile: `@kilocode/cli@7.2.0`.
+2. Verify the minimum accepted Kilo floor: `@kilocode/cli >=7.2.0`.
 3. Resolve the curated model choice and scope.
 4. Use the recommended scope automatically in the default interactive flow:
    - `project` inside a git repository
@@ -113,9 +114,10 @@ That means:
 
 The repository must stay explicit about what is not yet claimed:
 
-- no support claim beyond exact `@kilocode/cli@7.2.0`
+- no Kilo version pin beyond the minimum accepted `@kilocode/cli >=7.2.0`
 - no GonkaGate `responses` transport claim
 - no production-ready native Windows claim before the native oracle-safety
   proof exists
-- no implication that later `7.2.x` Kilo builds, broader model catalogs, or
-  native Windows are already proven just because the current default is public
+- no implication that every future Kilo behavior, broader model catalog, or
+  native Windows path is already proven just because the current default is
+  public

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Accepted Kilo versions at or above `@kilocode/cli >=7.2.0` instead of
+  pre-blocking future Kilo releases with the previous `7.2.0`-only gate.
 - Promoted `moonshotai/Kimi-K2.6` to the recommended validated curated
   default, with installer-managed `limit.output = 8192` for Kilo `7.2.0`
   compatibility.

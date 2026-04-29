@@ -177,7 +177,7 @@ npx @gonkagate/kilo-setup
 
 ![Package](https://img.shields.io/badge/package-%40gonkagate%2Fkilo--setup-6E63FF?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.14.0-4DA2FF?style=flat-square)
-![Kilo](https://img.shields.io/badge/kilo-7.2.0-35D6FF?style=flat-square)
+![Kilo](https://img.shields.io/badge/kilo-%3E%3D7.2.0-35D6FF?style=flat-square)
 ![License](https://img.shields.io/badge/license-Apache--2.0-2A2A2A?style=flat-square)
 
 [![Website](https://img.shields.io/badge/Website-gonkagate.com-111827?style=flat-square)](https://gonkagate.com/en)

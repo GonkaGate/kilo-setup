@@ -23,6 +23,8 @@ import {
   KILO_PREFERRED_GLOBAL_CONFIG,
   KILO_PREFERRED_PROJECT_CONFIG,
   KILO_PRIMARY_COMMAND,
+  KILO_SUPPORTED_VERSION_LABEL,
+  KILO_SUPPORTED_VERSION_RANGE,
 } from "../src/install/kilo.js";
 import { readText } from "./contract-helpers.js";
 
@@ -97,6 +99,8 @@ test("prettier ignore matches the release-please changelog workflow", () => {
 test("constants use Kilo-specific defaults and leave OpenCode env vars out", () => {
   assert.equal(KILO_PRIMARY_COMMAND, "kilo");
   assert.equal(KILO_FALLBACK_COMMAND, "kilocode");
+  assert.equal(KILO_SUPPORTED_VERSION_RANGE, ">=7.2.0");
+  assert.equal(KILO_SUPPORTED_VERSION_LABEL, "@kilocode/cli >=7.2.0");
   assert.equal(KILO_CONFIG_ENV_VAR, "KILO_CONFIG");
   assert.equal(KILO_CONFIG_DIR_ENV_VAR, "KILO_CONFIG_DIR");
   assert.equal(KILO_CONFIG_CONTENT_ENV_VAR, "KILO_CONFIG_CONTENT");

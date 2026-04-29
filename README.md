@@ -8,7 +8,7 @@ npx @gonkagate/kilo-setup
 
 ![Package](https://img.shields.io/badge/package-%40gonkagate%2Fkilo--setup-6E63FF?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.14.0-4DA2FF?style=flat-square)
-![Kilo](https://img.shields.io/badge/kilo-7.2.0-35D6FF?style=flat-square)
+![Kilo](https://img.shields.io/badge/kilo-%3E%3D7.2.0-35D6FF?style=flat-square)
 ![License](https://img.shields.io/badge/license-Apache--2.0-2A2A2A?style=flat-square)
 
 [![Website](https://img.shields.io/badge/Website-gonkagate.com-111827?style=flat-square)](https://gonkagate.com/en)
@@ -52,7 +52,7 @@ What it does for you:
 What it does not do:
 
 - it does not install Kilo itself
-- it does not claim support beyond exact `@kilocode/cli@7.2.0`
+- it does not install or pin Kilo versions for you
 - it does not claim GonkaGate `responses` support today
 - it does not claim native Windows production support yet
 
@@ -63,7 +63,7 @@ You need:
 - Node `>=22.14.0`
 - local `kilo` installed and available on `PATH`, or the fallback `kilocode`
   command
-- local Kilo matching the exact investigated profile: `@kilocode/cli@7.2.0`
+- local Kilo matching the minimum accepted floor: `@kilocode/cli >=7.2.0`
 - a GonkaGate API key in the usual `gp-...` format from the
   [dashboard](https://gonkagate.com/en/register)
 
@@ -74,7 +74,7 @@ Current public baseline:
 - current transport target: `chat/completions`
 - curated default:
   `moonshotai/Kimi-K2.6`
-- installer-managed `limit.output = 8192` for exact `@kilocode/cli@7.2.0`
+- installer-managed `limit.output = 8192` for Kilo compatibility
 - no native Windows production claim yet
 
 ## Shortest Start Path
@@ -90,7 +90,7 @@ npx @gonkagate/kilo-setup
 The installer will:
 
 1. detect `kilo`, or fall back to `kilocode`
-2. verify exact `@kilocode/cli@7.2.0`
+2. verify local Kilo is at least `@kilocode/cli >=7.2.0`
 3. show the curated model choice
 4. choose the recommended scope automatically:
    - inside a git repository: `project`
@@ -197,14 +197,16 @@ Scope rules:
 
 This repository intentionally stays narrow today:
 
-- exact investigated compatibility profile: `@kilocode/cli@7.2.0`
+- minimum accepted Kilo floor: `@kilocode/cli >=7.2.0`
 - current transport target: `chat/completions`
 - current curated default:
   `moonshotai/Kimi-K2.6`
 - real-path Kilo verification is not the production default
 - native Windows production support is not claimed yet
-- later Kilo patch releases, unvalidated extra models, and new flows are not
-  implied just because this package exists
+- future Kilo releases are not pre-blocked by version, but observed
+  compatibility breaks still need fixes
+- unvalidated extra models and new flows are not implied just because this
+  package exists
 
 The shipped runtime treats effective Kilo config as the real success gate. It
 uses the local resolver as the durable verifier and keeps the XDG-isolated

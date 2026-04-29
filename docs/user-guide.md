@@ -21,7 +21,7 @@ to hand-edit Kilo config or store secrets in the repository.
 
 Today the public package is intentionally narrow:
 
-- exact Kilo compatibility target: `@kilocode/cli@7.2.0`
+- minimum Kilo compatibility floor: `@kilocode/cli >=7.2.0`
 - current transport target: `chat/completions`
 - current curated default:
   `moonshotai/Kimi-K2.6`
@@ -34,7 +34,7 @@ Make sure these conditions are true:
 
 1. You have local `kilo` installed, or the fallback `kilocode` command is
    available.
-2. The local Kilo version matches exact `@kilocode/cli@7.2.0`.
+2. The local Kilo version is at least `@kilocode/cli >=7.2.0`.
 3. You already have a GonkaGate API key from the
    [dashboard](https://gonkagate.com/en/register).
 4. You are ready to provide that key through one of the supported safe inputs:
@@ -55,7 +55,7 @@ npx @gonkagate/kilo-setup
 The installer will then:
 
 1. Detect `kilo`, or fall back to `kilocode`.
-2. Check the exact supported Kilo profile.
+2. Check the minimum supported Kilo floor.
 3. Offer the curated GonkaGate model choice.
 4. Choose the recommended scope automatically:
    - inside a git repository: `project`
@@ -242,7 +242,7 @@ printf '%s' "$GONKAGATE_API_KEY" | npx @gonkagate/kilo-setup --api-key-stdin --s
 The most common reasons are:
 
 - `kilo` and `kilocode` are both missing from `PATH`
-- installed Kilo is not exact `@kilocode/cli@7.2.0`
+- installed Kilo is older than `@kilocode/cli >=7.2.0`
 - `KILO_CONFIG`, `KILO_CONFIG_DIR`, or `KILO_CONFIG_CONTENT` overrides are
   changing the effective result
 - local provider allow/deny settings still block `gonkagate`
