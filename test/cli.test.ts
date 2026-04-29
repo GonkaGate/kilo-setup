@@ -462,6 +462,36 @@ test("CLI emits structured JSON failed payloads for resolved-config mismatches",
   assert.match(stdout.contents, /"errorCode": "installation_rolled_back"/);
 });
 
+test("human-readable rollback output includes verification blockers", async () => {
+  const stdout = createBufferWriter();
+  const stderr = createBufferWriter();
+  const dependencies = createCliDependencies({
+    env: {
+      GONKAGATE_API_KEY: "gp-from-env",
+      KILO_CONFIG: "/workspace/session/kilo.json",
+    },
+    repository: true,
+    seedFiles: [
+      {
+        contents: '{\n  "model": "openai/gpt-4.1"\n}\n',
+        path: "/workspace/session/kilo.json",
+      },
+    ],
+  });
+
+  const result = await run(["--yes"], {
+    dependencies,
+    stderr,
+    stdout,
+  });
+
+  assert.equal(result.exitCode, 1);
+  assert.match(stdout.contents, /rolled back/i);
+  assert.match(stdout.contents, /Blockers:/);
+  assert.match(stdout.contents, /KILO_CONFIG/);
+  assert.match(stdout.contents, /model/);
+});
+
 test("human-readable success output still includes the minimal next step", async () => {
   const stdout = createBufferWriter();
   const stderr = createBufferWriter();

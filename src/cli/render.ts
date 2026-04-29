@@ -112,21 +112,7 @@ function renderHumanResult(result: InstallFlowResult): string {
       output.push(`Verification target: ${result.verificationTarget.modelRef}`);
     }
 
-    if ((result.blockers?.length ?? 0) > 0) {
-      output.push("Blockers:");
-
-      for (const blocker of result.blockers ?? []) {
-        output.push(formatVerificationBlocker(blocker));
-      }
-    }
-
-    if ((result.mismatches?.length ?? 0) > 0) {
-      output.push("Mismatches:");
-
-      for (const mismatch of result.mismatches ?? []) {
-        output.push(formatVerificationMismatch(mismatch));
-      }
-    }
+    appendHumanVerificationDetails(output, result);
 
     appendHumanResultNotices(output, result.notices);
     output.push("");
@@ -150,6 +136,11 @@ function renderHumanResult(result: InstallFlowResult): string {
       "GonkaGate Kilo setup rolled back after a failed install attempt.",
       redactSecretBearingText(result.message),
     ];
+    if (result.verificationTarget !== undefined) {
+      output.push(`Verification target: ${result.verificationTarget.modelRef}`);
+    }
+
+    appendHumanVerificationDetails(output, result);
     appendHumanResultNotices(output, result.notices);
     output.push("");
 
@@ -167,6 +158,30 @@ function renderHumanResult(result: InstallFlowResult): string {
   output.push("");
 
   return output.join("\n");
+}
+
+function appendHumanVerificationDetails(
+  output: string[],
+  result: {
+    blockers?: readonly EffectiveConfigVerificationBlocker[];
+    mismatches?: readonly EffectiveConfigVerificationMismatch[];
+  },
+): void {
+  if ((result.blockers?.length ?? 0) > 0) {
+    output.push("Blockers:");
+
+    for (const blocker of result.blockers ?? []) {
+      output.push(formatVerificationBlocker(blocker));
+    }
+  }
+
+  if ((result.mismatches?.length ?? 0) > 0) {
+    output.push("Mismatches:");
+
+    for (const mismatch of result.mismatches ?? []) {
+      output.push(formatVerificationMismatch(mismatch));
+    }
+  }
 }
 
 function finalizeCliExecution(

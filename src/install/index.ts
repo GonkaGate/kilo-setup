@@ -27,6 +27,11 @@ import {
   verifyEffectiveKiloConfig,
 } from "./verify-effective.js";
 import type { ManagedArtifactRollbackAction } from "./contracts/managed-artifact.js";
+import type {
+  EffectiveConfigVerificationBlocker,
+  EffectiveConfigVerificationMismatch,
+  EffectiveConfigVerificationTarget,
+} from "./contracts/effective-config.js";
 import type { CliOptions } from "../cli/contracts.js";
 import type { InstallDependencies } from "./deps.js";
 import { isInstallError, isInstallErrorCode } from "./errors.js";
@@ -338,8 +343,11 @@ async function buildInstallFailureResult(
     return buildInstallErrorResult(rollbackError, progressState);
   }
 
+  const verificationDetails = getRolledBackVerificationDetails(error);
+
   return {
     ...progressState,
+    ...verificationDetails,
     context: createInstallFlowContext(),
     errorCode: "installation_rolled_back",
     message: `Installation failed and installer-owned writes were rolled back. ${formatInstallFailureMessage(
@@ -348,6 +356,28 @@ async function buildInstallFailureResult(
     ok: false,
     status: "rolled_back",
   };
+}
+
+function getRolledBackVerificationDetails(error: unknown): {
+  blockers?: readonly EffectiveConfigVerificationBlocker[];
+  mismatches?: readonly EffectiveConfigVerificationMismatch[];
+  verificationTarget?: EffectiveConfigVerificationTarget;
+} {
+  if (isInstallErrorCode(error, "effective_config_blocked")) {
+    return {
+      blockers: error.details.blockers,
+      verificationTarget: error.details.target,
+    };
+  }
+
+  if (isInstallErrorCode(error, "effective_config_mismatch")) {
+    return {
+      mismatches: error.details.mismatches,
+      verificationTarget: error.details.target,
+    };
+  }
+
+  return {};
 }
 
 function buildInstallErrorResult(

@@ -118,9 +118,12 @@ export interface FailedInstallResult
 
 export interface RolledBackInstallResult
   extends InstallFlowResultBase, InstallFlowProgress {
+  blockers?: readonly EffectiveConfigVerificationBlocker[];
   errorCode: "installation_rolled_back";
+  mismatches?: readonly EffectiveConfigVerificationMismatch[];
   ok: false;
   status: "rolled_back";
+  verificationTarget?: EffectiveConfigVerificationTarget;
 }
 
 export interface InstalledInstallResult
