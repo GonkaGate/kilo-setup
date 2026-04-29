@@ -27,6 +27,14 @@
   falling back to the pinned `npm exec` oracle path when the direct launch
   fails.
 
+## [0.4.0](https://github.com/GonkaGate/kilo-setup/compare/v0.3.3...v0.4.0) (2026-04-29)
+
+
+### Features
+
+* make Kimi K2.6 the default model ([d02d9a7](https://github.com/GonkaGate/kilo-setup/commit/d02d9a7612d66b423e7c091cf2dd76386b36623c))
+* make Kimi K2.6 the default model ([20da778](https://github.com/GonkaGate/kilo-setup/commit/20da778a8cba18fda6f32f5c8b837d1e3090fce8))
+
 ## [0.3.3](https://github.com/GonkaGate/kilo-setup/compare/v0.3.2...v0.3.3) (2026-04-15)
 
 
