@@ -152,6 +152,7 @@ test("runInstallFlow rolls managed writes back when durable verification fails",
 
   assert.equal(result.status, "rolled_back");
   assert.equal(result.errorCode, "installation_rolled_back");
+  assert.equal(result.blockers?.[0]?.layer, "inferred_non_local");
   assert.equal(fs.readText(managedPaths.secretPath), undefined);
   assert.equal(fs.readText(managedPaths.userConfigDefaultPath), undefined);
   assert.equal(fs.readText(managedPaths.projectConfigDefaultPath), undefined);
@@ -278,6 +279,7 @@ test("runInstallFlow still rolls managed writes back when KILO_CONFIG blocks dur
 
   assert.equal(result.status, "rolled_back");
   assert.equal(result.errorCode, "installation_rolled_back");
+  assert.equal(result.blockers?.[0]?.layer, "KILO_CONFIG");
   assert.equal(fs.readText(managedPaths.secretPath), undefined);
   assert.equal(fs.readText(managedPaths.userConfigDefaultPath), undefined);
   assert.equal(fs.readText(managedPaths.projectConfigDefaultPath), undefined);
