@@ -74,6 +74,9 @@ Current public baseline:
 - current transport target: `chat/completions`
 - curated default:
   `moonshotai/Kimi-K2.6`
+- managed validated catalog for Kilo's OpenCode-style `/models` picker:
+  `moonshotai/Kimi-K2.6` and
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
 - installer-managed `limit.output = 8192` for Kilo compatibility
 - no native Windows production claim yet
 
@@ -92,12 +95,14 @@ The installer will:
 1. detect `kilo`, or fall back to `kilocode`
 2. verify local Kilo is at least `@kilocode/cli >=7.2.0`
 3. show the curated model choice
-4. choose the recommended scope automatically:
+4. write the validated GonkaGate provider model catalog for Kilo's `/models`
+   picker
+5. choose the recommended scope automatically:
    - inside a git repository: `project`
    - outside a repository: `user`
-5. collect your API key through a hidden prompt
-6. write the managed config and verify the result
-7. return you to normal `kilo` usage
+6. collect your API key through a hidden prompt
+7. write the managed config and verify the result
+8. return you to normal `kilo` usage
 
 On interactive reruns, the installer asks about scope only if the last
 installer-managed scope differs from the new recommendation.
@@ -201,6 +206,9 @@ This repository intentionally stays narrow today:
 - current transport target: `chat/completions`
 - current curated default:
   `moonshotai/Kimi-K2.6`
+- validated GonkaGate models exposed to Kilo's `/models` picker:
+  `moonshotai/Kimi-K2.6` and
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
 - real-path Kilo verification is not the production default
 - native Windows production support is not claimed yet
 - future Kilo releases are not pre-blocked by version, but observed

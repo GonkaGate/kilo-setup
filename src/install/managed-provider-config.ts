@@ -6,10 +6,12 @@ import {
 } from "../constants/gateway.js";
 import {
   getCuratedModelByKey,
+  getValidatedModels,
   type CuratedModel,
   type CuratedModelCompatibility,
   type CuratedModelKey,
   type CuratedModelLimits,
+  type ValidatedCuratedModel,
 } from "../constants/models.js";
 import type { JsonObject } from "../json.js";
 
@@ -27,6 +29,40 @@ export function buildManagedProviderConfig(
   modelKey: CuratedModelKey,
 ): JsonObject {
   const model = resolveCuratedModel(modelKey);
+  const providerModels = createManagedProviderModels(model);
+  const models: JsonObject = {};
+
+  for (const providerModel of providerModels) {
+    models[providerModel.key] = createManagedModelConfig(providerModel);
+  }
+
+  return {
+    models,
+    name: GONKAGATE_PROVIDER_NAME,
+    npm: model.adapterPackage,
+    options: createManagedProviderOptions(model),
+  };
+}
+
+function createManagedProviderModels(
+  selectedModel: CuratedModel,
+): readonly ValidatedCuratedModel[] {
+  const providerModels = getValidatedModels().filter(
+    (model) =>
+      model.transport === selectedModel.transport &&
+      model.adapterPackage === selectedModel.adapterPackage,
+  );
+
+  if (providerModels.some((model) => model.key === selectedModel.key)) {
+    return providerModels;
+  }
+
+  throw new Error(
+    `Validated model catalog does not include selected model: ${selectedModel.key}`,
+  );
+}
+
+function createManagedModelConfig(model: ValidatedCuratedModel): JsonObject {
   const runtimeCompatibility = model.runtimeCompatibility as
     | CuratedModelCompatibility
     | undefined;
@@ -60,6 +96,13 @@ export function buildManagedProviderConfig(
     Object.assign(modelConfig, modelOptions);
   }
 
+  return modelConfig;
+}
+
+function createManagedProviderOptions(model: CuratedModel): JsonObject {
+  const runtimeCompatibility = model.runtimeCompatibility as
+    | CuratedModelCompatibility
+    | undefined;
   const providerOptions: JsonObject = {
     apiKey: GONKAGATE_SECRET_FILE_REFERENCE,
     baseURL: GONKAGATE_BASE_URL,
@@ -69,14 +112,7 @@ export function buildManagedProviderConfig(
     Object.assign(providerOptions, runtimeCompatibility.providerOptions);
   }
 
-  return {
-    models: {
-      [model.key]: modelConfig,
-    },
-    name: GONKAGATE_PROVIDER_NAME,
-    npm: model.adapterPackage,
-    options: providerOptions,
-  };
+  return providerOptions;
 }
 
 function resolveCuratedModel(modelKey: CuratedModelKey): CuratedModel {

@@ -22,7 +22,8 @@ Current contract documents:
 - [`specs/kilo-setup-prd/spec.md`](./specs/kilo-setup-prd/spec.md): copied Kilo
   setup PRD from the planning repository
 
-This repository ships the Kilo installer runtime with a validated curated Kimi
-K2.6 default, installer-managed `limit.output = 8192` for Kilo compatibility,
-and a minimum accepted Kilo floor of `@kilocode/cli >=7.2.0` without a preset
-upper version bound.
+This repository ships the Kilo installer runtime with a validated curated
+GonkaGate chat-completions catalog, Kimi K2.6 as the recommended default,
+installer-managed `limit.output = 8192` for Kilo compatibility, and a minimum
+accepted Kilo floor of `@kilocode/cli >=7.2.0` without a preset upper version
+bound.

@@ -68,6 +68,8 @@ test("user scope writes provider and activation to user config and removes owned
     userConfigText,
     /"model": "gonkagate\/qwen3-235b-a22b-instruct-2507-fp8"/,
   );
+  assert.match(userConfigText, /"kimi-k2\.6"/);
+  assert.match(userConfigText, /"qwen3-235b-a22b-instruct-2507-fp8"/);
   assert.doesNotMatch(userConfigText, /small_model/);
   assert.doesNotMatch(projectConfigText, /"model": "gonkagate\//);
   assert.match(projectConfigText, /"small_model": "custom\/small"/);

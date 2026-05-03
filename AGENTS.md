@@ -35,6 +35,10 @@ Current honest state:
 - the stock public build now ships `moonshotai/Kimi-K2.6` as the recommended
   validated curated default, with installer-managed
   `limit.output = 8192` for Kilo `7.2.0` compatibility
+- the managed GonkaGate provider config now writes the validated
+  chat-completions catalog, currently Kimi K2.6 plus Qwen3 235B A22B Instruct
+  2507 FP8, so Kilo's OpenCode-style `/models` picker can switch between
+  validated GonkaGate models
 - Kilo detection now accepts `@kilocode/cli >=7.2.0` without pre-blocking
   future Kilo releases, while the audited compatibility baseline remains
   `@kilocode/cli@7.2.0`
@@ -131,7 +135,8 @@ These are implementation facts today:
   intake, managed config writes, rollback, effective-config verification, and
   orchestration
 - `src/constants/models.ts` now exposes Kimi K2.6 as the recommended validated
-  production default with installer-managed `limit.output = 8192` in the
+  production default plus the validated Qwen3 235B A22B Instruct 2507 FP8
+  catalog entry, each with installer-managed `limit.output = 8192` in the
   written Kilo provider config
 - `docs/specs/kilo-setup-prd/spec.md` is the copied Kilo setup PRD
 - `docs/release-readiness.md` records the current production-readiness audit
