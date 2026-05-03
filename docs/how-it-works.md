@@ -32,8 +32,12 @@ Current public limit:
 - the curated default is
   `moonshotai/Kimi-K2.6` with `limit.context = 262144` and
   `limit.output = 8192`
-- broader model claims still require additional proof before they should be
-  added to the validated public choice set
+- the written provider config includes the validated chat-completions model
+  catalog, currently `moonshotai/Kimi-K2.6` and
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, so Kilo's OpenCode-style
+  `/models` picker can switch between validated GonkaGate models
+- broader model claims still require additional proof before models should be
+  added to the validated catalog
 
 ## Install Flow
 
@@ -50,7 +54,8 @@ Current public limit:
    - `GONKAGATE_API_KEY`
    - `--api-key-stdin`
 7. Save the secret only under `~/.gonkagate/kilo/api-key`.
-8. Write or update the user-level provider definition.
+8. Write or update the user-level provider definition, including the validated
+   GonkaGate model catalog for Kilo's `/models` picker.
 9. When `project` scope is chosen, write only activation settings into
    `.kilo/kilo.jsonc`.
 10. On rerun, remove only installer-owned stale GonkaGate activation from the
@@ -118,6 +123,6 @@ The repository must stay explicit about what is not yet claimed:
 - no GonkaGate `responses` transport claim
 - no production-ready native Windows claim before the native oracle-safety
   proof exists
-- no implication that every future Kilo behavior, broader model catalog, or
+- no implication that every future Kilo behavior, live GonkaGate model, or
   native Windows path is already proven just because the current default is
   public

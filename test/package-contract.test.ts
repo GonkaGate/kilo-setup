@@ -165,3 +165,19 @@ test("managed provider config includes the required Kilo output token limit", ()
   assert.equal(providerConfig.models["kimi-k2.6"]?.limit?.context, 262144);
   assert.equal(providerConfig.models["kimi-k2.6"]?.limit?.output, 8192);
 });
+
+test("managed provider config exposes the validated catalog for model switching", () => {
+  const providerConfig = buildManagedProviderConfig("kimi-k2.6") as {
+    models: Record<string, { id?: string; name?: string }>;
+  };
+
+  assert.deepEqual(Object.keys(providerConfig.models), [
+    "kimi-k2.6",
+    "qwen3-235b-a22b-instruct-2507-fp8",
+  ]);
+  assert.equal(providerConfig.models["kimi-k2.6"]?.id, "moonshotai/Kimi-K2.6");
+  assert.equal(
+    providerConfig.models["qwen3-235b-a22b-instruct-2507-fp8"]?.id,
+    "qwen/qwen3-235b-a22b-instruct-2507-fp8",
+  );
+});

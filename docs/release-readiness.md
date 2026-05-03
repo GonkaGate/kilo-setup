@@ -19,7 +19,10 @@ docs, and tests for these facts:
 - current GonkaGate transport claim: `chat/completions`
 - curated public default:
   `moonshotai/Kimi-K2.6`
-- curated model limits:
+- validated provider catalog exposed to Kilo's OpenCode-style `/models` picker:
+  `moonshotai/Kimi-K2.6` and
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+- curated model limits for the validated catalog:
   `limit.context = 262144`; `limit.output = 8192`
 - managed secret path: `~/.gonkagate/kilo/api-key`
 - project scope stays secret-free and still depends on a compatible
@@ -37,9 +40,12 @@ Moonshot metadata checked on 2026-04-29:
 - the model card documents OpenAI-compatible chat completions access through
   Moonshot's API
 - the API docs describe the supported request path as `POST /v1/chat/completions`
-- the package writes `limit.output = 8192` as the installer-managed Kilo
-  compatibility clamp because Kilo `7.2.0` requires a numeric output limit in
-  custom model config
+- the package writes `limit.output = 8192` for validated catalog entries as
+  the installer-managed Kilo compatibility clamp because Kilo `7.2.0` requires
+  a numeric output limit in custom model config
+- the April 14, 2026 Kilo compatibility spike captured
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8` as a validated
+  chat-completions model with a 262K context window and `maxTokens` 8192
 - npm registry metadata checked on 2026-04-29 showed `@kilocode/cli` patch
   releases in the `7.2.x` line, including `7.2.14`, with both `kilo` and
   `kilocode` binaries still exposed by the wrapper package
@@ -53,7 +59,7 @@ The repository must continue to avoid these claims:
 - no claim that GonkaGate `responses` transport works today
 - no claim that real-path Kilo verification is the production default
 - no claim that native Windows production support is proven
-- no claim that every future Kilo behavior or additional GonkaGate model is
+- no claim that every future Kilo behavior or live GonkaGate model is
   proven just because the current curated default is shipped
 
 ## Remaining Follow-Up Items
@@ -69,5 +75,5 @@ repository-only pass:
 
 Those items do not change the current package contract: the publishable surface
 remains the minimum Kilo `7.2.0` floor without an upper version bound, the
-validated Kimi curated default, and the current non-Windows verification policy
-documented above.
+validated GonkaGate chat-completions catalog with Kimi as the recommended
+default, and the current non-Windows verification policy documented above.

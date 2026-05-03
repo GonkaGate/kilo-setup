@@ -25,6 +25,9 @@ Today the public package is intentionally narrow:
 - current transport target: `chat/completions`
 - current curated default:
   `moonshotai/Kimi-K2.6`
+- validated GonkaGate catalog for Kilo's OpenCode-style `/models` picker:
+  `moonshotai/Kimi-K2.6` and
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
 - managed model limits: `limit.context = 262144`, `limit.output = 8192`
 - no native Windows production claim yet
 
@@ -57,12 +60,14 @@ The installer will then:
 1. Detect `kilo`, or fall back to `kilocode`.
 2. Check the minimum supported Kilo floor.
 3. Offer the curated GonkaGate model choice.
-4. Choose the recommended scope automatically:
+4. Write the validated GonkaGate provider model catalog for Kilo's `/models`
+   picker.
+5. Choose the recommended scope automatically:
    - inside a git repository: `project`
    - outside a repository: `user`
-5. Prompt for the GonkaGate API key using a hidden input.
-6. Write the managed config and verify the result.
-7. Return you to normal `kilo` usage.
+6. Prompt for the GonkaGate API key using a hidden input.
+7. Write the managed config and verify the result.
+8. Return you to normal `kilo` usage.
 
 Interactive reruns ask about scope only when the previous installer-managed
 scope differs from the new recommendation.

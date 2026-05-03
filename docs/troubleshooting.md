@@ -17,6 +17,19 @@ If you see a config error mentioning
 you are likely running a stale build that predates the required Kilo 7.2.0
 output-limit fix.
 
+## Why Does `/models` Show Only One GonkaGate Model?
+
+Current builds write the validated GonkaGate chat-completions catalog into
+`provider.gonkagate.models`, so Kilo's OpenCode-style `/models` picker should
+show both `moonshotai/Kimi-K2.6` and
+`qwen/qwen3-235b-a22b-instruct-2507-fp8`.
+
+If `/models` still shows only one GonkaGate model, rerun the installer from a
+current build so the user-level `provider.gonkagate` definition is refreshed.
+Also check for a higher-precedence Kilo layer such as project config,
+`KILO_CONFIG`, `KILO_CONFIG_DIR`, or `KILO_CONFIG_CONTENT` defining its own
+`provider.gonkagate.models` object.
+
 ## The CLI Says Setup Is Blocked
 
 Common reasons:
