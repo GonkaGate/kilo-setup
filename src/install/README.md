@@ -20,6 +20,6 @@ Start here:
   durable/current-session Kilo proof path with redacted diagnostics
 
 The current stock runtime ships a validated curated Kimi K2.6 default plus the
-validated Qwen3 235B A22B Instruct 2507 FP8 catalog entry. Keep Kilo-specific
-behavior here and do not import OpenCode env vars or config targets as runtime
-defaults.
+validated Qwen3 235B A22B Instruct 2507 FP8 and MiniMax M2.7 catalog entries.
+Keep Kilo-specific behavior here and do not import OpenCode env vars or config
+targets as runtime defaults.

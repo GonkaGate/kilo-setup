@@ -26,9 +26,11 @@ Today the public package is intentionally narrow:
 - current curated default:
   `moonshotai/Kimi-K2.6`
 - validated GonkaGate catalog for Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6` and
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
-- managed model limits: `limit.context = 262144`, `limit.output = 8192`
+  `moonshotai/Kimi-K2.6`,
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
+  `minimaxai/minimax-m2.7`
+- managed model limits: `limit.output = 8192` for all validated entries;
+  `limit.context = 262144` for Kimi/Qwen and `204800` for MiniMax
 - no native Windows production claim yet
 
 ## Before You Run It

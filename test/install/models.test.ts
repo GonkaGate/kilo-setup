@@ -17,6 +17,7 @@ test("the default curated model is the shipped validated Kimi public default", (
   assert.deepEqual(getValidatedModelKeys(), [
     "kimi-k2.6",
     "qwen3-235b-a22b-instruct-2507-fp8",
+    "minimax-m2.7",
   ]);
   assert.equal(getRecommendedProductionDefaultModel()?.key, "kimi-k2.6");
 });

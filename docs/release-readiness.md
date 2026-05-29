@@ -20,10 +20,12 @@ docs, and tests for these facts:
 - curated public default:
   `moonshotai/Kimi-K2.6`
 - validated provider catalog exposed to Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6` and
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+  `moonshotai/Kimi-K2.6`,
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
+  `minimaxai/minimax-m2.7`
 - curated model limits for the validated catalog:
-  `limit.context = 262144`; `limit.output = 8192`
+  `limit.output = 8192` for all validated entries; `limit.context = 262144`
+  for Kimi/Qwen and `204800` for MiniMax
 - managed secret path: `~/.gonkagate/kilo/api-key`
 - project scope stays secret-free and still depends on a compatible
   user-level `provider.gonkagate` definition on each machine
@@ -46,6 +48,10 @@ Moonshot metadata checked on 2026-04-29:
 - the April 14, 2026 Kilo compatibility spike captured
   `qwen/qwen3-235b-a22b-instruct-2507-fp8` as a validated
   chat-completions model with a 262K context window and `maxTokens` 8192
+- NVIDIA NIM metadata checked on 2026-05-29 lists
+  `minimaxai/minimax-m2.7` as MiniMax M2.7 with a 204,800 input context
+  length; the package keeps the same installer-managed `limit.output = 8192`
+  compatibility clamp for this catalog entry
 - npm registry metadata checked on 2026-04-29 showed `@kilocode/cli` patch
   releases in the `7.2.x` line, including `7.2.14`, with both `kilo` and
   `kilocode` binaries still exposed by the wrapper package
@@ -76,4 +82,5 @@ repository-only pass:
 Those items do not change the current package contract: the publishable surface
 remains the minimum Kilo `7.2.0` floor without an upper version bound, the
 validated GonkaGate chat-completions catalog with Kimi as the recommended
-default, and the current non-Windows verification policy documented above.
+default, Qwen3 and MiniMax as additional validated entries, and the current
+non-Windows verification policy documented above.

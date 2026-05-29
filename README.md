@@ -75,8 +75,9 @@ Current public baseline:
 - curated default:
   `moonshotai/Kimi-K2.6`
 - managed validated catalog for Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6` and
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+  `moonshotai/Kimi-K2.6`,
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
+  `minimaxai/minimax-m2.7`
 - installer-managed `limit.output = 8192` for Kilo compatibility
 - no native Windows production claim yet
 
@@ -207,8 +208,9 @@ This repository intentionally stays narrow today:
 - current curated default:
   `moonshotai/Kimi-K2.6`
 - validated GonkaGate models exposed to Kilo's `/models` picker:
-  `moonshotai/Kimi-K2.6` and
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
+  `moonshotai/Kimi-K2.6`,
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
+  `minimaxai/minimax-m2.7`
 - real-path Kilo verification is not the production default
 - native Windows production support is not claimed yet
 - future Kilo releases are not pre-blocked by version, but observed

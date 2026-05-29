@@ -4,7 +4,7 @@
 
 - Wrote the validated GonkaGate chat-completions catalog into the managed
   provider config so Kilo's OpenCode-style `/models` picker can switch between
-  Kimi K2.6 and Qwen3 235B A22B Instruct 2507 FP8.
+  Kimi K2.6, Qwen3 235B A22B Instruct 2507 FP8, and MiniMax M2.7.
 - Accepted Kilo versions at or above `@kilocode/cli >=7.2.0` instead of
   pre-blocking future Kilo releases with the previous `7.2.0`-only gate.
 - Kept local verification blockers and mismatches visible in rollback output
