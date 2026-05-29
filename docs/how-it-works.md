@@ -33,9 +33,10 @@ Current public limit:
   `moonshotai/Kimi-K2.6` with `limit.context = 262144` and
   `limit.output = 8192`
 - the written provider config includes the validated chat-completions model
-  catalog, currently `moonshotai/Kimi-K2.6` and
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, so Kilo's OpenCode-style
-  `/models` picker can switch between validated GonkaGate models
+  catalog, currently `moonshotai/Kimi-K2.6`,
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
+  `minimaxai/minimax-m2.7`, so Kilo's OpenCode-style `/models` picker can
+  switch between validated GonkaGate models
 - broader model claims still require additional proof before models should be
   added to the validated catalog
 

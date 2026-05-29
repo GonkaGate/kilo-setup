@@ -117,6 +117,24 @@ export const CURATED_MODEL_REGISTRY = Object.freeze({
     transport: "chat_completions",
     validationStatus: "validated",
   },
+  "minimax-m2.7": {
+    adapterPackage: "@ai-sdk/openai-compatible",
+    displayName: "MiniMax M2.7",
+    limits: {
+      context: 204800,
+      output: 8192,
+    },
+    modelId: "minimaxai/minimax-m2.7",
+    recommended: false,
+    runtimeCompatibility: {
+      notes: [
+        "NVIDIA NIM metadata lists minimaxai/minimax-m2.7 as MiniMax M2.7 with a 204,800 input context length.",
+        "The installer writes limit.output = 8192 as the existing conservative Kilo 7.2.0 compatibility clamp for validated catalog entries.",
+      ],
+    },
+    transport: "chat_completions",
+    validationStatus: "validated",
+  },
 } as const satisfies CuratedModelRegistry);
 
 function toCuratedModelRecord<

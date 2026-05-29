@@ -24,6 +24,7 @@ Current contract documents:
 
 This repository ships the Kilo installer runtime with a validated curated
 GonkaGate chat-completions catalog, Kimi K2.6 as the recommended default,
-installer-managed `limit.output = 8192` for Kilo compatibility, and a minimum
-accepted Kilo floor of `@kilocode/cli >=7.2.0` without a preset upper version
-bound.
+MiniMax M2.7 and Qwen3 235B A22B Instruct 2507 FP8 as additional validated
+catalog entries, installer-managed `limit.output = 8192` for Kilo
+compatibility, and a minimum accepted Kilo floor of `@kilocode/cli >=7.2.0`
+without a preset upper version bound.

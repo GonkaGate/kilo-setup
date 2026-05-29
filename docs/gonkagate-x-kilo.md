@@ -131,9 +131,11 @@ Right now the public default is deliberately small:
 - minimum Kilo floor: `@kilocode/cli >=7.2.0`
 - recommended validated model: `moonshotai/Kimi-K2.6`
 - validated catalog exposed to Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6` and
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`
-- managed limits: `limit.context = 262144`, `limit.output = 8192`
+  `moonshotai/Kimi-K2.6`,
+  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
+  `minimaxai/minimax-m2.7`
+- managed limits: `limit.output = 8192` for all validated entries;
+  `limit.context = 262144` for Kimi/Qwen and `204800` for MiniMax
 
 We are treating model support as a curated list, not as a vague "it probably
 works" promise.
