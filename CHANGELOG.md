@@ -34,6 +34,14 @@
   falling back to the pinned `npm exec` oracle path when the direct launch
   fails.
 
+## [0.7.0](https://github.com/GonkaGate/kilo-setup/compare/v0.6.0...v0.7.0) (2026-05-29)
+
+
+### Features
+
+* add MiniMax M2.7 to validated catalog ([b7cda93](https://github.com/GonkaGate/kilo-setup/commit/b7cda93bce5403db991b1cbb861a25a4562e03f8))
+* add MiniMax M2.7 to validated catalog ([68cbcee](https://github.com/GonkaGate/kilo-setup/commit/68cbceeef011dbd313eea134b0b3033cbcbad6bb))
+
 ## [0.6.0](https://github.com/GonkaGate/kilo-setup/compare/v0.5.1...v0.6.0) (2026-05-03)
 
 
