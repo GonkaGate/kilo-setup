@@ -23,7 +23,7 @@ not contain raw `kilo debug config` output or real secrets.
   - example model id:
     `qwen/qwen3-235b-a22b-instruct-2507-fp8`
 - GonkaGate public model page checked:
-  - `qwen/qwen3-235b-a22b-instruct-2507-fp8` context window: `262K`
+  - `qwen/qwen3-235b-a22b-instruct-2507-fp8` context window: `240000`
   - GonkaGate OpenClaw custom-provider guidance documents `maxTokens: 8192`
     for the same model.
 

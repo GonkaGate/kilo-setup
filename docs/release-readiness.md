@@ -24,8 +24,8 @@ docs, and tests for these facts:
   `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
   `minimaxai/minimax-m2.7`
 - curated model limits for the validated catalog:
-  `limit.output = 8192` for all validated entries; `limit.context = 262144`
-  for Kimi/Qwen and `204800` for MiniMax
+  `limit.output = 8192` for all validated entries; `limit.context = 240000`
+  for Kimi/Qwen and `180000` for MiniMax
 - managed secret path: `~/.gonkagate/kilo/api-key`
 - project scope stays secret-free and still depends on a compatible
   user-level `provider.gonkagate` definition on each machine
@@ -34,24 +34,21 @@ docs, and tests for these facts:
 
 ## External Evidence Captured
 
-The current default-model contract is backed by product direction plus public
-Moonshot metadata checked on 2026-04-29:
+The current model-limit contract is backed by product direction plus Gonka
+deployment metadata checked on 2026-06-23:
 
-- the Kimi K2.6 model card lists `moonshotai/Kimi-K2.6` and documents a 256K
-  context window
+- Gonka deployment model args list Kimi K2.6 and Qwen3 235B A22B Instruct 2507
+  FP8 with `--max-model-len 240000`
+- Gonka deployment model args list `minimaxai/minimax-m2.7` with
+  `--max-model-len 180000`
 - the model card documents OpenAI-compatible chat completions access through
   Moonshot's API
 - the API docs describe the supported request path as `POST /v1/chat/completions`
 - the package writes `limit.output = 8192` for validated catalog entries as
   the installer-managed Kilo compatibility clamp because Kilo `7.2.0` requires
   a numeric output limit in custom model config
-- the April 14, 2026 Kilo compatibility spike captured
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8` as a validated
-  chat-completions model with a 262K context window and `maxTokens` 8192
-- NVIDIA NIM metadata checked on 2026-05-29 lists
-  `minimaxai/minimax-m2.7` as MiniMax M2.7 with a 204,800 input context
-  length; the package keeps the same installer-managed `limit.output = 8192`
-  compatibility clamp for this catalog entry
+- the package keeps the same installer-managed `limit.output = 8192`
+  compatibility clamp for every validated catalog entry
 - npm registry metadata checked on 2026-04-29 showed `@kilocode/cli` patch
   releases in the `7.2.x` line, including `7.2.14`, with both `kilo` and
   `kilocode` binaries still exposed by the wrapper package

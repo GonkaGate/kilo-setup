@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Updated managed GonkaGate `limit.context` values to match the current
+  deployed windows: `240000` for Kimi/Qwen and `180000` for MiniMax.
 - Wrote the validated GonkaGate chat-completions catalog into the managed
   provider config so Kilo's OpenCode-style `/models` picker can switch between
   Kimi K2.6, Qwen3 235B A22B Instruct 2507 FP8, and MiniMax M2.7.

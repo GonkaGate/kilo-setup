@@ -6,7 +6,7 @@ export const TEST_VALIDATED_MODEL = {
   displayName: "Kimi K2.6",
   key: "kimi-k2.6",
   limits: {
-    context: 262144,
+    context: 240000,
     output: 8192,
   },
   modelId: "moonshotai/Kimi-K2.6",

@@ -30,7 +30,7 @@ Current public limit:
   `@kilocode/cli >=7.2.0`, `chat/completions`, and non-Windows production
   claims
 - the curated default is
-  `moonshotai/Kimi-K2.6` with `limit.context = 262144` and
+  `moonshotai/Kimi-K2.6` with `limit.context = 240000` and
   `limit.output = 8192`
 - the written provider config includes the validated chat-completions model
   catalog, currently `moonshotai/Kimi-K2.6`,

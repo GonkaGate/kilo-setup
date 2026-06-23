@@ -66,8 +66,8 @@ Redacted evidence notes are preserved in
 - A full `.../chat/completions` URL must not be written to any Kilo base URL
   field; Kilo appends `chat/completions` through the OpenAI-compatible adapter.
 - Production setup should leave `small_model` untouched by default.
-- GonkaGate public sources prove the selected model's context window as `262K`
-  tokens, interpreted for Kilo as `262144`.
+- GonkaGate deployment sources prove the selected model's context window as
+  `240000` tokens.
 - GonkaGate public OpenClaw guidance documents `maxTokens: 8192` for the
   selected model, which the installer writes as Kilo `limit.output`.
 - No safe `GONKAGATE_API_KEY` was present during the spike, so live GonkaGate
@@ -538,7 +538,7 @@ Expected production managed provider shape:
           "name": "Qwen3 235B A22B Instruct 2507 FP8",
           "tool_call": true,
           "limit": {
-            "context": 262144,
+            "context": 240000,
             "output": "BLOCKED_UNTIL_GONKAGATE_LIMIT_IS_PROVEN",
           },
         },
@@ -576,8 +576,8 @@ Evidence:
 - The same fake smoke proved that writing a full `.../chat/completions` URL
   produces a doubled `/chat/completions/chat/completions` path.
 
-The `limit.context` value is proven from the GonkaGate public model page as
-`262K`, mapped to the integer `262144`. GonkaGate OpenClaw guidance documents
+The `limit.context` value is proven from the GonkaGate deployment metadata as
+`240000`. GonkaGate OpenClaw guidance documents
 `maxTokens: 8192` for the same model, so the installer writes
 `limit.output = 8192`. Kilo docs state that `context: 0` disables compaction and
 context-size-dependent usage tracking, while `output: 0` falls back to Kilo's

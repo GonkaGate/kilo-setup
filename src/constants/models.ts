@@ -84,14 +84,14 @@ export const CURATED_MODEL_REGISTRY = Object.freeze({
     adapterPackage: "@ai-sdk/openai-compatible",
     displayName: "Kimi K2.6",
     limits: {
-      context: 262144,
+      context: 240000,
       output: 8192,
     },
     modelId: "moonshotai/Kimi-K2.6",
     recommended: true,
     runtimeCompatibility: {
       notes: [
-        "Moonshot model metadata lists Kimi K2.6 with a 256K context window and OpenAI-compatible chat completions access.",
+        "Gonka deployment metadata lists Kimi K2.6 with a 240,000 token context window and OpenAI-compatible chat completions access.",
         "The installer writes limit.output = 8192 as a conservative Kilo 7.2.0 compatibility clamp for this default.",
       ],
     },
@@ -102,14 +102,14 @@ export const CURATED_MODEL_REGISTRY = Object.freeze({
     adapterPackage: "@ai-sdk/openai-compatible",
     displayName: "Qwen3 235B A22B Instruct 2507 FP8",
     limits: {
-      context: 262144,
+      context: 240000,
       output: 8192,
     },
     modelId: "qwen/qwen3-235b-a22b-instruct-2507-fp8",
     recommended: false,
     runtimeCompatibility: {
       notes: [
-        "Official GonkaGate model metadata lists this model as available with a 262K context window.",
+        "Gonka deployment metadata lists this model as available with a 240,000 token context window.",
         "Official GonkaGate OpenClaw provider guidance lists this model with maxTokens 8192.",
         "Kilo 7.2.0 rejects custom model entries without a numeric limit.output value, so the installer writes limit.output = 8192 for this validated default.",
       ],
@@ -121,14 +121,14 @@ export const CURATED_MODEL_REGISTRY = Object.freeze({
     adapterPackage: "@ai-sdk/openai-compatible",
     displayName: "MiniMax M2.7",
     limits: {
-      context: 204800,
+      context: 180000,
       output: 8192,
     },
     modelId: "minimaxai/minimax-m2.7",
     recommended: false,
     runtimeCompatibility: {
       notes: [
-        "NVIDIA NIM metadata lists minimaxai/minimax-m2.7 as MiniMax M2.7 with a 204,800 input context length.",
+        "Gonka deployment metadata lists minimaxai/minimax-m2.7 as MiniMax M2.7 with a 180,000 token context window.",
         "The installer writes limit.output = 8192 as the existing conservative Kilo 7.2.0 compatibility clamp for validated catalog entries.",
       ],
     },
