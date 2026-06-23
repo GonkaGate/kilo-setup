@@ -27,7 +27,7 @@ const VALIDATED_MODEL: RecommendedProductionDefaultCuratedModel = {
   displayName: "Kimi K2.6",
   key: MODEL_KEY,
   limits: {
-    context: 262144,
+    context: 240000,
     output: 8192,
   },
   modelId: "moonshotai/Kimi-K2.6",

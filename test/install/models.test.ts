@@ -12,7 +12,7 @@ test("the default curated model is the shipped validated Kimi public default", (
 
   assert.equal(model.adapterPackage, "@ai-sdk/openai-compatible");
   assert.equal(model.validationStatus, "validated");
-  assert.equal(model.limits?.context, 262144);
+  assert.equal(model.limits?.context, 240000);
   assert.equal(model.limits?.output, 8192);
   assert.deepEqual(getValidatedModelKeys(), [
     "kimi-k2.6",

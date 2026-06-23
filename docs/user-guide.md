@@ -30,7 +30,7 @@ Today the public package is intentionally narrow:
   `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
   `minimaxai/minimax-m2.7`
 - managed model limits: `limit.output = 8192` for all validated entries;
-  `limit.context = 262144` for Kimi/Qwen and `204800` for MiniMax
+  `limit.context = 240000` for Kimi/Qwen and `180000` for MiniMax
 - no native Windows production claim yet
 
 ## Before You Run It
