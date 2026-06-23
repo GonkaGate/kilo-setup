@@ -36,6 +36,14 @@
   falling back to the pinned `npm exec` oracle path when the direct launch
   fails.
 
+## [0.7.1](https://github.com/GonkaGate/kilo-setup/compare/v0.7.0...v0.7.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* align Kilo context limits with Gonka deployment ([9610905](https://github.com/GonkaGate/kilo-setup/commit/9610905d897d1c79175af60f698a8ad53685590f))
+* align Kilo context limits with Gonka deployment ([caf4fd0](https://github.com/GonkaGate/kilo-setup/commit/caf4fd0a19fe991f2be5ce7092fe4056c5ac098e))
+
 ## [0.7.0](https://github.com/GonkaGate/kilo-setup/compare/v0.6.0...v0.7.0) (2026-05-29)
 
 
