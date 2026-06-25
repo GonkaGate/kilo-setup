@@ -11,9 +11,9 @@ npx @gonkagate/kilo-setup
 ![Kilo](https://img.shields.io/badge/kilo-%3E%3D7.2.0-35D6FF?style=flat-square)
 ![License](https://img.shields.io/badge/license-Apache--2.0-2A2A2A?style=flat-square)
 
-[![Website](https://img.shields.io/badge/Website-gonkagate.com-111827?style=flat-square)](https://gonkagate.com/en)
-[![Docs](https://img.shields.io/badge/Docs-API%20Guides-2563EB?style=flat-square)](https://gonkagate.com/en/docs)
-[![API%20Key](https://img.shields.io/badge/API%20Key-Dashboard-F97316?style=flat-square)](https://gonkagate.com/en/register)
+[![Website](https://img.shields.io/badge/Website-gonkagate.com-111827?style=flat-square)](https://gonkagate.com/en?utm_source=github&utm_medium=referral&utm_campaign=kilo_setup&utm_content=readme_badge_website)
+[![Docs](https://img.shields.io/badge/Docs-API%20Guides-2563EB?style=flat-square)](https://gonkagate.com/en/docs?utm_source=github&utm_medium=referral&utm_campaign=kilo_setup&utm_content=readme_badge_docs)
+[![API%20Key](https://img.shields.io/badge/API%20Key-Dashboard-F97316?style=flat-square)](https://gonkagate.com/en/register?utm_source=github&utm_medium=referral&utm_campaign=kilo_setup&utm_content=readme_badge_api_key)
 [![Telegram](https://img.shields.io/badge/Telegram-%40gonkagate-229ED9?style=flat-square&logo=telegram&logoColor=white)](https://t.me/gonkagate)
 [![X](https://img.shields.io/badge/X-%40gonkagate-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/gonkagate)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-GonkaGate-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/gonkagate)
@@ -24,7 +24,7 @@ From API key to a working `kilo` setup in one short walkthrough:
 
 [![See the installer in action](https://raw.githubusercontent.com/GonkaGate/kilo-setup/main/.github/assets/gonkagate-kilo-setup-demo.gif)](https://raw.githubusercontent.com/GonkaGate/kilo-setup/main/.github/assets/gonkagate-kilo-setup-demo.mp4)
 
-Need an API key first? [Get one on GonkaGate](https://gonkagate.com/en/register).
+Need an API key first? [Get one on GonkaGate](https://gonkagate.com/en/register?utm_source=github&utm_medium=referral&utm_campaign=kilo_setup&utm_content=readme_api_key_cta).
 
 ## Overview
 
@@ -65,7 +65,7 @@ You need:
   command
 - local Kilo matching the minimum accepted floor: `@kilocode/cli >=7.2.0`
 - a GonkaGate API key in the usual `gp-...` format from the
-  [dashboard](https://gonkagate.com/en/register)
+  [dashboard](https://gonkagate.com/en/register?utm_source=github&utm_medium=referral&utm_campaign=kilo_setup&utm_content=readme_api_key_cta)
 
 Current public baseline:
 
