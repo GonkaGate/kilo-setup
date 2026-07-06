@@ -39,6 +39,13 @@
   falling back to the pinned `npm exec` oracle path when the direct launch
   fails.
 
+## [0.8.0](https://github.com/GonkaGate/kilo-setup/compare/v0.7.1...v0.8.0) (2026-07-06)
+
+
+### Features
+
+* fetch GonkaGate models dynamically ([c959284](https://github.com/GonkaGate/kilo-setup/commit/c959284532dd87b0a11639033e7117efb67b4055))
+
 ## [0.7.1](https://github.com/GonkaGate/kilo-setup/compare/v0.7.0...v0.7.1) (2026-06-23)
 
 
