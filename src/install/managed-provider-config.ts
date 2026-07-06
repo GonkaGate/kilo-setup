@@ -4,35 +4,25 @@ import {
   GONKAGATE_PROVIDER_ID,
   GONKAGATE_PROVIDER_NAME,
 } from "../constants/gateway.js";
-import {
-  getCuratedModelByKey,
-  getValidatedModels,
-  type CuratedModel,
-  type CuratedModelCompatibility,
-  type CuratedModelKey,
-  type CuratedModelLimits,
-  type ValidatedCuratedModel,
-} from "../constants/models.js";
 import type { JsonObject } from "../json.js";
+import type { InstallModel, InstallModelCatalog } from "./model-catalog.js";
 
 export const GONKAGATE_SECRET_FILE_REFERENCE = `{file:${GONKAGATE_MANAGED_SECRET_PATH}}`;
 
-export function formatKiloModelRef(
-  model: CuratedModel | CuratedModelKey,
-): string {
+export function formatKiloModelRef(model: InstallModel | string): string {
   const key = typeof model === "string" ? model : model.key;
 
   return `${GONKAGATE_PROVIDER_ID}/${key}`;
 }
 
 export function buildManagedProviderConfig(
-  modelKey: CuratedModelKey,
+  modelKey: string,
+  catalog: InstallModelCatalog,
 ): JsonObject {
-  const model = resolveCuratedModel(modelKey);
-  const providerModels = createManagedProviderModels(model);
+  const model = resolveInstallModel(modelKey, catalog);
   const models: JsonObject = {};
 
-  for (const providerModel of providerModels) {
+  for (const providerModel of createManagedProviderModels(model, catalog)) {
     models[providerModel.key] = createManagedModelConfig(providerModel);
   }
 
@@ -40,90 +30,58 @@ export function buildManagedProviderConfig(
     models,
     name: GONKAGATE_PROVIDER_NAME,
     npm: model.adapterPackage,
-    options: createManagedProviderOptions(model),
+    options: createManagedProviderOptions(),
   };
 }
 
 function createManagedProviderModels(
-  selectedModel: CuratedModel,
-): readonly ValidatedCuratedModel[] {
-  const providerModels = getValidatedModels().filter(
-    (model) =>
-      model.transport === selectedModel.transport &&
-      model.adapterPackage === selectedModel.adapterPackage,
-  );
+  selectedModel: InstallModel,
+  catalog: InstallModelCatalog,
+): readonly InstallModel[] {
+  const providerModels = catalog
+    .getModels()
+    .filter(
+      (model) =>
+        model.transport === selectedModel.transport &&
+        model.adapterPackage === selectedModel.adapterPackage,
+    );
 
   if (providerModels.some((model) => model.key === selectedModel.key)) {
     return providerModels;
   }
 
   throw new Error(
-    `Validated model catalog does not include selected model: ${selectedModel.key}`,
+    `Live model catalog does not include selected model: ${selectedModel.key}`,
   );
 }
 
-function createManagedModelConfig(model: ValidatedCuratedModel): JsonObject {
-  const runtimeCompatibility = model.runtimeCompatibility as
-    | CuratedModelCompatibility
-    | undefined;
-  const limits = model.limits as CuratedModelLimits | undefined;
-  const modelConfig: JsonObject = {
+function createManagedModelConfig(model: InstallModel): JsonObject {
+  return {
     id: model.modelId,
+    limit: {
+      context: model.limits.context,
+      output: model.limits.output,
+    },
     name: model.displayName,
     tool_call: true,
   };
-
-  if (
-    typeof limits?.context === "number" ||
-    typeof limits?.output === "number"
-  ) {
-    const limit: JsonObject = {};
-
-    if (typeof limits?.context === "number") {
-      limit.context = limits.context;
-    }
-
-    if (typeof limits?.output === "number") {
-      limit.output = limits.output;
-    }
-
-    modelConfig.limit = limit;
-  }
-
-  const modelOptions = runtimeCompatibility?.modelOptions;
-
-  if (modelOptions !== undefined) {
-    Object.assign(modelConfig, modelOptions);
-  }
-
-  return modelConfig;
 }
 
-function createManagedProviderOptions(model: CuratedModel): JsonObject {
-  const runtimeCompatibility = model.runtimeCompatibility as
-    | CuratedModelCompatibility
-    | undefined;
-  const providerOptions: JsonObject = {
+function createManagedProviderOptions(): JsonObject {
+  return {
     apiKey: GONKAGATE_SECRET_FILE_REFERENCE,
     baseURL: GONKAGATE_BASE_URL,
   };
-
-  if (runtimeCompatibility?.providerOptions !== undefined) {
-    Object.assign(providerOptions, runtimeCompatibility.providerOptions);
-  }
-
-  return providerOptions;
 }
 
-function resolveCuratedModel(modelKey: CuratedModelKey): CuratedModel {
-  const model = getCuratedModelByKey(modelKey);
+function resolveInstallModel(
+  modelKey: string,
+  catalog: InstallModelCatalog,
+): InstallModel {
+  const model = catalog.getModelByKey(modelKey);
 
   if (model === undefined) {
-    throw new Error(`Unsupported curated model key: ${modelKey}`);
-  }
-
-  if (model.validationStatus !== "validated") {
-    throw new Error(`Unvalidated curated model key: ${modelKey}`);
+    throw new Error(`Unsupported GonkaGate model id: ${modelKey}`);
   }
 
   return model;

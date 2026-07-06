@@ -5,7 +5,7 @@ export const CONTRACT_METADATA = {
   packageName: "@gonkagate/kilo-setup",
   publicEntrypoint: "npx @gonkagate/kilo-setup",
   publicState:
-    "Installer runtime is shipped with a validated curated GonkaGate chat-completions catalog for @kilocode/cli >=7.2.0 installs, with Kimi K2.6 as the recommended default and installer-managed limit.output = 8192 for compatibility.",
+    "Installer runtime fetches the GonkaGate chat-completions model catalog from /v1/models after safe API-key intake for @kilocode/cli >=7.2.0 installs.",
   secondaryBinName: "gonkagate-kilo",
   upstreamKilo: {
     checkedAt: "2026-04-29",

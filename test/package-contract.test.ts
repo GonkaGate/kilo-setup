@@ -6,11 +6,6 @@ import {
   GONKAGATE_MANAGED_SECRET_PATH,
   GONKAGATE_PROVIDER_ID,
 } from "../src/constants/gateway.js";
-import {
-  CURATED_MODEL_REGISTRY,
-  getRecommendedProductionDefaultModel,
-  getValidatedModelKeys,
-} from "../src/constants/models.js";
 import { buildManagedProviderConfig } from "../src/install/managed-provider-config.js";
 import {
   KILO_CONFIG_CONTENT_ENV_VAR,
@@ -27,6 +22,11 @@ import {
   KILO_SUPPORTED_VERSION_RANGE,
 } from "../src/install/kilo.js";
 import { readText } from "./contract-helpers.js";
+import {
+  createValidatedTestModelCatalog,
+  TEST_EXTRA_MODEL,
+  TEST_VALIDATED_MODEL,
+} from "./install/test-model-catalog.js";
 
 interface PackageJson {
   bin?: Record<string, string>;
@@ -132,70 +132,58 @@ test("constants use Kilo-specific defaults and leave OpenCode env vars out", () 
   assert.doesNotMatch(runtimeSource, /OPENCODE_CONFIG/);
 });
 
-test("curated model registry exposes Kimi as the shipped validated default", () => {
-  const kimi = CURATED_MODEL_REGISTRY["kimi-k2.6"];
-  const qwen = CURATED_MODEL_REGISTRY["qwen3-235b-a22b-instruct-2507-fp8"];
-  const minimax = CURATED_MODEL_REGISTRY["minimax-m2.7"];
-
-  assert.equal(kimi.adapterPackage, "@ai-sdk/openai-compatible");
-  assert.deepEqual(kimi.limits, { context: 240000, output: 8192 });
-  assert.equal(kimi.modelId, "moonshotai/Kimi-K2.6");
-  assert.equal(kimi.recommended, true);
-  assert.equal(kimi.transport, "chat_completions");
-  assert.equal(kimi.validationStatus, "validated");
-
-  assert.equal(qwen.adapterPackage, "@ai-sdk/openai-compatible");
-  assert.equal(qwen.limits?.context, 240000);
-  assert.equal(qwen.limits?.output, 8192);
-  assert.equal(qwen.modelId, "qwen/qwen3-235b-a22b-instruct-2507-fp8");
-  assert.equal(qwen.recommended, false);
-  assert.equal(qwen.transport, "chat_completions");
-  assert.equal(qwen.validationStatus, "validated");
-
-  assert.equal(minimax.adapterPackage, "@ai-sdk/openai-compatible");
-  assert.equal(minimax.limits?.context, 180000);
-  assert.equal(minimax.limits?.output, 8192);
-  assert.equal(minimax.modelId, "minimaxai/minimax-m2.7");
-  assert.equal(minimax.recommended, false);
-  assert.equal(minimax.transport, "chat_completions");
-  assert.equal(minimax.validationStatus, "validated");
-  assert.deepEqual(getValidatedModelKeys(), [
-    "kimi-k2.6",
-    "qwen3-235b-a22b-instruct-2507-fp8",
-    "minimax-m2.7",
+test("managed provider config includes generic Kilo model limits", () => {
+  const catalog = createValidatedTestModelCatalog([
+    TEST_VALIDATED_MODEL,
+    TEST_EXTRA_MODEL,
   ]);
-  assert.equal(getRecommendedProductionDefaultModel()?.key, "kimi-k2.6");
-});
-
-test("managed provider config includes the required Kilo model limits", () => {
-  const providerConfig = buildManagedProviderConfig("kimi-k2.6") as {
+  const providerConfig = buildManagedProviderConfig(
+    TEST_VALIDATED_MODEL.key,
+    catalog,
+  ) as {
     models: Record<string, { limit?: { context?: number; output?: number } }>;
   };
 
-  assert.equal(providerConfig.models["kimi-k2.6"]?.limit?.context, 240000);
-  assert.equal(providerConfig.models["kimi-k2.6"]?.limit?.output, 8192);
-  assert.equal(providerConfig.models["minimax-m2.7"]?.limit?.context, 180000);
-  assert.equal(providerConfig.models["minimax-m2.7"]?.limit?.output, 8192);
+  assert.equal(
+    providerConfig.models[TEST_VALIDATED_MODEL.key]?.limit?.context,
+    240000,
+  );
+  assert.equal(
+    providerConfig.models[TEST_VALIDATED_MODEL.key]?.limit?.output,
+    8192,
+  );
+  assert.equal(
+    providerConfig.models[TEST_EXTRA_MODEL.key]?.limit?.output,
+    8192,
+  );
 });
 
-test("managed provider config exposes the validated catalog for model switching", () => {
-  const providerConfig = buildManagedProviderConfig("kimi-k2.6") as {
+test("managed provider config exposes every fetched model for switching", () => {
+  const catalog = createValidatedTestModelCatalog([
+    TEST_VALIDATED_MODEL,
+    TEST_EXTRA_MODEL,
+  ]);
+  const providerConfig = buildManagedProviderConfig(
+    TEST_VALIDATED_MODEL.key,
+    catalog,
+  ) as {
     models: Record<string, { id?: string; name?: string }>;
   };
 
   assert.deepEqual(Object.keys(providerConfig.models), [
-    "kimi-k2.6",
-    "qwen3-235b-a22b-instruct-2507-fp8",
-    "minimax-m2.7",
+    TEST_VALIDATED_MODEL.key,
+    TEST_EXTRA_MODEL.key,
   ]);
-  assert.equal(providerConfig.models["kimi-k2.6"]?.id, "moonshotai/Kimi-K2.6");
   assert.equal(
-    providerConfig.models["qwen3-235b-a22b-instruct-2507-fp8"]?.id,
-    "qwen/qwen3-235b-a22b-instruct-2507-fp8",
+    providerConfig.models[TEST_VALIDATED_MODEL.key]?.id,
+    TEST_VALIDATED_MODEL.modelId,
   );
   assert.equal(
-    providerConfig.models["minimax-m2.7"]?.id,
-    "minimaxai/minimax-m2.7",
+    providerConfig.models[TEST_EXTRA_MODEL.key]?.id,
+    TEST_EXTRA_MODEL.modelId,
   );
-  assert.equal(providerConfig.models["minimax-m2.7"]?.name, "MiniMax M2.7");
+  assert.equal(
+    providerConfig.models[TEST_EXTRA_MODEL.key]?.name,
+    TEST_EXTRA_MODEL.displayName,
+  );
 });

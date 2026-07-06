@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fetched GonkaGate model availability from authenticated `GET /v1/models`
+  after safe API-key intake, using the live response for the model picker,
+  config writes, and `--model` validation.
 - Updated managed GonkaGate `limit.context` values to match the current
   deployed windows: `240000` for Kimi/Qwen and `180000` for MiniMax.
 - Wrote the validated GonkaGate chat-completions catalog into the managed

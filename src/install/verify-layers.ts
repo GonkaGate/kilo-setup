@@ -6,7 +6,6 @@ import type {
   EffectiveConfigVerificationLayerSnapshot,
 } from "./contracts/effective-config.js";
 import type { InstallScope } from "./contracts.js";
-import type { CuratedModelKey } from "../constants/models.js";
 import type { InstallDependencies } from "./deps.js";
 import { createInstallError } from "./errors.js";
 import { tryParseJsoncObject } from "./jsonc.js";
@@ -23,7 +22,7 @@ import type { ManagedPaths } from "./paths.js";
 import { resolveInspectableSystemManagedConfigPaths } from "./paths.js";
 import {
   collectManagedOverlapBlockers,
-  collectMissingCuratedModelEntryBlockers,
+  collectMissingSelectedModelEntryBlockers,
   collectProviderActivationBlockers,
   collectProviderModelFilterBlockers,
   collectProviderShapeBlockers,
@@ -36,6 +35,7 @@ import {
   isPathInside,
   normalizeInstallPath,
 } from "./platform-path.js";
+import type { InstallModelKey } from "./model-catalog.js";
 
 const INSPECTABLE_LAYER_PRECEDENCE = Object.freeze({
   global_config: 0,
@@ -51,7 +51,7 @@ const INSPECTABLE_LAYER_PRECEDENCE = Object.freeze({
 
 export interface VerificationLayerInspectionRequest {
   managedPaths: ManagedPaths;
-  model: CuratedModelKey;
+  model: InstallModelKey;
   projectRoot: string;
   providerId: string;
   scope: InstallScope;
@@ -134,7 +134,7 @@ export async function inspectVerificationLayers(
         request.providerId,
         layerPath,
       ),
-      ...collectMissingCuratedModelEntryBlockers(
+      ...collectMissingSelectedModelEntryBlockers(
         layerSnapshot.config,
         layerSnapshot.source.layer,
         {

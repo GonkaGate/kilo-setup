@@ -164,9 +164,9 @@ const INSTALL_ERROR_MESSAGE_FACTORIES: {
       ? "Non-interactive setup inside a git repository requires --scope or --yes so the installer can choose between user and project activation safely."
       : "Non-interactive setup requires --scope or --yes so the installer can confirm the activation scope safely.",
   unsupported_model_key: (details) =>
-    `The model key ${details.modelKey} is not a validated curated GonkaGate Kilo option.`,
+    `The model id ${details.modelKey} was not returned by GonkaGate /v1/models.`,
   validated_models_unavailable: () =>
-    "No validated curated GonkaGate Kilo models are currently available in this package build.",
+    "No usable GonkaGate Kilo models were returned by /v1/models.",
 };
 
 export class InstallError<TCode extends InstallErrorCode> extends Error {

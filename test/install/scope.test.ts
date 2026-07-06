@@ -4,6 +4,11 @@ import { writeScopeManagedConfigs } from "../../src/install/scope.js";
 import { resolveManagedPaths } from "../../src/install/paths.js";
 import type { StubInstallFs } from "./test-deps.js";
 import { createStubbedTestInstallDependencies } from "./test-deps.js";
+import {
+  createValidatedTestModelCatalog,
+  TEST_EXTRA_MODEL,
+  TEST_VALIDATED_MODEL,
+} from "./test-model-catalog.js";
 
 function createScopeTestContext(
   options: {
@@ -13,6 +18,10 @@ function createScopeTestContext(
   const dependencies = createStubbedTestInstallDependencies({
     seedFiles: options.seedFiles,
   });
+  const modelCatalog = createValidatedTestModelCatalog([
+    TEST_VALIDATED_MODEL,
+    TEST_EXTRA_MODEL,
+  ]);
   const projectRoot = dependencies.runtime.cwd;
   const managedPaths = resolveManagedPaths(
     dependencies.runtime.homeDir,
@@ -24,6 +33,7 @@ function createScopeTestContext(
     dependencies,
     fs: dependencies.fs as StubInstallFs,
     managedPaths,
+    modelCatalog,
     projectRoot,
   };
 }
@@ -32,8 +42,7 @@ test("user scope writes provider and activation to user config and removes owned
   const context = createScopeTestContext({
     seedFiles: [
       {
-        contents:
-          '{\n  "model": "gonkagate/qwen3-235b-a22b-instruct-2507-fp8",\n  "small_model": "custom/small"\n}\n',
+        contents: `{\n  "model": "${formatModelRef(TEST_VALIDATED_MODEL.key)}",\n  "small_model": "custom/small"\n}\n`,
         path: "/workspace/project/.kilo/kilo.jsonc",
       },
     ],
@@ -42,7 +51,8 @@ test("user scope writes provider and activation to user config and removes owned
   const result = await writeScopeManagedConfigs(
     {
       managedPaths: context.managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: TEST_VALIDATED_MODEL.key,
+      modelCatalog: context.modelCatalog,
       projectRoot: context.projectRoot,
       scope: "user",
     },
@@ -66,10 +76,15 @@ test("user scope writes provider and activation to user config and removes owned
   );
   assert.match(
     userConfigText,
-    /"model": "gonkagate\/qwen3-235b-a22b-instruct-2507-fp8"/,
+    new RegExp(
+      `"model": "${escapeRegExp(formatModelRef(TEST_VALIDATED_MODEL.key))}"`,
+    ),
   );
-  assert.match(userConfigText, /"kimi-k2\.6"/);
-  assert.match(userConfigText, /"qwen3-235b-a22b-instruct-2507-fp8"/);
+  assert.match(
+    userConfigText,
+    new RegExp(escapeRegExp(TEST_VALIDATED_MODEL.key)),
+  );
+  assert.match(userConfigText, new RegExp(escapeRegExp(TEST_EXTRA_MODEL.key)));
   assert.doesNotMatch(userConfigText, /small_model/);
   assert.doesNotMatch(projectConfigText, /"model": "gonkagate\//);
   assert.match(projectConfigText, /"small_model": "custom\/small"/);
@@ -81,7 +96,8 @@ test("project scope writes provider only to user config and activation only to p
   const result = await writeScopeManagedConfigs(
     {
       managedPaths: context.managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: TEST_VALIDATED_MODEL.key,
+      modelCatalog: context.modelCatalog,
       projectRoot: context.projectRoot,
       scope: "project",
     },
@@ -109,7 +125,8 @@ test("scope writes are idempotent on rerun", async () => {
   const firstWrite = await writeScopeManagedConfigs(
     {
       managedPaths: context.managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: TEST_VALIDATED_MODEL.key,
+      modelCatalog: context.modelCatalog,
       projectRoot: context.projectRoot,
       scope: "project",
     },
@@ -118,7 +135,8 @@ test("scope writes are idempotent on rerun", async () => {
   const secondWrite = await writeScopeManagedConfigs(
     {
       managedPaths: context.managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: TEST_VALIDATED_MODEL.key,
+      modelCatalog: context.modelCatalog,
       projectRoot: context.projectRoot,
       scope: "project",
     },
@@ -134,8 +152,7 @@ test("scope switch removes only installer-owned stale activation from the old ta
   const context = createScopeTestContext({
     seedFiles: [
       {
-        contents:
-          '{\n  "model": "gonkagate/qwen3-235b-a22b-instruct-2507-fp8",\n  "small_model": "custom/small"\n}\n',
+        contents: `{\n  "model": "${formatModelRef(TEST_VALIDATED_MODEL.key)}",\n  "small_model": "custom/small"\n}\n`,
         path: "/home/test/.config/kilo/kilo.jsonc",
       },
       {
@@ -148,8 +165,9 @@ test("scope switch removes only installer-owned stale activation from the old ta
   await writeScopeManagedConfigs(
     {
       managedPaths: context.managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
-      previousManagedModelKey: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: TEST_VALIDATED_MODEL.key,
+      modelCatalog: context.modelCatalog,
+      previousManagedModelKey: TEST_VALIDATED_MODEL.key,
       projectRoot: context.projectRoot,
       scope: "project",
     },
@@ -165,3 +183,11 @@ test("scope switch removes only installer-owned stale activation from the old ta
   assert.match(userConfigText, /"small_model": "custom\/small"/);
   assert.match(projectConfigText, /"model": "gonkagate\//);
 });
+
+function formatModelRef(modelKey: string): string {
+  return `gonkagate/${modelKey}`;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

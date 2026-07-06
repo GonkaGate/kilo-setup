@@ -13,12 +13,9 @@ import {
   KILO_PREFERRED_PROJECT_CONFIG,
   KILO_PRIMARY_COMMAND,
 } from "./kilo.js";
-import type {
-  CuratedModelKey,
-  ValidatedCuratedModel,
-} from "../constants/models.js";
 import type { ResolvedInstallContext } from "./context.js";
 import { formatKiloModelRef } from "./managed-provider-config.js";
+import type { InstallModel } from "./model-catalog.js";
 import type {
   InstalledInstallResult,
   InstallFlowProgress,
@@ -32,30 +29,27 @@ export type InstallProgressState = InstallFlowProgress;
 
 export interface PreparedInstallSession {
   context: ResolvedInstallContext;
-  model: ValidatedCuratedModel;
+  model: InstallModel;
   summary: InstallFlowSelectionSummary;
 }
 
 export function createInstallProgressState(
   kilo: SupportedKiloSummary,
-  model?: ValidatedCuratedModel,
+  model?: InstallModel,
   scope?: InstallScope,
 ): InstallProgressState {
   return {
     kilo,
     modelDisplayName: model?.displayName,
     modelKey: model?.key,
-    modelRef:
-      model === undefined
-        ? undefined
-        : (formatKiloModelRef(model) as `gonkagate/${CuratedModelKey}`),
+    modelRef: model === undefined ? undefined : formatKiloModelRef(model),
     scope,
   };
 }
 
 export function prepareInstallSession(
   context: ResolvedInstallContext,
-  model: ValidatedCuratedModel,
+  model: InstallModel,
   scope: InstallScope,
 ): PreparedInstallSession {
   return {

@@ -32,13 +32,11 @@ Current honest state:
   sandbox XDG config tree so project-scope verification matches the local
   resolver on `@kilocode/cli >=7.2.0` installs, and that temporary sandbox now
   stages outside the repository with cleanup after verification
-- the stock public build now ships `moonshotai/Kimi-K2.6` as the recommended
-  validated curated default, with installer-managed
+- the installer now fetches `GET https://api.gonkagate.com/v1/models` after
+  safe API-key intake and uses that live response as the model source of truth
+- the managed GonkaGate provider config writes every fetched chat-completions
+  model into Kilo's OpenCode-style `/models` picker with installer-managed
   `limit.output = 8192` for Kilo `7.2.0` compatibility
-- the managed GonkaGate provider config now writes the validated
-  chat-completions catalog, currently Kimi K2.6, Qwen3 235B A22B Instruct
-  2507 FP8, and MiniMax M2.7, so Kilo's OpenCode-style `/models` picker can
-  switch between validated GonkaGate models
 - Kilo detection now accepts `@kilocode/cli >=7.2.0` without pre-blocking
   future Kilo releases, while the audited compatibility baseline remains
   `@kilocode/cli@7.2.0`
@@ -59,12 +57,12 @@ The intended happy path is:
 
 1. user runs `npx @gonkagate/kilo-setup`
 2. installer validates local `kilo` or fallback `kilocode`
-3. installer offers curated validated Kilo model choices
-4. installer auto-selects `project` inside a git repository or `user`
+3. installer collects a GonkaGate key through a hidden prompt,
+   `GONKAGATE_API_KEY`, or `--api-key-stdin`
+4. installer fetches live Kilo model choices from GonkaGate `/v1/models`
+5. installer auto-selects `project` inside a git repository or `user`
    otherwise, and only asks on interactive reruns when the previous
    installer-managed scope differs from the new recommendation
-5. installer collects a GonkaGate key through a hidden prompt,
-   `GONKAGATE_API_KEY`, or `--api-key-stdin`
 6. installer writes the minimum safe Kilo config layers
 7. for `project` installs, installer reports Kilo global UI-model cache risk
    and can clear the current cached model on request
@@ -134,10 +132,8 @@ These are implementation facts today:
 - `src/install/` contains shipped Kilo detection, path resolution, secret
   intake, managed config writes, rollback, effective-config verification, and
   orchestration
-- `src/constants/models.ts` now exposes Kimi K2.6 as the recommended validated
-  production default plus the validated Qwen3 235B A22B Instruct 2507 FP8
-  and MiniMax M2.7 catalog entries, each with installer-managed
-  `limit.output = 8192` in the written Kilo provider config
+- `src/install/model-catalog.ts` fetches and parses GonkaGate `/v1/models` as
+  the installer model source of truth
 - `docs/specs/kilo-setup-prd/spec.md` is the copied Kilo setup PRD
 - `docs/release-readiness.md` records the current production-readiness audit
 - `.github/workflows/release-please.yml` and `.github/workflows/publish.yml`

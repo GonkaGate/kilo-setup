@@ -1,5 +1,5 @@
-import type { CuratedModelKey } from "../../constants/models.js";
 import type { JsonObject, JsonValue } from "../../json.js";
+import type { InstallModelCatalog, InstallModelKey } from "../model-catalog.js";
 import type { ManagedPaths } from "../paths.js";
 import type { ManagedArtifactWriteResult } from "./managed-artifact.js";
 
@@ -85,8 +85,9 @@ export type ManagedConfigPlan =
 
 export interface ScopeWriteRequest {
   managedPaths: ManagedPaths;
-  model: CuratedModelKey;
-  previousManagedModelKey?: CuratedModelKey;
+  model: InstallModelKey;
+  modelCatalog: InstallModelCatalog;
+  previousManagedModelKey?: InstallModelKey;
   projectRoot: string;
   scope: ManagedConfigScope;
 }

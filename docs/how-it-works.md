@@ -29,48 +29,46 @@ Current public limit:
 - the published contract keeps a minimum Kilo floor of
   `@kilocode/cli >=7.2.0`, `chat/completions`, and non-Windows production
   claims
-- the curated default is
-  `moonshotai/Kimi-K2.6` with `limit.context = 240000` and
-  `limit.output = 8192`
-- the written provider config includes the validated chat-completions model
-  catalog, currently `moonshotai/Kimi-K2.6`,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
-  `minimaxai/minimax-m2.7`, so Kilo's OpenCode-style `/models` picker can
-  switch between validated GonkaGate models
-- broader model claims still require additional proof before models should be
-  added to the validated catalog
+- model availability comes from authenticated `GET /v1/models` after safe
+  API-key intake
+- the written provider config includes every fetched GonkaGate
+  chat-completions model so Kilo's OpenCode-style `/models` picker can switch
+  between the live GonkaGate options
+- each fetched model entry gets installer-managed `limit.output = 8192` for
+  Kilo `7.2.0` compatibility
 
 ## Install Flow
 
 1. Check that `kilo` is available, or fall back to `kilocode`.
 2. Verify the minimum accepted Kilo floor: `@kilocode/cli >=7.2.0`.
-3. Resolve the curated model choice and scope.
-4. Use the recommended scope automatically in the default interactive flow:
-   - `project` inside a git repository
-   - `user` outside a repository
-5. On interactive reruns, ask about scope only when the previous
-   installer-managed scope differs from the new recommendation.
-6. Accept a GonkaGate API key through:
+3. Accept a GonkaGate API key through:
    - a hidden interactive prompt
    - `GONKAGATE_API_KEY`
    - `--api-key-stdin`
-7. Save the secret only under `~/.gonkagate/kilo/api-key`.
-8. Write or update the user-level provider definition, including the validated
+4. Fetch the live GonkaGate model catalog from `GET /v1/models`.
+5. Resolve the live model choice and scope.
+6. Use the recommended scope automatically in the default interactive flow:
+   - `project` inside a git repository
+   - `user` outside a repository
+7. On interactive reruns, ask about scope only when the previous
+   installer-managed scope differs from the new recommendation.
+8. Save the secret only under `~/.gonkagate/kilo/api-key`.
+9. Write or update the user-level provider definition, including the fetched
    GonkaGate model catalog for Kilo's `/models` picker.
-9. When `project` scope is chosen, write only activation settings into
-   `.kilo/kilo.jsonc`.
-10. On rerun, remove only installer-owned stale GonkaGate activation from the
+10. When `project` scope is chosen, write only activation settings into
+    `.kilo/kilo.jsonc`.
+11. On rerun, remove only installer-owned stale GonkaGate activation from the
     old location and preserve unrelated Kilo config.
-11. Verify the durable intended Kilo outcome with the local resolver and use
+12. Verify the durable intended Kilo outcome with the local resolver and use
     the XDG-isolated oracle as a compatibility check.
-12. If `KILO_CONFIG_CONTENT` is active, or the installer is running inside an
+13. If `KILO_CONFIG_CONTENT` is active, or the installer is running inside an
     active `kilo` terminal session with runtime config overrides, verify the
     current session separately.
-13. For `project` installs, surface Kilo global UI-model cache notices and
+14. For `project` installs, surface Kilo global UI-model cache notices and
     optionally clear the current cached model when the user requests it.
-14. Report redacted blockers or mismatches instead of printing raw resolved
+15. Report redacted blockers or mismatches instead of printing raw resolved
     config.
-15. Finish by sending the user back to plain `kilo`.
+16. Finish by sending the user back to plain `kilo`.
 
 ## Why User-Level Provider Ownership
 

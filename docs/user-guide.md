@@ -23,14 +23,10 @@ Today the public package is intentionally narrow:
 
 - minimum Kilo compatibility floor: `@kilocode/cli >=7.2.0`
 - current transport target: `chat/completions`
-- current curated default:
-  `moonshotai/Kimi-K2.6`
-- validated GonkaGate catalog for Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6`,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
-  `minimaxai/minimax-m2.7`
-- managed model limits: `limit.output = 8192` for all validated entries;
-  `limit.context = 240000` for Kimi/Qwen and `180000` for MiniMax
+- model availability comes from authenticated `GET /v1/models`
+- Kilo's OpenCode-style `/models` picker receives every fetched GonkaGate
+  model
+- managed model limit: `limit.output = 8192` for each fetched model entry
 - no native Windows production claim yet
 
 ## Before You Run It
@@ -61,15 +57,16 @@ The installer will then:
 
 1. Detect `kilo`, or fall back to `kilocode`.
 2. Check the minimum supported Kilo floor.
-3. Offer the curated GonkaGate model choice.
-4. Write the validated GonkaGate provider model catalog for Kilo's `/models`
+3. Prompt for the GonkaGate API key using a hidden input.
+4. Fetch the live GonkaGate model catalog from `/v1/models`.
+5. Offer the live GonkaGate model choices.
+6. Write the fetched GonkaGate provider model catalog for Kilo's `/models`
    picker.
-5. Choose the recommended scope automatically:
+7. Choose the recommended scope automatically:
    - inside a git repository: `project`
    - outside a repository: `user`
-6. Prompt for the GonkaGate API key using a hidden input.
-7. Write the managed config and verify the result.
-8. Return you to normal `kilo` usage.
+8. Write the managed config and verify the result.
+9. Return you to normal `kilo` usage.
 
 Interactive reruns ask about scope only when the previous installer-managed
 scope differs from the new recommendation.
@@ -162,7 +159,7 @@ Use `--json` when another tool needs a machine-readable result.
 
 What they are for:
 
-- `--model`: choose a curated GonkaGate model key explicitly
+- `--model`: choose a GonkaGate model id returned by `/v1/models` explicitly
 - `--scope`: choose `user` or `project` without an interactive prompt
 - `--cwd`: change the directory used for project-scope path resolution
 - `--api-key-stdin`: read the API key from standard input

@@ -3,16 +3,10 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import type {
-  CuratedModelKey,
-  RecommendedProductionDefaultCuratedModel,
-  ValidatedCuratedModel,
-} from "../src/constants/models.js";
 import { CONTRACT_METADATA } from "../src/constants/contract.js";
 import { GONKAGATE_BASE_URL } from "../src/constants/gateway.js";
 import { parseCliOptions, renderCliEntrypointError, run } from "../src/cli.js";
 import type { InstallSelectOptions } from "../src/install/deps.js";
-import type { InstallModelCatalog } from "../src/install/model-catalog.js";
 import {
   buildManagedProviderConfig,
   formatKiloModelRef,
@@ -20,21 +14,12 @@ import {
 import { createStubbedTestInstallDependencies } from "./install/test-deps.js";
 import type { TestInstallFsFileSeed } from "./install/test-deps.js";
 import { escapeRegExp, repoRoot } from "./contract-helpers.js";
+import {
+  createValidatedTestModelCatalog,
+  TEST_VALIDATED_MODEL,
+} from "./install/test-model-catalog.js";
 
-const MODEL_KEY = "kimi-k2.6" as const;
-const VALIDATED_MODEL: RecommendedProductionDefaultCuratedModel = {
-  adapterPackage: "@ai-sdk/openai-compatible",
-  displayName: "Kimi K2.6",
-  key: MODEL_KEY,
-  limits: {
-    context: 240000,
-    output: 8192,
-  },
-  modelId: "moonshotai/Kimi-K2.6",
-  recommended: true,
-  transport: "chat_completions",
-  validationStatus: "validated",
-};
+const MODEL_KEY = TEST_VALIDATED_MODEL.key;
 
 type TestSelectOption = <TValue extends string>(
   options: InstallSelectOptions<TValue>,
@@ -54,27 +39,14 @@ function createBufferWriter(): BufferWriter {
   };
 }
 
-function createValidatedModelCatalog(): InstallModelCatalog {
-  return {
-    getCuratedModelByKey(key) {
-      return key === MODEL_KEY ? VALIDATED_MODEL : undefined;
-    },
-    getRecommendedProductionDefaultModel() {
-      return VALIDATED_MODEL;
-    },
-    getValidatedModels() {
-      return [VALIDATED_MODEL];
-    },
-  };
-}
-
 function createResolvedConfigFixture(
   mutate?: (config: Record<string, unknown>) => void,
 ): string {
+  const catalog = createValidatedTestModelCatalog();
   const resolvedConfig = {
     model: formatKiloModelRef(MODEL_KEY),
     provider: {
-      gonkagate: buildManagedProviderConfig(MODEL_KEY),
+      gonkagate: buildManagedProviderConfig(MODEL_KEY, catalog),
     },
   } satisfies Record<string, unknown>;
   const nextConfig = structuredClone(resolvedConfig);
@@ -118,7 +90,7 @@ function createCliDependencies(
     },
     models: {
       kind: "override",
-      value: createValidatedModelCatalog(),
+      value: createValidatedTestModelCatalog(),
     },
     prompts:
       options.selectOption === undefined
@@ -196,7 +168,7 @@ test("CLI wrapper exposes the runtime help surface", () => {
   assert.equal(helpResult.status, 0);
   assert.match(helpResult.stdout, /Usage: kilo-setup/i);
   assert.match(helpResult.stdout, /Configure Kilo to use GonkaGate/i);
-  assert.match(helpResult.stdout, /validated Kimi K2\.6/i);
+  assert.match(helpResult.stdout, /fetches GonkaGate models/i);
   assert.match(helpResult.stdout, /--scope <scope>/);
   assert.match(helpResult.stdout, /--api-key-stdin/);
   assert.match(helpResult.stdout, /GONKAGATE_API_KEY/);
@@ -240,7 +212,7 @@ test("interactive runs show the public model picker even when one validated mode
     promptMessages[0] ?? "",
     /Choose the GonkaGate model to configure for Kilo/i,
   );
-  assert.deepEqual(promptChoices[0], ["Kimi K2.6 (Recommended)"]);
+  assert.deepEqual(promptChoices[0], ["Live Test Model (Recommended)"]);
   assert.equal(promptMessages.length, 1);
 });
 
@@ -394,7 +366,7 @@ test("CLI omits undefined blocked kilo details from JSON output", async () => {
     dependencies: createStubbedTestInstallDependencies({
       models: {
         kind: "override",
-        value: createValidatedModelCatalog(),
+        value: createValidatedTestModelCatalog(),
       },
       runtime: {
         cwd: "/workspace/project",

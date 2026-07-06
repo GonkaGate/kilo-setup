@@ -72,13 +72,10 @@ Current public baseline:
 - package: `@gonkagate/kilo-setup`
 - primary command after setup: `kilo`
 - current transport target: `chat/completions`
-- curated default:
-  `moonshotai/Kimi-K2.6`
-- managed validated catalog for Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6`,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
-  `minimaxai/minimax-m2.7`
-- installer-managed `limit.output = 8192` for Kilo compatibility
+- model source of truth: `GET https://api.gonkagate.com/v1/models` after safe
+  API-key intake
+- Kilo's OpenCode-style `/models` picker receives every fetched GonkaGate model
+- installer-managed `limit.output = 8192` for each fetched model entry
 - no native Windows production claim yet
 
 ## Shortest Start Path
@@ -95,15 +92,16 @@ The installer will:
 
 1. detect `kilo`, or fall back to `kilocode`
 2. verify local Kilo is at least `@kilocode/cli >=7.2.0`
-3. show the curated model choice
-4. write the validated GonkaGate provider model catalog for Kilo's `/models`
+3. collect your API key through a hidden prompt
+4. fetch the live GonkaGate model catalog from `/v1/models`
+5. show the live model choices
+6. write the fetched GonkaGate provider model catalog for Kilo's `/models`
    picker
-5. choose the recommended scope automatically:
+7. choose the recommended scope automatically:
    - inside a git repository: `project`
    - outside a repository: `user`
-6. collect your API key through a hidden prompt
-7. write the managed config and verify the result
-8. return you to normal `kilo` usage
+8. write the managed config and verify the result
+9. return you to normal `kilo` usage
 
 On interactive reruns, the installer asks about scope only if the last
 installer-managed scope differs from the new recommendation.
@@ -205,18 +203,14 @@ This repository intentionally stays narrow today:
 
 - minimum accepted Kilo floor: `@kilocode/cli >=7.2.0`
 - current transport target: `chat/completions`
-- current curated default:
-  `moonshotai/Kimi-K2.6`
-- validated GonkaGate models exposed to Kilo's `/models` picker:
-  `moonshotai/Kimi-K2.6`,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
-  `minimaxai/minimax-m2.7`
+- model availability comes from authenticated `GET /v1/models`
+- if no explicit model is selected, setup uses the API-provided default when
+  present, otherwise the first returned model
 - real-path Kilo verification is not the production default
 - native Windows production support is not claimed yet
 - future Kilo releases are not pre-blocked by version, but observed
   compatibility breaks still need fixes
-- unvalidated extra models and new flows are not implied just because this
-  package exists
+- new transport flows are not implied just because this package exists
 
 The shipped runtime treats effective Kilo config as the real success gate. It
 uses the local resolver as the durable verifier and keeps the XDG-isolated

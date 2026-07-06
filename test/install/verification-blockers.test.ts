@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   collectManagedOverlapBlockers,
-  collectMissingCuratedModelEntryBlockers,
+  collectMissingSelectedModelEntryBlockers,
   collectProviderActivationBlockers,
   collectProviderModelFilterBlockers,
   collectProviderShapeBlockers,
@@ -85,9 +85,9 @@ test("provider shape blockers catch non-object provider definitions", () => {
   );
 });
 
-test("missing curated model entry blockers fire when a higher-precedence provider omits the selected model", () => {
+test("missing selected model entry blockers fire when a higher-precedence provider omits the selected model", () => {
   assert.deepEqual(
-    collectMissingCuratedModelEntryBlockers(
+    collectMissingSelectedModelEntryBlockers(
       {
         provider: {
           gonkagate: {
@@ -112,7 +112,7 @@ test("missing curated model entry blockers fire when a higher-precedence provide
         layer: "system_managed_config",
         path: "/etc/kilo/kilo.jsonc",
         reason:
-          "Higher-precedence config defines the GonkaGate provider without the curated model entry.",
+          "Higher-precedence config defines the GonkaGate provider without the selected model entry.",
       },
     ],
   );

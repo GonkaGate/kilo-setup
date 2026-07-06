@@ -1,88 +1,99 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { GONKAGATE_BASE_URL } from "../../src/constants/gateway.js";
 import {
-  CURATED_MODEL_REGISTRY,
-  createCuratedModelIndex,
-  getRecommendedProductionDefaultModel,
-  getValidatedModelKeys,
-} from "../../src/constants/models.js";
+  fetchLiveInstallModelCatalog,
+  type InstallHttpClient,
+} from "../../src/install/model-catalog.js";
+import { expectInstallErrorCode } from "./test-helpers.js";
 
-test("the default curated model is the shipped validated Kimi public default", () => {
-  const model = CURATED_MODEL_REGISTRY["kimi-k2.6"];
+test("fetchLiveInstallModelCatalog uses /v1/models as the source of truth", async () => {
+  let requestedUrl = "";
+  let requestedAuthorization = "";
+  const catalog = await fetchLiveInstallModelCatalog("gp-test-secret", {
+    async fetchJson(url, options) {
+      requestedUrl = url;
+      requestedAuthorization = options?.headers?.Authorization ?? "";
 
-  assert.equal(model.adapterPackage, "@ai-sdk/openai-compatible");
-  assert.equal(model.validationStatus, "validated");
-  assert.equal(model.limits?.context, 240000);
-  assert.equal(model.limits?.output, 8192);
-  assert.deepEqual(getValidatedModelKeys(), [
-    "kimi-k2.6",
-    "qwen3-235b-a22b-instruct-2507-fp8",
-    "minimax-m2.7",
-  ]);
-  assert.equal(getRecommendedProductionDefaultModel()?.key, "kimi-k2.6");
+      return {
+        body: {
+          data: [
+            { id: "provider/live-alpha", name: "Live Alpha" },
+            { id: "provider/live-beta" },
+            { id: "provider/live-alpha", name: "Ignored Duplicate" },
+          ],
+        },
+        ok: true,
+        status: 200,
+      };
+    },
+  });
+
+  assert.equal(requestedUrl, `${GONKAGATE_BASE_URL}/models`);
+  assert.equal(requestedAuthorization, "Bearer gp-test-secret");
+  assert.deepEqual(
+    catalog.getModels().map((model) => model.key),
+    ["provider/live-alpha", "provider/live-beta"],
+  );
+  assert.equal(
+    catalog.getModelByKey("provider/live-alpha")?.displayName,
+    "Live Alpha",
+  );
+  assert.equal(
+    catalog.getModelByKey("provider/live-beta")?.displayName,
+    "provider/live-beta",
+  );
+  assert.equal(
+    catalog.getRecommendedDefaultModel()?.key,
+    "provider/live-alpha",
+  );
 });
 
-test("createCuratedModelIndex exposes a recommended production default when a validated model is recommended", () => {
-  const testRegistry = {
-    alpha: {
-      adapterPackage: "@ai-sdk/openai-compatible",
-      displayName: "Alpha",
-      limits: {
-        context: 1024,
-      },
-      modelId: "gonkagate/alpha",
-      recommended: false,
-      transport: "chat_completions",
-      validationStatus: "validated",
+test("fetchLiveInstallModelCatalog honors an API-provided default model", async () => {
+  const catalog = await fetchLiveInstallModelCatalog("gp-test-secret", {
+    async fetchJson() {
+      return {
+        body: {
+          data: [
+            { id: "provider/live-alpha", name: "Live Alpha" },
+            { default: true, id: "provider/live-beta", name: "Live Beta" },
+          ],
+        },
+        ok: true,
+        status: 200,
+      };
     },
-    beta: {
-      adapterPackage: "@ai-sdk/openai-compatible",
-      displayName: "Beta",
-      limits: {
-        context: 1024,
-        output: 2048,
-      },
-      modelId: "gonkagate/beta",
-      recommended: true,
-      transport: "chat_completions",
-      validationStatus: "validated",
-    },
-  } as const;
+  });
 
-  const index = createCuratedModelIndex(testRegistry);
-
-  assert.deepEqual(index.validatedModelKeys, ["alpha", "beta"]);
-  assert.equal(index.recommendedProductionDefaultModel?.key, "beta");
+  assert.equal(catalog.getRecommendedDefaultModel()?.key, "provider/live-beta");
 });
 
-test("createCuratedModelIndex rejects more than one recommended validated production default", () => {
-  const invalidRegistry = {
-    alpha: {
-      adapterPackage: "@ai-sdk/openai-compatible",
-      displayName: "Alpha",
-      limits: {
-        output: 512,
-      },
-      modelId: "gonkagate/alpha",
-      recommended: true,
-      transport: "chat_completions",
-      validationStatus: "validated",
+test("fetchLiveInstallModelCatalog rejects empty or invalid responses", async () => {
+  const emptyHttp: InstallHttpClient = {
+    async fetchJson() {
+      return {
+        body: { data: [] },
+        ok: true,
+        status: 200,
+      };
     },
-    beta: {
-      adapterPackage: "@ai-sdk/openai-compatible",
-      displayName: "Beta",
-      limits: {
-        output: 256,
-      },
-      modelId: "gonkagate/beta",
-      recommended: true,
-      transport: "chat_completions",
-      validationStatus: "validated",
+  };
+  const invalidHttp: InstallHttpClient = {
+    async fetchJson() {
+      return {
+        body: { data: [{ name: "Missing id" }] },
+        ok: true,
+        status: 200,
+      };
     },
-  } as const;
+  };
 
-  assert.throws(
-    () => createCuratedModelIndex(invalidRegistry),
-    /recommended validated production default/i,
+  await assert.rejects(
+    () => fetchLiveInstallModelCatalog("gp-test-secret", emptyHttp),
+    expectInstallErrorCode("validated_models_unavailable"),
+  );
+  await assert.rejects(
+    () => fetchLiveInstallModelCatalog("gp-test-secret", invalidHttp),
+    expectInstallErrorCode("validated_models_unavailable"),
   );
 });

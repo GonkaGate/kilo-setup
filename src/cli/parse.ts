@@ -54,8 +54,8 @@ function createProgram(output?: ProgramOutput): Command {
     .description("Configure Kilo to use GonkaGate.")
     .addOption(
       new Option(
-        "--model <model-key>",
-        "Choose a curated GonkaGate model key.",
+        "--model <model-id>",
+        "Choose a GonkaGate model id returned by /v1/models.",
       ),
     )
     .addOption(
@@ -110,7 +110,7 @@ Examples:
   printf '%s' "$${GONKAGATE_SECRET_ENV_VAR}" | ${CONTRACT_METADATA.publicEntrypoint} --api-key-stdin --scope project --yes --json
 
 Runtime status:
-  The installer runtime is shipped for Kilo and currently defaults to the validated Kimi K2.6 profile for @kilocode/cli >=7.2.0 installs.
+  The installer runtime fetches GonkaGate models from ${GONKAGATE_BASE_URL}/models after API-key intake for @kilocode/cli >=7.2.0 installs.
 
 Kilo contract anchors:
   - Primary command: ${KILO_PRIMARY_COMMAND}

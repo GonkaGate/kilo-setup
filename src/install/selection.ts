@@ -1,11 +1,8 @@
-import type {
-  CuratedModelKey,
-  ValidatedCuratedModel,
-} from "../constants/models.js";
 import { formatKiloModelRef } from "./managed-provider-config.js";
 import type { InstallDependencies, InstallSelectChoice } from "./deps.js";
 import { createInstallError } from "./errors.js";
 import type { InstallScope } from "./contracts.js";
+import type { InstallModel, InstallModelKey } from "./model-catalog.js";
 
 export interface ModelSelectionRequest {
   modelKey?: string;
@@ -34,10 +31,10 @@ export function getRecommendedInstallScope(
 export async function resolveInstallModel(
   request: ModelSelectionRequest,
   dependencies: InstallDependencies,
-): Promise<ValidatedCuratedModel> {
-  const validatedModels = dependencies.models.getValidatedModels();
+): Promise<InstallModel> {
+  const models = dependencies.models.getModels();
 
-  if (validatedModels.length === 0) {
+  if (models.length === 0) {
     throw createInstallError("validated_models_unavailable", {});
   }
 
@@ -45,44 +42,21 @@ export async function resolveInstallModel(
     return requireValidatedModel(request.modelKey, dependencies);
   }
 
-  const recommendedModel =
-    dependencies.models.getRecommendedProductionDefaultModel();
-  const singleValidatedModel =
-    validatedModels.length === 1 ? validatedModels[0] : undefined;
-  const defaultPromptModel =
-    recommendedModel ?? singleValidatedModel ?? validatedModels[0];
+  const defaultModel = dependencies.models.getRecommendedDefaultModel();
 
   if (request.yes) {
-    if (recommendedModel !== undefined) {
-      return recommendedModel;
-    }
-
-    if (singleValidatedModel !== undefined) {
-      return singleValidatedModel;
-    }
+    return defaultModel ?? models[0]!;
   }
 
   if (!canUseInteractiveInstallPrompts(dependencies)) {
-    if (recommendedModel !== undefined) {
-      return recommendedModel;
-    }
-
-    if (singleValidatedModel !== undefined) {
-      return singleValidatedModel;
-    }
-
-    throw createInstallError("model_selection_required", {
-      validatedModelCount: validatedModels.length,
-    });
+    return defaultModel ?? models[0]!;
   }
 
   const selectedModelKey = await dependencies.prompts.selectOption({
-    choices: validatedModels.map((model) =>
-      createModelChoice(model, defaultPromptModel),
-    ),
-    defaultValue: defaultPromptModel.key,
+    choices: models.map((model) => createModelChoice(model, defaultModel)),
+    defaultValue: (defaultModel ?? models[0]!).key,
     message: "Choose the GonkaGate model to configure for Kilo",
-    pageSize: Math.min(8, validatedModels.length),
+    pageSize: Math.min(8, models.length),
   });
 
   return requireValidatedModel(selectedModelKey, dependencies);
@@ -131,13 +105,13 @@ export async function resolveInstallScope(
 }
 
 function createModelChoice(
-  model: ValidatedCuratedModel,
-  defaultModel: ValidatedCuratedModel,
-): InstallSelectChoice<CuratedModelKey> {
+  model: InstallModel,
+  defaultModel: InstallModel | undefined,
+): InstallSelectChoice<InstallModelKey> {
   return {
-    description: `${formatKiloModelRef(model)} · validated`,
+    description: formatKiloModelRef(model),
     label:
-      model.key === defaultModel.key
+      model.key === defaultModel?.key
         ? `${model.displayName} (Recommended)`
         : model.displayName,
     value: model.key,
@@ -185,14 +159,14 @@ function formatScopeLabel(scope: InstallScope): string {
 function requireValidatedModel(
   modelKey: string,
   dependencies: InstallDependencies,
-): ValidatedCuratedModel {
-  const model = dependencies.models.getCuratedModelByKey(modelKey);
+): InstallModel {
+  const model = dependencies.models.getModelByKey(modelKey);
 
-  if (model === undefined || model.validationStatus !== "validated") {
+  if (model === undefined) {
     throw createInstallError("unsupported_model_key", {
       modelKey,
     });
   }
 
-  return model as ValidatedCuratedModel;
+  return model;
 }

@@ -212,7 +212,7 @@ export function collectProviderShapeBlockers(
   );
 }
 
-export function collectMissingCuratedModelEntryBlockers(
+export function collectMissingSelectedModelEntryBlockers(
   config: Record<string, unknown>,
   layer: EffectiveConfigVerificationBlockingLayer,
   options: {
@@ -253,7 +253,7 @@ export function collectMissingCuratedModelEntryBlockers(
       layer,
       path,
       reason:
-        "Higher-precedence config defines the GonkaGate provider without the curated model entry.",
+        "Higher-precedence config defines the GonkaGate provider without the selected model entry.",
     },
   ];
 }

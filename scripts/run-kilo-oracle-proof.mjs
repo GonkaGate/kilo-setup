@@ -9,6 +9,7 @@ import {
   buildManagedProviderConfig,
   formatKiloModelRef,
 } from "../dist/install/managed-provider-config.js";
+import { createInstallModelCatalog } from "../dist/install/model-catalog.js";
 import { resolveManagedPaths } from "../dist/install/paths.js";
 import { resolveDurableLocalKiloConfig } from "../dist/install/verify-layers.js";
 import { tryParseJsoncObject } from "../dist/install/jsonc.js";
@@ -38,6 +39,18 @@ const managedPaths = resolveManagedPaths(
 );
 const selectedModelKey = "qwen3-235b-a22b-instruct-2507-fp8";
 const selectedModelRef = formatKiloModelRef(selectedModelKey);
+const fixtureModelCatalog = createInstallModelCatalog([
+  {
+    adapterPackage: "@ai-sdk/openai-compatible",
+    displayName: "Oracle Proof Model",
+    key: selectedModelKey,
+    limits: { context: 240000, output: 8192 },
+    modelId: selectedModelKey,
+    recommended: true,
+    transport: "chat_completions",
+    validationStatus: "validated",
+  },
+]);
 
 try {
   await seedFixtureFiles();
@@ -133,7 +146,10 @@ async function seedFixtureFiles() {
     `${JSON.stringify(
       {
         provider: {
-          gonkagate: buildManagedProviderConfig(selectedModelKey),
+          gonkagate: buildManagedProviderConfig(
+            selectedModelKey,
+            fixtureModelCatalog,
+          ),
         },
       },
       null,
@@ -221,6 +237,7 @@ async function executeOracleInvocation(invocation, dependencies) {
         exitCode: result.exitCode,
         ok: false,
         signal: result.signal,
+        stderr: redactSensitiveOutput(result.stderr),
         stderrLength: result.stderr.length,
       };
     }
@@ -244,7 +261,11 @@ function formatOracleFailure(label, attempt) {
     return `${label} invocation ${attempt.command} ${attempt.args.join(" ")} threw ${String(attempt.error)}.`;
   }
 
-  return `${label} invocation ${attempt.command} ${attempt.args.join(" ")} failed with exit code ${attempt.exitCode}${attempt.signal ? ` and signal ${attempt.signal}` : ""}. stderr length=${attempt.stderrLength}.`;
+  return `${label} invocation ${attempt.command} ${attempt.args.join(" ")} failed with exit code ${attempt.exitCode}${attempt.signal ? ` and signal ${attempt.signal}` : ""}. stderr length=${attempt.stderrLength}. stderr=${attempt.stderr}`;
+}
+
+function redactSensitiveOutput(value) {
+  return value.replace(/gp-[A-Za-z0-9]+/gu, "gp-[redacted]");
 }
 
 function collectRealPathCandidates() {

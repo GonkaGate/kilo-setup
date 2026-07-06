@@ -22,9 +22,7 @@ Current contract documents:
 - [`specs/kilo-setup-prd/spec.md`](./specs/kilo-setup-prd/spec.md): copied Kilo
   setup PRD from the planning repository
 
-This repository ships the Kilo installer runtime with a validated curated
-GonkaGate chat-completions catalog, Kimi K2.6 as the recommended default,
-MiniMax M2.7 and Qwen3 235B A22B Instruct 2507 FP8 as additional validated
-catalog entries, installer-managed `limit.output = 8192` for Kilo
-compatibility, and a minimum accepted Kilo floor of `@kilocode/cli >=7.2.0`
-without a preset upper version bound.
+This repository ships the Kilo installer runtime with authenticated GonkaGate
+`GET /v1/models` discovery as the model source of truth, installer-managed
+`limit.output = 8192` for each fetched Kilo model entry, and a minimum accepted
+Kilo floor of `@kilocode/cli >=7.2.0` without a preset upper version bound.

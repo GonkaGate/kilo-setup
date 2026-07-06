@@ -129,16 +129,13 @@ Right now the public default is deliberately small:
 - base URL: `https://api.gonkagate.com/v1`
 - transport: `chat/completions`
 - minimum Kilo floor: `@kilocode/cli >=7.2.0`
-- recommended validated model: `moonshotai/Kimi-K2.6`
-- validated catalog exposed to Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6`,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
-  `minimaxai/minimax-m2.7`
-- managed limits: `limit.output = 8192` for all validated entries;
-  `limit.context = 240000` for Kimi/Qwen and `180000` for MiniMax
+- model source of truth: authenticated `GET /v1/models`
+- catalog exposed to Kilo's OpenCode-style `/models` picker: every fetched
+  GonkaGate model id
+- managed limit: `limit.output = 8192` for each fetched model entry
 
-We are treating model support as a curated list, not as a vague "it probably
-works" promise.
+We are treating model availability as GonkaGate API truth, not as a checked-in
+package catalog.
 
 ## What we are not claiming
 
