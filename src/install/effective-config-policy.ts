@@ -1,8 +1,4 @@
 import {
-  type CuratedModelKey,
-  getCuratedModelByKey,
-} from "../constants/models.js";
-import {
   CURRENT_TRANSPORT_TARGET,
   GONKAGATE_PROVIDER_ID,
 } from "../constants/gateway.js";
@@ -12,6 +8,7 @@ import {
   buildManagedProviderConfig,
   GONKAGATE_SECRET_FILE_REFERENCE,
 } from "./managed-provider-config.js";
+import type { InstallModelCatalog, InstallModelKey } from "./model-catalog.js";
 import type { EffectiveConfigValueCheck } from "./verification-mismatches.js";
 
 export interface SecretBindingVerificationPolicy {
@@ -36,12 +33,13 @@ const PROVIDER_REASON_RULES = Object.freeze({
 } as const satisfies Record<string, string>);
 
 export function createResolvedConfigVerificationPolicy(
-  modelKey: CuratedModelKey,
+  modelKey: InstallModelKey,
+  catalog: InstallModelCatalog,
 ): ResolvedConfigVerificationPolicy {
-  const model = getCuratedModelByKey(modelKey);
+  const model = catalog.getModelByKey(modelKey);
 
   if (model === undefined) {
-    throw new Error(`Unsupported curated model key: ${modelKey}`);
+    throw new Error(`Unsupported GonkaGate model id: ${modelKey}`);
   }
 
   const target: EffectiveConfigVerificationTarget = {
@@ -51,7 +49,7 @@ export function createResolvedConfigVerificationPolicy(
     transport:
       CURRENT_TRANSPORT_TARGET as EffectiveConfigVerificationTarget["transport"],
   };
-  const expectedProviderConfig = buildManagedProviderConfig(modelKey);
+  const expectedProviderConfig = buildManagedProviderConfig(modelKey, catalog);
 
   return {
     target,

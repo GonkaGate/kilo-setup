@@ -1,12 +1,9 @@
 import { CONTRACT_METADATA } from "../constants/contract.js";
-import {
-  isCuratedModelKey,
-  isCuratedModelTransport,
-} from "../constants/models.js";
 import type { ManagedInstallStateRecord } from "./contracts/install-state.js";
 import type { ManagedArtifactWriteResult } from "./contracts/managed-artifact.js";
 import type { InstallDependencies } from "./deps.js";
 import { createInstallError } from "./errors.js";
+import { isInstallModelTransport } from "./model-catalog.js";
 import {
   assertUserProfileScopedManagedPath,
   replaceManagedTextFile,
@@ -124,12 +121,12 @@ function parseManagedInstallStateRecord(
   const selectedModelKey = getRequiredString(value, "selectedModelKey");
   const selectedScope = getRequiredString(value, "selectedScope");
 
-  if (!isCuratedModelTransport(currentTransport)) {
+  if (!isInstallModelTransport(currentTransport)) {
     throw new Error("Managed install state has an unknown currentTransport.");
   }
 
-  if (!isCuratedModelKey(selectedModelKey)) {
-    throw new Error("Managed install state has an unknown selectedModelKey.");
+  if (selectedModelKey.trim().length === 0) {
+    throw new Error("Managed install state has an empty selectedModelKey.");
   }
 
   if (selectedScope !== "project" && selectedScope !== "user") {

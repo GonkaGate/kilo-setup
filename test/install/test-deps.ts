@@ -6,13 +6,17 @@ import {
   type InstallCommandRunner,
   type InstallDependencies,
   type InstallFs,
+  type InstallHttpClient,
   type InstallInput,
   type InstallPrompts,
   type InstallRuntimeEnvironment,
   type InstallRuntimeOverrides,
   type InstallSelectOptions,
 } from "../../src/install/deps.js";
-import type { InstallModelCatalog } from "../../src/install/model-catalog.js";
+import {
+  createInstallModelCatalog,
+  type InstallModelCatalog,
+} from "../../src/install/model-catalog.js";
 import {
   getInstallPathApi,
   normalizeInstallPath,
@@ -51,6 +55,10 @@ type TestInstallInputConfig = TestDependencyConfig<
   InstallInput,
   { stdinText?: string }
 >;
+type TestInstallHttpConfig = TestDependencyConfig<
+  InstallHttpClient,
+  { body?: unknown; ok?: boolean; status?: number }
+>;
 type TestInstallModelCatalogConfig = OverrideConfig<InstallModelCatalog>;
 type TestInstallPromptsConfig = TestDependencyConfig<
   InstallPrompts,
@@ -68,6 +76,7 @@ export interface TestInstallDependencyOverrides {
   seedDirectories?: readonly TestInstallFsDirectorySeed[];
   seedFiles?: readonly TestInstallFsFileSeed[];
   fs?: Partial<InstallFs>;
+  http?: TestInstallHttpConfig;
   input?: TestInstallInputConfig;
   models?: TestInstallModelCatalogConfig;
   prompts?: TestInstallPromptsConfig;
@@ -437,6 +446,53 @@ export function createStubInstallInput(stdinText = ""): InstallInput {
   };
 }
 
+export function createStubInstallHttp(
+  options: { body?: unknown; ok?: boolean; status?: number } = {},
+): InstallHttpClient {
+  return {
+    async fetchJson() {
+      return {
+        body: options.body ?? {
+          data: [{ id: "provider/live-test-model", name: "Live Test Model" }],
+        },
+        ok: options.ok ?? true,
+        status: options.status ?? 200,
+      };
+    },
+  };
+}
+
+export function createStubInstallModelCatalog(): InstallModelCatalog {
+  return createInstallModelCatalog([
+    {
+      adapterPackage: "@ai-sdk/openai-compatible",
+      displayName: "Live Test Model",
+      key: "provider/live-test-model",
+      limits: {
+        context: 240000,
+        output: 8192,
+      },
+      modelId: "provider/live-test-model",
+      recommended: true,
+      transport: "chat_completions",
+      validationStatus: "validated",
+    },
+    {
+      adapterPackage: "@ai-sdk/openai-compatible",
+      displayName: "Qwen Fixture",
+      key: "qwen3-235b-a22b-instruct-2507-fp8",
+      limits: {
+        context: 240000,
+        output: 8192,
+      },
+      modelId: "qwen3-235b-a22b-instruct-2507-fp8",
+      recommended: false,
+      transport: "chat_completions",
+      validationStatus: "validated",
+    },
+  ]);
+}
+
 export function createStubInstallPrompts(
   options: {
     error?: unknown;
@@ -516,6 +572,14 @@ export function createStubbedTestInstallDependencies(
       overrides.commandBehaviors ?? {},
     ),
     fs: overrides.fs === undefined ? stubFs : { ...stubFs, ...overrides.fs },
+    http:
+      overrides.http?.kind === "override"
+        ? overrides.http.value
+        : createStubInstallHttp({
+            body: overrides.http?.body,
+            ok: overrides.http?.ok,
+            status: overrides.http?.status,
+          }),
     input:
       overrides.input?.kind === "override"
         ? overrides.input.value
@@ -523,7 +587,7 @@ export function createStubbedTestInstallDependencies(
     models:
       overrides.models?.kind === "override"
         ? overrides.models.value
-        : undefined,
+        : createStubInstallModelCatalog(),
     prompts:
       overrides.prompts?.kind === "override"
         ? overrides.prompts.value

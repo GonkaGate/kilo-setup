@@ -20,10 +20,11 @@ import {
 function createResolvedConfigFixture(
   mutate?: (config: Record<string, unknown>) => void,
 ): string {
+  const catalog = createValidatedTestModelCatalog();
   const resolvedConfig = {
     model: formatKiloModelRef(TEST_VALIDATED_MODEL.key),
     provider: {
-      gonkagate: buildManagedProviderConfig(TEST_VALIDATED_MODEL.key),
+      gonkagate: buildManagedProviderConfig(TEST_VALIDATED_MODEL.key, catalog),
     },
   } satisfies Record<string, unknown>;
   const nextConfig = structuredClone(resolvedConfig);
@@ -72,6 +73,13 @@ function createFlowDependencies(
           ? createEmptyTestModelCatalog()
           : createValidatedTestModelCatalog(),
     },
+    http:
+      options.models === "empty"
+        ? {
+            body: { data: [] },
+            kind: "stub",
+          }
+        : undefined,
     prompts: {
       kind: "stub",
       secret: "gp-flow-secret",

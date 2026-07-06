@@ -1,4 +1,3 @@
-import type { CuratedModelKey } from "../constants/models.js";
 import type {
   EffectiveConfigVerificationBlocker,
   EffectiveConfigVerificationMismatch,
@@ -8,6 +7,7 @@ import type { InstallScope, KiloCommandName } from "./contracts.js";
 import type { InstallDependencies } from "./deps.js";
 import { createResolvedConfigVerificationPolicy } from "./effective-config-policy.js";
 import { createInstallError } from "./errors.js";
+import type { InstallModelKey } from "./model-catalog.js";
 import { tryParseJsoncObject } from "./jsonc.js";
 import { runKiloOracle } from "./kilo-oracle.js";
 import type { ManagedPaths } from "./paths.js";
@@ -24,7 +24,7 @@ import { collectValueCheckMismatches } from "./verification-mismatches.js";
 export interface EffectiveKiloConfigVerificationRequest {
   kiloCommand: KiloCommandName;
   managedPaths: ManagedPaths;
-  model: CuratedModelKey;
+  model: InstallModelKey;
   projectRoot: string;
   scope: InstallScope;
 }
@@ -36,6 +36,7 @@ export async function verifyEffectiveKiloConfig(
   const verificationRequest = toLayerInspectionRequest(request);
   const verificationPolicy = createResolvedConfigVerificationPolicy(
     request.model,
+    dependencies.models,
   );
   const durableResolution = await resolveDurableLocalKiloConfig(
     verificationRequest,
@@ -108,6 +109,7 @@ export async function verifyCurrentSessionKiloConfig(
   });
   const verificationPolicy = createResolvedConfigVerificationPolicy(
     request.model,
+    dependencies.models,
   );
   const layerBlockers = selectHighestPrecedenceInspectableBlockers([
     ...(await inspectVerificationLayers(verificationRequest, dependencies, {

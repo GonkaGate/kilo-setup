@@ -17,15 +17,11 @@ docs, and tests for these facts:
 - Kilo command contract: `kilo` first, `kilocode` as fallback
 - minimum Kilo compatibility floor: `@kilocode/cli >=7.2.0`
 - current GonkaGate transport claim: `chat/completions`
-- curated public default:
-  `moonshotai/Kimi-K2.6`
-- validated provider catalog exposed to Kilo's OpenCode-style `/models` picker:
-  `moonshotai/Kimi-K2.6`,
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
-  `minimaxai/minimax-m2.7`
-- curated model limits for the validated catalog:
-  `limit.output = 8192` for all validated entries; `limit.context = 240000`
-  for Kimi/Qwen and `180000` for MiniMax
+- model availability source: authenticated `GET /v1/models`
+- provider catalog exposed to Kilo's OpenCode-style `/models` picker: every
+  fetched GonkaGate model id
+- model limit written for Kilo compatibility: `limit.output = 8192` for each
+  fetched model entry
 - managed secret path: `~/.gonkagate/kilo/api-key`
 - project scope stays secret-free and still depends on a compatible
   user-level `provider.gonkagate` definition on each machine
@@ -34,21 +30,16 @@ docs, and tests for these facts:
 
 ## External Evidence Captured
 
-The current model-limit contract is backed by product direction plus Gonka
-deployment metadata checked on 2026-06-23:
+The current model contract is backed by product direction plus Kilo
+compatibility evidence:
 
-- Gonka deployment model args list Kimi K2.6 and Qwen3 235B A22B Instruct 2507
-  FP8 with `--max-model-len 240000`
-- Gonka deployment model args list `minimaxai/minimax-m2.7` with
-  `--max-model-len 180000`
-- the model card documents OpenAI-compatible chat completions access through
-  Moonshot's API
-- the API docs describe the supported request path as `POST /v1/chat/completions`
-- the package writes `limit.output = 8192` for validated catalog entries as
-  the installer-managed Kilo compatibility clamp because Kilo `7.2.0` requires
-  a numeric output limit in custom model config
-- the package keeps the same installer-managed `limit.output = 8192`
-  compatibility clamp for every validated catalog entry
+- model availability is resolved from GonkaGate `GET /v1/models` after safe
+  API-key intake
+- the API docs describe the supported request path as
+  `POST /v1/chat/completions`
+- the package writes `limit.output = 8192` for fetched catalog entries as the
+  installer-managed Kilo compatibility clamp because Kilo `7.2.0` requires a
+  numeric output limit in custom model config
 - npm registry metadata checked on 2026-04-29 showed `@kilocode/cli` patch
   releases in the `7.2.x` line, including `7.2.14`, with both `kilo` and
   `kilocode` binaries still exposed by the wrapper package
@@ -62,22 +53,21 @@ The repository must continue to avoid these claims:
 - no claim that GonkaGate `responses` transport works today
 - no claim that real-path Kilo verification is the production default
 - no claim that native Windows production support is proven
-- no claim that every future Kilo behavior or live GonkaGate model is
-  proven just because the current curated default is shipped
+- no claim that every future Kilo behavior or live GonkaGate model is proven
+  beyond fetching and writing the catalog shape
 
 ## Remaining Follow-Up Items
 
 These items still benefit from fresh proof or human review outside this
 repository-only pass:
 
-- fresh live GonkaGate/Kilo smoke evidence when the selected public model or
-  Kilo baseline changes
+- fresh live GonkaGate/Kilo smoke evidence when Kilo's model config
+  requirements or transport behavior changes
 - native Windows oracle-safety proof on a real runner or equivalent native VM
 - product/legal approval for public publishing under
   `@gonkagate/kilo-setup`
 
 Those items do not change the current package contract: the publishable surface
-remains the minimum Kilo `7.2.0` floor without an upper version bound, the
-validated GonkaGate chat-completions catalog with Kimi as the recommended
-default, Qwen3 and MiniMax as additional validated entries, and the current
-non-Windows verification policy documented above.
+remains the minimum Kilo `7.2.0` floor without an upper version bound,
+authenticated GonkaGate `/v1/models` discovery for the chat-completions
+catalog, and the current non-Windows verification policy documented above.

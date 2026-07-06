@@ -1,8 +1,8 @@
-import type {
-  CuratedModelKey,
-  CuratedModelTransport,
-} from "../../constants/models.js";
 import type { InstallScope } from "../contracts.js";
+import type {
+  InstallModelKey,
+  InstallModelTransport,
+} from "../model-catalog.js";
 
 export interface ManagedInstallStateRecord {
   compatibilityAuditVersion: string;
@@ -10,12 +10,12 @@ export interface ManagedInstallStateRecord {
     project?: string;
     user: string;
   };
-  currentTransport: CuratedModelTransport;
+  currentTransport: InstallModelTransport;
   installerPackageName: string;
   installerVersion: string;
   kiloCommand: string;
   kiloVersion: string;
   lastDurableSetupAt?: string;
-  selectedModelKey: CuratedModelKey;
+  selectedModelKey: InstallModelKey;
   selectedScope: InstallScope;
 }

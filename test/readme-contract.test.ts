@@ -24,6 +24,6 @@ test("README stays usable as the first-stop GitHub and npm landing page", () => 
   assert.match(readme, /~\/\.gonkagate\/kilo\/api-key/);
   assert.match(readme, /@kilocode\/cli >=7\.2\.0/);
   assert.match(readme, /chat\/completions/);
-  assert.match(readme, /moonshotai\/Kimi-K2\.6/);
+  assert.match(readme, /GET https:\/\/api\.gonkagate\.com\/v1\/models/);
   assert.match(readme, /no native Windows production claim yet/i);
 });

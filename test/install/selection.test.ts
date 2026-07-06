@@ -9,6 +9,7 @@ import { createStubbedTestInstallDependencies } from "./test-deps.js";
 import {
   createEmptyTestModelCatalog,
   createValidatedTestModelCatalog,
+  TEST_VALIDATED_MODEL,
 } from "./test-model-catalog.js";
 import { expectInstallErrorCode } from "./test-helpers.js";
 
@@ -111,7 +112,7 @@ test("resolveInstallScope asks for confirmation when the previous managed scope 
   );
 });
 
-test("resolveInstallModel uses the recommended validated default for --yes", async () => {
+test("resolveInstallModel uses the live default for --yes", async () => {
   const model = await resolveInstallModel(
     {
       yes: true,
@@ -124,5 +125,5 @@ test("resolveInstallModel uses the recommended validated default for --yes", asy
     }),
   );
 
-  assert.equal(model.key, "kimi-k2.6");
+  assert.equal(model.key, TEST_VALIDATED_MODEL.key);
 });

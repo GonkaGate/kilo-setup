@@ -15,6 +15,7 @@ import { password, select } from "@inquirer/prompts";
 import writeFileAtomic from "write-file-atomic";
 import {
   createDefaultInstallModelCatalog,
+  type InstallHttpClient,
   type InstallModelCatalog,
 } from "./model-catalog.js";
 
@@ -76,6 +77,8 @@ export interface InstallInput {
   readStdin(): Promise<string>;
 }
 
+export type { InstallHttpClient };
+
 export interface InstallSelectChoice<TValue extends string = string> {
   description?: string;
   label: string;
@@ -120,6 +123,7 @@ export interface InstallDependencies {
   clock: InstallClock;
   commands: InstallCommandRunner;
   fs: InstallFs;
+  http: InstallHttpClient;
   input: InstallInput;
   models: InstallModelCatalog;
   prompts: InstallPrompts;
@@ -130,6 +134,7 @@ export interface CreateInstallDependenciesOverrides {
   clock?: Partial<InstallClock>;
   commands?: Partial<InstallCommandRunner>;
   fs?: Partial<InstallFs>;
+  http?: Partial<InstallHttpClient>;
   input?: Partial<InstallInput>;
   models?: Partial<InstallModelCatalog>;
   prompts?: Partial<InstallPrompts>;
@@ -268,6 +273,33 @@ async function readStdin(): Promise<string> {
   });
 }
 
+async function fetchJson(
+  url: string,
+  options: Parameters<InstallHttpClient["fetchJson"]>[1] = {},
+): Promise<Awaited<ReturnType<InstallHttpClient["fetchJson"]>>> {
+  const response = await fetch(url, {
+    headers: options.headers,
+    method: options.method ?? "GET",
+  });
+  let body: unknown;
+
+  try {
+    body = (await response.json()) as unknown;
+  } catch {
+    body = undefined;
+  }
+
+  return {
+    body,
+    ok: response.ok,
+    status: response.status,
+  };
+}
+
+const DEFAULT_INSTALL_HTTP: InstallHttpClient = {
+  fetchJson,
+};
+
 async function readSecret(message: string): Promise<string> {
   return await password({
     mask: "*",
@@ -327,6 +359,7 @@ export function createNodeInstallDependencies(
     clock: { ...DEFAULT_INSTALL_CLOCK, ...overrides.clock },
     commands: { ...DEFAULT_INSTALL_COMMANDS, ...overrides.commands },
     fs: { ...DEFAULT_INSTALL_FS, ...overrides.fs },
+    http: { ...DEFAULT_INSTALL_HTTP, ...overrides.http },
     input: { ...DEFAULT_INSTALL_INPUT, ...overrides.input },
     models: { ...DEFAULT_INSTALL_MODELS, ...overrides.models },
     prompts: { ...DEFAULT_INSTALL_PROMPTS, ...overrides.prompts },

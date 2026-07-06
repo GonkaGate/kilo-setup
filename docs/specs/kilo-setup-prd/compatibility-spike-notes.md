@@ -2,6 +2,9 @@
 
 Date: April 14, 2026
 
+Current model availability comes from authenticated GonkaGate `GET /v1/models`;
+model ids below are historical evidence examples, not the runtime catalog.
+
 These notes preserve redacted evidence for the GonkaGate Kilo setup PRD. They do
 not contain raw `kilo debug config` output or real secrets.
 

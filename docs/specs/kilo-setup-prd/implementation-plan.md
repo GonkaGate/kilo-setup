@@ -1,5 +1,10 @@
 # Implementation Plan: GonkaGate Kilo Setup
 
+Current repository behavior supersedes the draft model-catalog tasks below:
+the installer now fetches authenticated `GET /v1/models` after safe API-key
+intake and uses that live response for model choices, config writes, and
+`--model` validation.
+
 ## Overview
 
 This plan breaks the draft PRD into ordered, verifiable implementation tasks.
@@ -317,7 +322,7 @@ diagnostics for the user and for machine-readable JSON output.
 
 - [ ] Detect `KILO_CONFIG`, `KILO_CONFIG_DIR`, home-level directory, and
       `KILO_CONFIG_CONTENT` blockers.
-- [ ] Detect provider shape mismatch, missing curated model entry, provider
+- [ ] Detect provider shape mismatch, missing selected model entry, provider
       allow/deny, provider whitelist/blacklist, and secret-binding provenance
       mismatch.
 - [ ] Treat `disabled_providers` as stronger than `enabled_providers` when both
@@ -422,14 +427,13 @@ sandbox and installer-owned targets.
 ## Task 12: Enable Interactive Setup
 
 **Description:** Replace scaffold-only execution with an interactive install
-flow that detects Kilo, shows the installed version, offers curated model
-choices, recommends scope, accepts a hidden secret, writes config, verifies, and
+flow that detects Kilo, shows the installed version, fetches live model choices from `/v1/models`, recommends scope, accepts a hidden secret, writes config, verifies, and
 ends by sending the user back to plain `kilo`.
 
 **Acceptance criteria:**
 
 - [ ] Interactive flow shows the selected Kilo command and version.
-- [ ] Model picker shows only validated curated choices.
+- [ ] Model picker shows fetched `/v1/models` choices.
 - [ ] Project scope is recommended inside a git repository and user scope
       outside a git repository.
 - [ ] Prompt text explains Kilo-specific scope effects in user language.
@@ -626,8 +630,7 @@ acceptance criteria before claiming production installer support.
 
 ## Open Questions
 
-- What is the proven numeric `limit.output` for
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`?
+- What numeric `limit.output` policy should fetched model entries use?
 - Does the live GonkaGate/Kilo `chat/completions` smoke pass tool-call behavior
   for the selected model?
 - Will product/legal approve `@gonkagate/kilo-setup` as the public package

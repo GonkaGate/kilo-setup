@@ -14,14 +14,37 @@ import {
   createStubbedTestInstallDependencies,
   type StubInstallFs,
 } from "./test-deps.js";
+import {
+  createValidatedTestModelCatalog,
+  TEST_VALIDATED_MODEL,
+} from "./test-model-catalog.js";
+
+const VERIFY_MODEL_KEY = "qwen3-235b-a22b-instruct-2507-fp8";
+const VERIFY_MODEL_CATALOG = createValidatedTestModelCatalog([
+  TEST_VALIDATED_MODEL,
+  {
+    adapterPackage: "@ai-sdk/openai-compatible",
+    displayName: "Qwen Fixture",
+    key: VERIFY_MODEL_KEY,
+    limits: {
+      context: 240000,
+      output: 8192,
+    },
+    modelId: VERIFY_MODEL_KEY,
+    recommended: true,
+    transport: "chat_completions",
+    validationStatus: "validated",
+  },
+]);
 
 function createVerifiedConfigDocument() {
   return JSON.stringify(
     {
-      model: formatKiloModelRef("qwen3-235b-a22b-instruct-2507-fp8"),
+      model: formatKiloModelRef(VERIFY_MODEL_KEY),
       provider: {
         gonkagate: buildManagedProviderConfig(
-          "qwen3-235b-a22b-instruct-2507-fp8",
+          VERIFY_MODEL_KEY,
+          VERIFY_MODEL_CATALOG,
         ),
       },
     },
@@ -55,7 +78,8 @@ test("verifyEffectiveKiloConfig succeeds when local resolver and oracle agree on
             {
               provider: {
                 gonkagate: buildManagedProviderConfig(
-                  "qwen3-235b-a22b-instruct-2507-fp8",
+                  VERIFY_MODEL_KEY,
+                  VERIFY_MODEL_CATALOG,
                 ),
               },
             },
@@ -65,9 +89,7 @@ test("verifyEffectiveKiloConfig succeeds when local resolver and oracle agree on
         path: "/home/test/.config/kilo/kilo.jsonc",
       },
       {
-        contents: `{ "model": "${formatKiloModelRef(
-          "qwen3-235b-a22b-instruct-2507-fp8",
-        )}" }\n`,
+        contents: `{ "model": "${formatKiloModelRef(VERIFY_MODEL_KEY)}" }\n`,
         path: "/workspace/project/.kilo/kilo.jsonc",
       },
     ],
@@ -82,7 +104,7 @@ test("verifyEffectiveKiloConfig succeeds when local resolver and oracle agree on
     {
       kiloCommand: "kilo",
       managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: VERIFY_MODEL_KEY,
       projectRoot: dependencies.runtime.cwd,
       scope: "project",
     },
@@ -121,7 +143,8 @@ test("verifyEffectiveKiloConfig prefers the detected local kilo oracle command o
             {
               provider: {
                 gonkagate: buildManagedProviderConfig(
-                  "qwen3-235b-a22b-instruct-2507-fp8",
+                  VERIFY_MODEL_KEY,
+                  VERIFY_MODEL_CATALOG,
                 ),
               },
             },
@@ -131,9 +154,7 @@ test("verifyEffectiveKiloConfig prefers the detected local kilo oracle command o
         path: "/home/test/.config/kilo/kilo.jsonc",
       },
       {
-        contents: `{ "model": "${formatKiloModelRef(
-          "qwen3-235b-a22b-instruct-2507-fp8",
-        )}" }\n`,
+        contents: `{ "model": "${formatKiloModelRef(VERIFY_MODEL_KEY)}" }\n`,
         path: "/workspace/project/.kilo/kilo.jsonc",
       },
     ],
@@ -148,7 +169,7 @@ test("verifyEffectiveKiloConfig prefers the detected local kilo oracle command o
     {
       kiloCommand: "kilo",
       managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: VERIFY_MODEL_KEY,
       projectRoot: dependencies.runtime.cwd,
       scope: "project",
     },
@@ -184,7 +205,8 @@ test("verifyEffectiveKiloConfig keeps oracle sandbox artifacts out of the reposi
             {
               provider: {
                 gonkagate: buildManagedProviderConfig(
-                  "qwen3-235b-a22b-instruct-2507-fp8",
+                  VERIFY_MODEL_KEY,
+                  VERIFY_MODEL_CATALOG,
                 ),
               },
             },
@@ -194,9 +216,7 @@ test("verifyEffectiveKiloConfig keeps oracle sandbox artifacts out of the reposi
         path: "/home/test/.config/kilo/kilo.jsonc",
       },
       {
-        contents: `{ "model": "${formatKiloModelRef(
-          "qwen3-235b-a22b-instruct-2507-fp8",
-        )}" }\n`,
+        contents: `{ "model": "${formatKiloModelRef(VERIFY_MODEL_KEY)}" }\n`,
         path: "/workspace/project/.kilo/kilo.jsonc",
       },
     ],
@@ -212,7 +232,7 @@ test("verifyEffectiveKiloConfig keeps oracle sandbox artifacts out of the reposi
     {
       kiloCommand: "kilo",
       managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: VERIFY_MODEL_KEY,
       projectRoot: dependencies.runtime.cwd,
       scope: "project",
     },
@@ -255,7 +275,8 @@ test("verifyEffectiveKiloConfig falls back when the runtime temp dir points insi
             {
               provider: {
                 gonkagate: buildManagedProviderConfig(
-                  "qwen3-235b-a22b-instruct-2507-fp8",
+                  VERIFY_MODEL_KEY,
+                  VERIFY_MODEL_CATALOG,
                 ),
               },
             },
@@ -265,9 +286,7 @@ test("verifyEffectiveKiloConfig falls back when the runtime temp dir points insi
         path: "/home/test/.config/kilo/kilo.jsonc",
       },
       {
-        contents: `{ "model": "${formatKiloModelRef(
-          "qwen3-235b-a22b-instruct-2507-fp8",
-        )}" }\n`,
+        contents: `{ "model": "${formatKiloModelRef(VERIFY_MODEL_KEY)}" }\n`,
         path: "/workspace/project/.kilo/kilo.jsonc",
       },
     ],
@@ -283,7 +302,7 @@ test("verifyEffectiveKiloConfig falls back when the runtime temp dir points insi
     {
       kiloCommand: "kilo",
       managedPaths,
-      model: "qwen3-235b-a22b-instruct-2507-fp8",
+      model: VERIFY_MODEL_KEY,
       projectRoot: dependencies.runtime.cwd,
       scope: "project",
     },
@@ -317,7 +336,8 @@ test("verifyCurrentSessionKiloConfig blocks inline secret-binding overrides", as
             {
               provider: {
                 gonkagate: buildManagedProviderConfig(
-                  "qwen3-235b-a22b-instruct-2507-fp8",
+                  VERIFY_MODEL_KEY,
+                  VERIFY_MODEL_CATALOG,
                 ),
               },
             },
@@ -327,9 +347,7 @@ test("verifyCurrentSessionKiloConfig blocks inline secret-binding overrides", as
         path: "/home/test/.config/kilo/kilo.jsonc",
       },
       {
-        contents: `{ "model": "${formatKiloModelRef(
-          "qwen3-235b-a22b-instruct-2507-fp8",
-        )}" }\n`,
+        contents: `{ "model": "${formatKiloModelRef(VERIFY_MODEL_KEY)}" }\n`,
         path: "/workspace/project/.kilo/kilo.jsonc",
       },
     ],
@@ -344,7 +362,7 @@ test("verifyCurrentSessionKiloConfig blocks inline secret-binding overrides", as
     verifyCurrentSessionKiloConfig(
       {
         managedPaths,
-        model: "qwen3-235b-a22b-instruct-2507-fp8",
+        model: VERIFY_MODEL_KEY,
         projectRoot: dependencies.runtime.cwd,
         scope: "project",
       },
@@ -371,7 +389,8 @@ test("verifyEffectiveKiloConfig reports inferred non-local influence when the or
                 model: "custom/other",
                 provider: {
                   gonkagate: buildManagedProviderConfig(
-                    "qwen3-235b-a22b-instruct-2507-fp8",
+                    VERIFY_MODEL_KEY,
+                    VERIFY_MODEL_CATALOG,
                   ),
                 },
               },
@@ -392,7 +411,8 @@ test("verifyEffectiveKiloConfig reports inferred non-local influence when the or
             {
               provider: {
                 gonkagate: buildManagedProviderConfig(
-                  "qwen3-235b-a22b-instruct-2507-fp8",
+                  VERIFY_MODEL_KEY,
+                  VERIFY_MODEL_CATALOG,
                 ),
               },
             },
@@ -402,9 +422,7 @@ test("verifyEffectiveKiloConfig reports inferred non-local influence when the or
         path: "/home/test/.config/kilo/kilo.jsonc",
       },
       {
-        contents: `{ "model": "${formatKiloModelRef(
-          "qwen3-235b-a22b-instruct-2507-fp8",
-        )}" }\n`,
+        contents: `{ "model": "${formatKiloModelRef(VERIFY_MODEL_KEY)}" }\n`,
         path: "/workspace/project/.kilo/kilo.jsonc",
       },
     ],
@@ -420,7 +438,7 @@ test("verifyEffectiveKiloConfig reports inferred non-local influence when the or
       {
         kiloCommand: "kilo",
         managedPaths,
-        model: "qwen3-235b-a22b-instruct-2507-fp8",
+        model: VERIFY_MODEL_KEY,
         projectRoot: dependencies.runtime.cwd,
         scope: "project",
       },

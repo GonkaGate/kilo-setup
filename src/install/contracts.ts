@@ -3,11 +3,11 @@ import type {
   EffectiveConfigVerificationMismatch,
   EffectiveConfigVerificationTarget,
 } from "./contracts/effective-config.js";
-import type {
-  CuratedModelKey,
-  CuratedModelTransport,
-} from "../constants/models.js";
 import type { GONKAGATE_PROVIDER_ID } from "../constants/gateway.js";
+import type {
+  InstallModelKey,
+  InstallModelTransport,
+} from "./model-catalog.js";
 import type { InstallErrorCode } from "./errors.js";
 
 export type InstallScope = "project" | "user";
@@ -73,7 +73,7 @@ interface InstallFlowResultBase {
 export interface InstallFlowSelectionSummary {
   kilo: SupportedKiloSummary;
   modelDisplayName: string;
-  modelKey: CuratedModelKey;
+  modelKey: InstallModelKey;
   modelRef: string;
   scope: InstallScope;
 }
@@ -81,7 +81,7 @@ export interface InstallFlowSelectionSummary {
 export interface InstallFlowProgress {
   kilo?: SupportedKiloSummary;
   modelDisplayName?: string;
-  modelKey?: CuratedModelKey;
+  modelKey?: InstallModelKey;
   modelRef?: string;
   scope?: InstallScope;
 }
@@ -96,7 +96,7 @@ export interface BlockedInstallResult extends InstallFlowResultBase {
     | "scope_selection_required";
   kilo?: BlockedKiloSummary | SupportedKiloSummary;
   modelDisplayName?: string;
-  modelKey?: CuratedModelKey;
+  modelKey?: InstallModelKey;
   modelRef?: string;
   ok: false;
   mismatches?: readonly EffectiveConfigVerificationMismatch[];
@@ -133,7 +133,7 @@ export interface InstalledInstallResult
   providerId: typeof GONKAGATE_PROVIDER_ID;
   scope: InstallScope;
   status: "installed";
-  transport: CuratedModelTransport;
+  transport: InstallModelTransport;
 }
 
 export type InstallFlowResult =

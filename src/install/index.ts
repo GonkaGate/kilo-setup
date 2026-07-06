@@ -27,6 +27,7 @@ import {
   verifyEffectiveKiloConfig,
 } from "./verify-effective.js";
 import type { ManagedArtifactRollbackAction } from "./contracts/managed-artifact.js";
+import type { ResolvedSecretInput } from "./secrets.js";
 import type {
   EffectiveConfigVerificationBlocker,
   EffectiveConfigVerificationMismatch,
@@ -45,6 +46,7 @@ import {
   clearKiloModelCacheSelection,
   inspectKiloModelCache,
 } from "./kilo-model-cache.js";
+import { fetchLiveInstallModelCatalog } from "./model-catalog.js";
 
 export async function runInstallFlow(
   request: CliOptions,
@@ -53,7 +55,9 @@ export async function runInstallFlow(
   let progressState: InstallProgressState = {};
   const managedWrites = createManagedWriteTransaction();
   let installFlow: PreparedInstallSession;
+  let installDependencies: InstallDependencies = dependencies;
   let previousInstallState: ManagedInstallStateRecord | undefined;
+  let resolvedSecret: ResolvedSecretInput;
 
   try {
     const resolvedContext = await resolveInstallContext(dependencies, {
@@ -81,12 +85,26 @@ export async function runInstallFlow(
       dependencies,
       resolvedContext.workspace.managedPaths,
     );
+    resolvedSecret = await resolveSecretInput(
+      {
+        apiKeyStdin: request.apiKeyStdin,
+      },
+      dependencies,
+    );
+    const liveModelCatalog = await fetchLiveInstallModelCatalog(
+      resolvedSecret.secret,
+      dependencies.http,
+    );
+    installDependencies = {
+      ...dependencies,
+      models: liveModelCatalog,
+    };
     const model = await resolveInstallModel(
       {
         modelKey: request.modelKey,
         yes: request.yes,
       },
-      dependencies,
+      installDependencies,
     );
     progressState = createInstallProgressState(resolvedContext.kilo, model);
 
@@ -109,25 +127,25 @@ export async function runInstallFlow(
 
   try {
     await applyManagedWrites(
-      request,
       installFlow,
       previousInstallState,
+      resolvedSecret,
       managedWrites,
-      dependencies,
+      installDependencies,
     );
-    await verifyPreparedInstall(installFlow, dependencies);
-    await persistInstallState(installFlow, managedWrites, dependencies);
+    await verifyPreparedInstall(installFlow, installDependencies);
+    await persistInstallState(installFlow, managedWrites, installDependencies);
     notices = await collectPostInstallNotices(
       request,
       installFlow,
-      dependencies,
+      installDependencies,
     );
   } catch (error) {
     return await buildInstallFailureResult(
       error,
       progressState,
       managedWrites.rollbackActions,
-      dependencies,
+      installDependencies,
     );
   }
 
@@ -135,7 +153,7 @@ export async function runInstallFlow(
     installFlow,
     notices,
     progressState,
-    dependencies,
+    installDependencies,
   );
 
   return (
@@ -144,19 +162,12 @@ export async function runInstallFlow(
 }
 
 async function applyManagedWrites(
-  request: CliOptions,
   installFlow: PreparedInstallSession,
   previousInstallState: ManagedInstallStateRecord | undefined,
+  resolvedSecret: ResolvedSecretInput,
   managedWrites: ReturnType<typeof createManagedWriteTransaction>,
   dependencies: InstallDependencies,
 ): Promise<void> {
-  const resolvedSecret = await resolveSecretInput(
-    {
-      apiKeyStdin: request.apiKeyStdin,
-    },
-    dependencies,
-  );
-
   await managedWrites.run(
     writeManagedSecret(
       {
@@ -170,6 +181,7 @@ async function applyManagedWrites(
     writeScopeManagedConfigs(
       {
         managedPaths: installFlow.context.workspace.managedPaths,
+        modelCatalog: dependencies.models,
         model: installFlow.model.key,
         previousManagedModelKey: previousInstallState?.selectedModelKey,
         projectRoot: installFlow.context.workspace.projectRoot,

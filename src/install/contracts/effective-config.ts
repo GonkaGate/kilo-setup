@@ -1,7 +1,7 @@
 import type {
-  CuratedModelKey,
-  CuratedModelTransport,
-} from "../../constants/models.js";
+  InstallModelKey,
+  InstallModelTransport,
+} from "../model-catalog.js";
 import type {
   RedactedDiagnosticData,
   RedactedDiagnosticValue,
@@ -50,10 +50,10 @@ export interface EffectiveConfigVerificationLayerSnapshot {
 }
 
 export interface EffectiveConfigVerificationTarget {
-  modelKey: CuratedModelKey;
+  modelKey: InstallModelKey;
   modelRef: string;
   providerId: string;
-  transport: CuratedModelTransport | "chat/completions";
+  transport: InstallModelTransport | "chat/completions";
 }
 
 export type EffectiveConfigDiagnosticData = RedactedDiagnosticData;

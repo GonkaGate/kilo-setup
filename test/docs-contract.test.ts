@@ -40,7 +40,7 @@ test("docs describe the shipped Kilo runtime and the remaining public proof gate
     /\.kilo\/kilo\.jsonc/,
     new RegExp(escapeRegExp(GONKAGATE_BASE_URL)),
     /chat\/completions|chat_completions/,
-    /runtime is shipped|validated default|Kimi K2\.6|blocks unsupported kilo|rollback/i,
+    /runtime is shipped|GET \/v1\/models|blocks unsupported kilo|rollback/i,
     /no plain `--api-key`|never accept plain `--api-key`|never accept `--api-key`/i,
     /provider\.gonkagate/,
     /each participating machine|each machine/i,

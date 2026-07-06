@@ -5,6 +5,11 @@ This document does not describe shipped behavior in this repository yet.
 
 Last upstream check: April 14, 2026.
 
+Current repository behavior supersedes the draft model-catalog portions below:
+the installer now fetches authenticated `GET /v1/models` after safe API-key
+intake and uses that live response for model choices, config writes, and
+`--model` validation.
+
 ## Source Baseline
 
 The original investigation request used the literal phrase `kilo-code cli`.
@@ -126,7 +131,7 @@ The tool:
 1. validates that local Kilo CLI is installed as `kilo` or `kilocode`
 2. identifies the installed Kilo CLI version and channel
 3. refuses versions without a supported compatibility profile
-4. shows only curated GonkaGate model choices
+4. fetches live GonkaGate model choices from /v1/models
 5. lets the user choose `user` or `project` scope
 6. accepts the GonkaGate API key through safe inputs only
 7. writes the minimum safe Kilo config layers
@@ -142,7 +147,7 @@ Interactive mode should:
 
 - detect local `kilo`
 - display installed Kilo CLI version
-- show the curated model picker even if only one model is currently validated
+- show the live model picker even if only one model is currently validated
 - recommend `project` scope inside a git repository
 - recommend `user` scope outside a git repository
 - explain the Kilo-specific scope effect in user language
@@ -162,7 +167,7 @@ In scope:
 - support for `kilo` as the primary command and `kilocode` as a fallback alias
 - Kilo CLI version detection
 - hidden or automation-safe GonkaGate secret input
-- curated GonkaGate model picker
+- live GonkaGate model picker
 - `user` and `project` activation scopes
 - managed user secret storage
 - managed install-state storage
@@ -182,7 +187,6 @@ Out of scope:
 - writing secrets to repository-local files
 - writing directly to Kilo's `auth.json`
 - depending on Kilo Gateway or Kilo account login
-- runtime `/v1/models` discovery as the primary onboarding UX
 - arbitrary custom base URLs
 - arbitrary custom model IDs
 - claiming GonkaGate `responses` support before validation
@@ -197,7 +201,7 @@ Out of scope:
 - canonical base URL: `https://api.gonkagate.com/v1`
 - current supported transport: `/v1/chat/completions`
 - `/v1/responses` is not supported today unless separately revalidated
-- setup must expose only curated, Kilo-validated model choices in the public
+- setup must expose the authenticated GonkaGate `/v1/models` choices in the public
   setup flow
 - the current planned model inherited from the OpenCode setup baseline is:
   `qwen/qwen3-235b-a22b-instruct-2507-fp8`
@@ -572,7 +576,7 @@ Evidence:
   `api.url` is null. Model listing alone is not a sufficient URL verifier.
 - A local fake OpenAI-compatible `kilo run` smoke proved that
   `options.baseURL = http://127.0.0.1:<port>/v1` sends a streaming POST to
-  `/v1/chat/completions` with the curated upstream model id and a Bearer header.
+  `/v1/chat/completions` with the selected upstream model id and a Bearer header.
 - The same fake smoke proved that writing a full `.../chat/completions` URL
   produces a doubled `/chat/completions/chat/completions` path.
 
@@ -592,7 +596,7 @@ also observed `limit.input` preserved in raw resolved config but absent from
 config and keep it only as future-compatible registry metadata if GonkaGate
 publishes it.
 
-The curated model registry must be able to carry:
+The live model catalog boundary must be able to carry:
 
 - visible model key
 - upstream model id
@@ -686,7 +690,7 @@ The installer must detect and report:
 - provider-level `whitelist` that excludes the selected GonkaGate model
 - provider-level `blacklist` that includes the selected GonkaGate model
 - provider block shape mismatches for `gonkagate`
-- missing curated model entry
+- missing selected model entry
 - secret-binding provenance mismatches
 
 `disabled_providers` should be treated as stronger than `enabled_providers`
@@ -786,7 +790,7 @@ resolver must check:
 - provider adapter package
 - base URL
 - transport-relevant shape
-- curated model entry
+- selected model entry
 - provider allow/deny gating
 - provider whitelist/blacklist gating
 
@@ -1024,9 +1028,7 @@ Production must not be claimed until:
 - the provider config shape is proven against a live GonkaGate/Kilo
   `chat/completions` smoke path, including tool-call behavior, using only an
   already-set `GONKAGATE_API_KEY` or a hidden prompt
-- the real numeric `limit.output` value is known for
-  `qwen/qwen3-235b-a22b-instruct-2507-fp8`, or that model is excluded from
-  validated defaults
+- the generic numeric `limit.output` value is chosen for fetched model entries
 - `limit.input` is excluded from production runtime config
 - the local resolver, sandboxed Kilo oracle, redaction path, rollback, and
   XDG-isolated verification strategy are implemented and tested
@@ -1133,7 +1135,7 @@ Production release is ready when:
 
 These are not post-production phases for the setup utility. They require a
 changed external contract, an additional audited Kilo compatibility profile, or
-new validated GonkaGate model data before they can become production
+new GonkaGate model metadata requirements before they can become production
 requirements:
 
 - GonkaGate `/v1/responses`, because GonkaGate currently supports
@@ -1143,7 +1145,6 @@ requirements:
 - enterprise-aware managed config policies, because production currently blocks
   higher-precedence managed secret bindings rather than treating them as
   supported enterprise ownership
-- additional GonkaGate models, because production exposes only curated,
-  Kilo-validated model choices
+- new model metadata fields, because production currently trusts only `/v1/models` id and name
 - real-path Kilo verification, because the production verifier strategy is the
   XDG-isolated sandbox oracle

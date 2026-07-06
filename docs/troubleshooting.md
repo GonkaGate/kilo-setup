@@ -1,29 +1,20 @@
 # Troubleshooting
 
-## The CLI Says No Validated Models Are Available
+## The CLI Says No Usable Models Were Returned
 
-That is no longer the expected stock public result.
+The installer fetches models from authenticated
+`GET https://api.gonkagate.com/v1/models` after collecting the GonkaGate API
+key.
 
-The published package now ships
-`moonshotai/Kimi-K2.6` as the recommended validated curated default with
-installer-managed `limit.output = 8192`.
-
-If you still see `validated_models_unavailable`, you are likely running a
-stale build, a locally modified package, or a fork whose curated registry does
-not include the published default.
-
-If you see a config error mentioning
-`provider.gonkagate.models.kimi-k2.6.limit.output`,
-you are likely running a stale build that predates the required Kilo 7.2.0
-output-limit fix.
+If you see `validated_models_unavailable`, the response was unavailable,
+empty, or not shaped like `{ data: [{ id: string, name?: string }] }`.
+Confirm the API key is valid and rerun setup.
 
 ## Why Does `/models` Show Too Few GonkaGate Models?
 
-Current builds write the validated GonkaGate chat-completions catalog into
+Current builds write the fetched GonkaGate chat-completions catalog into
 `provider.gonkagate.models`, so Kilo's OpenCode-style `/models` picker should
-show `moonshotai/Kimi-K2.6`,
-`qwen/qwen3-235b-a22b-instruct-2507-fp8`, and
-`minimaxai/minimax-m2.7`.
+show every model returned by `/v1/models`.
 
 If `/models` still shows fewer GonkaGate models, rerun the installer from a
 current build so the user-level `provider.gonkagate` definition is refreshed.

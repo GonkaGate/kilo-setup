@@ -1,4 +1,3 @@
-import { type CuratedModelKey } from "../constants/models.js";
 import {
   MANAGED_CONFIG_PLANS,
   type ManagedConfigTarget,
@@ -21,6 +20,7 @@ import {
   buildManagedProviderConfig,
   formatKiloModelRef,
 } from "./managed-provider-config.js";
+import type { InstallModelKey } from "./model-catalog.js";
 import {
   resolveProjectConfigTargetPath,
   resolveUserConfigTargetPath,
@@ -51,7 +51,10 @@ function createManagedConfigWriteContext(
     managedPaths: request.managedPaths,
     ownedActivationModelRefs: createOwnedActivationModelRefs(request),
     projectRoot: request.projectRoot,
-    providerConfig: buildManagedProviderConfig(request.model),
+    providerConfig: buildManagedProviderConfig(
+      request.model,
+      request.modelCatalog,
+    ),
   };
 }
 
@@ -178,8 +181,8 @@ function requireTargetWriteResult<TTarget extends ManagedConfigTarget>(
 }
 
 export function createOwnedActivationModelRefsForTesting(
-  model: CuratedModelKey,
-  previousManagedModelKey?: CuratedModelKey,
+  model: InstallModelKey,
+  previousManagedModelKey?: InstallModelKey,
 ): readonly string[] {
   return createOwnedActivationModelRefs({
     model,

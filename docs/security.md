@@ -54,6 +54,7 @@ proven.
   that sandbox up after verification
 - do not claim real-path Kilo verification as the production default
 
-The current runtime already rejects plain `--api-key`, keeps stock public runs
-blocked before writes when no validated curated model exists, and redacts
-secret-bearing text on user-facing error paths.
+The current runtime already rejects plain `--api-key`, fetches the model
+catalog only after safe API-key intake, blocks before writes when `/v1/models`
+does not return usable models, and redacts secret-bearing text on user-facing
+error paths.
