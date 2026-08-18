@@ -9,7 +9,7 @@ export const TEST_VALIDATED_MODEL = {
   displayName: "Live Test Model",
   key: "provider/live-test-model",
   limits: {
-    context: 240000,
+    context: 400000,
     output: 8192,
   },
   modelId: "provider/live-test-model",
@@ -23,10 +23,30 @@ export const TEST_EXTRA_MODEL = {
   displayName: "Live Extra Model",
   key: "provider/live-extra-model",
   limits: {
-    context: 240000,
+    context: 180000,
     output: 8192,
   },
   modelId: "provider/live-extra-model",
+  recommended: false,
+  transport: "chat_completions",
+  validationStatus: "validated",
+} as const satisfies InstallModel;
+
+/**
+ * Second-position fixture shared by the stubbed install dependencies and the
+ * effective-config verification tests. Both sides must agree on the whole
+ * managed model entry, including its context window, because verification
+ * compares the resolved config against the catalog-derived provider block.
+ */
+export const TEST_SECONDARY_MODEL = {
+  adapterPackage: "@ai-sdk/openai-compatible",
+  displayName: "Qwen Fixture",
+  key: "qwen3-235b-a22b-instruct-2507-fp8",
+  limits: {
+    context: 240000,
+    output: 8192,
+  },
+  modelId: "qwen3-235b-a22b-instruct-2507-fp8",
   recommended: false,
   transport: "chat_completions",
   validationStatus: "validated",

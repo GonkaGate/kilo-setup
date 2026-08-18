@@ -16,15 +16,21 @@ import {
   createValidatedTestModelCatalog,
   TEST_VALIDATED_MODEL,
 } from "./test-model-catalog.js";
+import {
+  FALLBACK_KILO_CONTEXT_LIMIT,
+  type InstallModelCatalog,
+} from "../../src/install/model-catalog.js";
+import { escapeRegExp } from "../contract-helpers.js";
 
-function createResolvedConfigFixture(
+function createResolvedConfigDocument(
+  catalog: InstallModelCatalog,
+  modelKey: string,
   mutate?: (config: Record<string, unknown>) => void,
 ): string {
-  const catalog = createValidatedTestModelCatalog();
   const resolvedConfig = {
-    model: formatKiloModelRef(TEST_VALIDATED_MODEL.key),
+    model: formatKiloModelRef(modelKey),
     provider: {
-      gonkagate: buildManagedProviderConfig(TEST_VALIDATED_MODEL.key, catalog),
+      gonkagate: buildManagedProviderConfig(modelKey, catalog),
     },
   } satisfies Record<string, unknown>;
   const nextConfig = structuredClone(resolvedConfig);
@@ -34,9 +40,20 @@ function createResolvedConfigFixture(
   return `${JSON.stringify(nextConfig, null, 2)}\n`;
 }
 
+function createResolvedConfigFixture(
+  mutate?: (config: Record<string, unknown>) => void,
+): string {
+  return createResolvedConfigDocument(
+    createValidatedTestModelCatalog(),
+    TEST_VALIDATED_MODEL.key,
+    mutate,
+  );
+}
+
 function createFlowDependencies(
   options: {
     env?: NodeJS.ProcessEnv;
+    httpBody?: unknown;
     interactive?: boolean;
     models?: "empty" | "validated";
     repository?: boolean;
@@ -79,7 +96,12 @@ function createFlowDependencies(
             body: { data: [] },
             kind: "stub",
           }
-        : undefined,
+        : options.httpBody === undefined
+          ? undefined
+          : {
+              body: options.httpBody,
+              kind: "stub",
+            },
     prompts: {
       kind: "stub",
       secret: "gp-flow-secret",
@@ -407,5 +429,115 @@ test("runInstallFlow offers to clear an existing GonkaGate cache during interact
   assert.doesNotMatch(
     fs.readText("/home/test/.local/state/kilo/model.json") ?? "",
     /"providerID": "gonkagate"/,
+  );
+});
+
+test("runInstallFlow writes the live per-model context window into Kilo config", async () => {
+  const dependencies = createFlowDependencies({
+    httpBody: {
+      data: [
+        {
+          context_length: TEST_VALIDATED_MODEL.limits.context,
+          created: 1753920000,
+          description: "Live long-context model.",
+          id: TEST_VALIDATED_MODEL.key,
+          name: TEST_VALIDATED_MODEL.displayName,
+          object: "model",
+          owned_by: "gonka",
+        },
+      ],
+    },
+    repository: true,
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  const result = await runInstallFlow(
+    {
+      apiKeyStdin: false,
+      clearKiloModelCache: false,
+      json: true,
+      yes: true,
+    },
+    dependencies,
+  );
+
+  const userConfigText = fs.readText(managedPaths.userConfigDefaultPath) ?? "";
+
+  assert.equal(result.status, "installed");
+  assert.notEqual(
+    TEST_VALIDATED_MODEL.limits.context,
+    FALLBACK_KILO_CONTEXT_LIMIT,
+  );
+  assert.match(
+    userConfigText,
+    new RegExp(`"context": ${TEST_VALIDATED_MODEL.limits.context}`),
+  );
+  assert.match(
+    userConfigText,
+    new RegExp(`"name": "${escapeRegExp(TEST_VALIDATED_MODEL.displayName)}"`),
+  );
+});
+
+test("runInstallFlow still installs against a gateway that publishes no model metadata", async () => {
+  const legacyGatewayCatalog = createValidatedTestModelCatalog([
+    {
+      ...TEST_VALIDATED_MODEL,
+      displayName: TEST_VALIDATED_MODEL.key,
+      limits: {
+        context: FALLBACK_KILO_CONTEXT_LIMIT,
+        output: TEST_VALIDATED_MODEL.limits.output,
+      },
+    },
+  ]);
+  const dependencies = createFlowDependencies({
+    httpBody: {
+      data: [
+        {
+          created: 0,
+          id: TEST_VALIDATED_MODEL.key,
+          object: "model",
+          owned_by: "gonka",
+        },
+      ],
+    },
+    repository: true,
+    resolvedConfig: createResolvedConfigDocument(
+      legacyGatewayCatalog,
+      TEST_VALIDATED_MODEL.key,
+    ),
+  });
+  const managedPaths = resolveManagedPaths(
+    dependencies.runtime.homeDir,
+    dependencies.runtime.cwd,
+    dependencies.runtime.platform,
+  );
+  const fs = dependencies.fs as StubInstallFs;
+
+  const result = await runInstallFlow(
+    {
+      apiKeyStdin: false,
+      clearKiloModelCache: false,
+      json: true,
+      yes: true,
+    },
+    dependencies,
+  );
+
+  const userConfigText = fs.readText(managedPaths.userConfigDefaultPath) ?? "";
+
+  assert.equal(result.status, "installed");
+  assert.match(
+    userConfigText,
+    new RegExp(`"context": ${FALLBACK_KILO_CONTEXT_LIMIT}`),
+  );
+  assert.doesNotMatch(userConfigText, /"context": (0|null)/);
+  assert.match(
+    userConfigText,
+    new RegExp(`"name": "${escapeRegExp(TEST_VALIDATED_MODEL.key)}"`),
   );
 });

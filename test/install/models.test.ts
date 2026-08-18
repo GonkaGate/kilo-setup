@@ -2,10 +2,19 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { GONKAGATE_BASE_URL } from "../../src/constants/gateway.js";
 import {
+  FALLBACK_KILO_CONTEXT_LIMIT,
   fetchLiveInstallModelCatalog,
   type InstallHttpClient,
 } from "../../src/install/model-catalog.js";
 import { expectInstallErrorCode } from "./test-helpers.js";
+
+function createStaticModelsHttp(body: unknown): InstallHttpClient {
+  return {
+    async fetchJson() {
+      return { body, ok: true, status: 200 };
+    },
+  };
+}
 
 test("fetchLiveInstallModelCatalog uses /v1/models as the source of truth", async () => {
   let requestedUrl = "";
@@ -47,6 +56,153 @@ test("fetchLiveInstallModelCatalog uses /v1/models as the source of truth", asyn
     catalog.getRecommendedDefaultModel()?.key,
     "provider/live-alpha",
   );
+});
+
+test("fetchLiveInstallModelCatalog reads the live per-model context window", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [
+        {
+          context_length: 400000,
+          created: 1753920000,
+          description: "Fast long-context model.",
+          id: "provider/live-long",
+          name: "Live Long",
+          object: "model",
+          owned_by: "gonka",
+        },
+        {
+          context_length: 180000,
+          id: "provider/live-short",
+          object: "model",
+        },
+      ],
+    }),
+  );
+
+  assert.equal(
+    catalog.getModelByKey("provider/live-long")?.limits.context,
+    400000,
+  );
+  assert.equal(
+    catalog.getModelByKey("provider/live-short")?.limits.context,
+    180000,
+  );
+  assert.equal(
+    catalog.getModelByKey("provider/live-long")?.description,
+    "Fast long-context model.",
+  );
+  assert.equal(
+    catalog.getModelByKey("provider/live-short")?.description,
+    undefined,
+  );
+  assert.equal(
+    catalog.getModelByKey("provider/live-long")?.limits.output,
+    8192,
+  );
+});
+
+test("fetchLiveInstallModelCatalog falls back when a gateway publishes no context window", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [
+        { created: 0, id: "provider/pre-pr70", object: "model" },
+        { context_length: null, id: "provider/explicit-null" },
+        { context_length: 0, id: "provider/unknown-zero" },
+        { context_length: -1, id: "provider/negative" },
+        { context_length: 1.5, id: "provider/fractional" },
+      ],
+    }),
+  );
+
+  for (const model of catalog.getModels()) {
+    assert.equal(model.limits.context, FALLBACK_KILO_CONTEXT_LIMIT);
+    assert.equal(typeof model.limits.context, "number");
+  }
+
+  assert.equal(FALLBACK_KILO_CONTEXT_LIMIT, 240000);
+});
+
+test("fetchLiveInstallModelCatalog tolerates absent and null optional metadata", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [
+        {
+          created: 0,
+          description: null,
+          id: "provider/bare",
+          name: null,
+          object: "model",
+          owned_by: "gonka",
+        },
+      ],
+    }),
+  );
+  const model = catalog.getModelByKey("provider/bare");
+
+  assert.equal(model?.displayName, "provider/bare");
+  assert.equal(model?.description, undefined);
+  assert.equal(model?.limits.context, FALLBACK_KILO_CONTEXT_LIMIT);
+  assert.equal(model?.recommended, true);
+});
+
+test("fetchLiveInstallModelCatalog also accepts a camelCase context window", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [{ contextLength: 240001, id: "provider/camel" }],
+    }),
+  );
+
+  assert.equal(catalog.getModelByKey("provider/camel")?.limits.context, 240001);
+});
+
+test("fetchLiveInstallModelCatalog degrades instead of failing on wrong-typed metadata", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [
+        {
+          context_length: "400000",
+          description: 7,
+          id: "provider/wrong-types",
+          name: false,
+          object: "model",
+        },
+      ],
+    }),
+  );
+  const model = catalog.getModelByKey("provider/wrong-types");
+
+  // Optional metadata is cosmetic: a malformed value must never abort an
+  // install that would otherwise succeed.
+  assert.equal(model?.limits.context, FALLBACK_KILO_CONTEXT_LIMIT);
+  assert.equal(model?.displayName, "provider/wrong-types");
+  assert.equal(model?.description, undefined);
+});
+
+test("fetchLiveInstallModelCatalog strips control characters from catalog text", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [
+        {
+          description: "line1\nline2\u001B[31mRED",
+          id: "provider/ansi",
+          name: "Bad\u001B[2JName",
+          object: "model",
+        },
+      ],
+    }),
+  );
+  const model = catalog.getModelByKey("provider/ansi");
+
+  assert.equal(model?.description?.includes("\u001B"), false);
+  assert.equal(model?.description?.includes("\n"), false);
+  assert.equal(model?.displayName.includes("\u001B"), false);
 });
 
 test("fetchLiveInstallModelCatalog honors an API-provided default model", async () => {

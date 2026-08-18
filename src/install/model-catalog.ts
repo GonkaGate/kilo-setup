@@ -11,6 +11,7 @@ export interface InstallModelLimits {
 
 export interface InstallModel {
   adapterPackage: string;
+  description?: string;
   displayName: string;
   key: InstallModelKey;
   limits: InstallModelLimits;
@@ -44,8 +45,25 @@ export interface InstallHttpClient {
 
 const GONKAGATE_MODELS_URL = `${GONKAGATE_BASE_URL}/models`;
 const OPENAI_COMPATIBLE_ADAPTER_PACKAGE = "@ai-sdk/openai-compatible";
-const GENERIC_KILO_CONTEXT_LIMIT = 240000;
-const GENERIC_KILO_OUTPUT_LIMIT = 8192;
+
+/**
+ * `GET /v1/models` is the context-window source of truth, but older GonkaGate
+ * deployments answer with the bare OpenAI model shape and no `context_length`.
+ * This value is only the fallback for those responses; it is never preferred
+ * over a live per-model context window.
+ *
+ * A non-zero fallback is used rather than `0` because the PRD records that Kilo
+ * treats `context: 0` as "disable compaction and context-size-dependent usage
+ * tracking" (docs/specs/kilo-setup-prd/spec.md). That is degraded behavior, not
+ * a hard failure, so this is a quality choice and not a proven hard requirement.
+ */
+export const FALLBACK_KILO_CONTEXT_LIMIT = 240000;
+
+/**
+ * GonkaGate `/v1/models` does not publish a max-output budget, so the
+ * installer keeps writing its own Kilo compatibility clamp.
+ */
+const MANAGED_KILO_OUTPUT_LIMIT = 8192;
 
 export async function fetchLiveInstallModelCatalog(
   apiKey: string,
@@ -139,15 +157,20 @@ function parseLiveModel(value: unknown): InstallModel {
   }
 
   const id = parseRequiredNonEmptyString(value.id);
-  const name = parseOptionalNonEmptyString(value.name) ?? id;
+  const name = readOptionalDisplayString(value.name) ?? id;
+  const description = readOptionalDisplayString(value.description);
+  const contextLength =
+    readOptionalContextLength(value.context_length) ??
+    readOptionalContextLength(value.contextLength);
 
   return {
     adapterPackage: OPENAI_COMPATIBLE_ADAPTER_PACKAGE,
+    ...(description === undefined ? {} : { description }),
     displayName: name,
     key: id,
     limits: {
-      context: GENERIC_KILO_CONTEXT_LIMIT,
-      output: GENERIC_KILO_OUTPUT_LIMIT,
+      context: contextLength ?? FALLBACK_KILO_CONTEXT_LIMIT,
+      output: MANAGED_KILO_OUTPUT_LIMIT,
     },
     modelId: id,
     recommended: false,
@@ -170,18 +193,44 @@ function parseRequiredNonEmptyString(value: unknown): string {
   return trimmedValue;
 }
 
-function parseOptionalNonEmptyString(value: unknown): string | undefined {
-  if (value === undefined) {
+/**
+ * Reads optional catalog display metadata (`name`, `description`).
+ *
+ * Optional metadata is cosmetic, so a malformed value must never abort an
+ * install that would otherwise succeed: anything that is not a usable string
+ * is treated as "not published" and the caller falls back. Only `id`, which
+ * the installer cannot work without, stays strict.
+ *
+ * Control characters are stripped because this text is gateway-supplied and is
+ * rendered straight into the interactive picker; raw newlines or ANSI escapes
+ * would otherwise reflow or recolor the prompt.
+ */
+function readOptionalDisplayString(value: unknown): string | undefined {
+  if (typeof value !== "string") {
     return undefined;
   }
 
-  if (typeof value !== "string") {
-    throw createInstallError("validated_models_unavailable", {});
+  // eslint-disable-next-line no-control-regex
+  const sanitizedValue = value
+    .replaceAll(/[\u0000-\u001F\u007F]/gu, " ")
+    .trim();
+
+  return sanitizedValue.length === 0 ? undefined : sanitizedValue;
+}
+
+/**
+ * Returns a usable Kilo context window, or `undefined` when the gateway does
+ * not publish one. Absent, `null`, non-positive, and wrong-typed values all
+ * mean "unknown" on the wire, so they resolve to `undefined` and let the
+ * caller fall back instead of writing `0` or `null` into Kilo config, or
+ * failing an install over a context window the installer can substitute.
+ */
+function readOptionalContextLength(value: unknown): number | undefined {
+  if (typeof value !== "number" || !Number.isSafeInteger(value) || value <= 0) {
+    return undefined;
   }
 
-  const trimmedValue = value.trim();
-
-  return trimmedValue.length === 0 ? undefined : trimmedValue;
+  return value;
 }
 
 function isResponseDefaultModel(value: unknown): boolean {

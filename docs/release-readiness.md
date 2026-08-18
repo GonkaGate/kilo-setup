@@ -20,6 +20,8 @@ docs, and tests for these facts:
 - model availability source: authenticated `GET /v1/models`
 - provider catalog exposed to Kilo's OpenCode-style `/models` picker: every
   fetched GonkaGate model id
+- model context written per model: live `context_length` from `/v1/models`,
+  with a generic `240000` fallback when the gateway does not publish one
 - model limit written for Kilo compatibility: `limit.output = 8192` for each
   fetched model entry
 - managed secret path: `~/.gonkagate/kilo/api-key`
@@ -40,6 +42,12 @@ compatibility evidence:
 - the package writes `limit.output = 8192` for fetched catalog entries as the
   installer-managed Kilo compatibility clamp because Kilo `7.2.0` requires a
   numeric output limit in custom model config
+- the package no longer writes one generic context window for every model: it
+  reads each model's `context_length` from `/v1/models` and only falls back to
+  `240000` when the response omits it. The fallback is non-zero because the PRD
+  records that Kilo treats `context: 0` as disabling compaction and
+  context-size-dependent usage tracking; no evidence was captured that Kilo
+  hard-requires a numeric context limit, unlike the output limit above
 - npm registry metadata checked on 2026-04-29 showed `@kilocode/cli` patch
   releases in the `7.2.x` line, including `7.2.14`, with both `kilo` and
   `kilocode` binaries still exposed by the wrapper package

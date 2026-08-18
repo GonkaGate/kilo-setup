@@ -16,25 +16,14 @@ import {
 } from "./test-deps.js";
 import {
   createValidatedTestModelCatalog,
+  TEST_SECONDARY_MODEL,
   TEST_VALIDATED_MODEL,
 } from "./test-model-catalog.js";
 
-const VERIFY_MODEL_KEY = "qwen3-235b-a22b-instruct-2507-fp8";
+const VERIFY_MODEL_KEY = TEST_SECONDARY_MODEL.key;
 const VERIFY_MODEL_CATALOG = createValidatedTestModelCatalog([
   TEST_VALIDATED_MODEL,
-  {
-    adapterPackage: "@ai-sdk/openai-compatible",
-    displayName: "Qwen Fixture",
-    key: VERIFY_MODEL_KEY,
-    limits: {
-      context: 240000,
-      output: 8192,
-    },
-    modelId: VERIFY_MODEL_KEY,
-    recommended: true,
-    transport: "chat_completions",
-    validationStatus: "validated",
-  },
+  { ...TEST_SECONDARY_MODEL, recommended: true },
 ]);
 
 function createVerifiedConfigDocument() {

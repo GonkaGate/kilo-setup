@@ -132,10 +132,12 @@ Right now the public default is deliberately small:
 - model source of truth: authenticated `GET /v1/models`
 - catalog exposed to Kilo's OpenCode-style `/models` picker: every fetched
   GonkaGate model id
-- managed limit: `limit.output = 8192` for each fetched model entry
+- managed limits: `limit.context` from each model's live `context_length`, with
+  a `240000` fallback for gateways that do not publish one, plus
+  `limit.output = 8192` for each fetched model entry
 
-We are treating model availability as GonkaGate API truth, not as a checked-in
-package catalog.
+We are treating model availability and model metadata as GonkaGate API truth,
+not as a checked-in package catalog.
 
 ## What we are not claiming
 
