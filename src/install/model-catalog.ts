@@ -11,6 +11,7 @@ export interface InstallModelLimits {
 
 export interface InstallModel {
   adapterPackage: string;
+  description?: string;
   displayName: string;
   key: InstallModelKey;
   limits: InstallModelLimits;
@@ -44,8 +45,21 @@ export interface InstallHttpClient {
 
 const GONKAGATE_MODELS_URL = `${GONKAGATE_BASE_URL}/models`;
 const OPENAI_COMPATIBLE_ADAPTER_PACKAGE = "@ai-sdk/openai-compatible";
-const GENERIC_KILO_CONTEXT_LIMIT = 240000;
-const GENERIC_KILO_OUTPUT_LIMIT = 8192;
+
+/**
+ * Kilo `7.2.0` requires a numeric `limit.context` for config-defined custom
+ * models. `GET /v1/models` is the context-window source of truth, but older
+ * GonkaGate deployments answer with the bare OpenAI model shape and no
+ * `context_length`. This value is only the fallback for those responses; it is
+ * never preferred over a live per-model context window.
+ */
+export const FALLBACK_KILO_CONTEXT_LIMIT = 240000;
+
+/**
+ * GonkaGate `/v1/models` does not publish a max-output budget, so the
+ * installer keeps writing its own Kilo compatibility clamp.
+ */
+const MANAGED_KILO_OUTPUT_LIMIT = 8192;
 
 export async function fetchLiveInstallModelCatalog(
   apiKey: string,
@@ -140,14 +154,19 @@ function parseLiveModel(value: unknown): InstallModel {
 
   const id = parseRequiredNonEmptyString(value.id);
   const name = parseOptionalNonEmptyString(value.name) ?? id;
+  const description = parseOptionalNonEmptyString(value.description);
+  const contextLength =
+    parseOptionalContextLength(value.context_length) ??
+    parseOptionalContextLength(value.contextLength);
 
   return {
     adapterPackage: OPENAI_COMPATIBLE_ADAPTER_PACKAGE,
+    ...(description === undefined ? {} : { description }),
     displayName: name,
     key: id,
     limits: {
-      context: GENERIC_KILO_CONTEXT_LIMIT,
-      output: GENERIC_KILO_OUTPUT_LIMIT,
+      context: contextLength ?? FALLBACK_KILO_CONTEXT_LIMIT,
+      output: MANAGED_KILO_OUTPUT_LIMIT,
     },
     modelId: id,
     recommended: false,
@@ -171,7 +190,7 @@ function parseRequiredNonEmptyString(value: unknown): string {
 }
 
 function parseOptionalNonEmptyString(value: unknown): string | undefined {
-  if (value === undefined) {
+  if (value === undefined || value === null) {
     return undefined;
   }
 
@@ -182,6 +201,29 @@ function parseOptionalNonEmptyString(value: unknown): string | undefined {
   const trimmedValue = value.trim();
 
   return trimmedValue.length === 0 ? undefined : trimmedValue;
+}
+
+/**
+ * Returns a usable Kilo context window, or `undefined` when the gateway does
+ * not publish one. Absent, `null`, and non-positive values all mean "unknown"
+ * on the wire, so they resolve to `undefined` and let the caller fall back
+ * instead of writing `0` or `null` into Kilo config. A wrong-typed value is a
+ * broken catalog and fails the same way every other malformed field does.
+ */
+function parseOptionalContextLength(value: unknown): number | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value !== "number") {
+    throw createInstallError("validated_models_unavailable", {});
+  }
+
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    return undefined;
+  }
+
+  return value;
 }
 
 function isResponseDefaultModel(value: unknown): boolean {

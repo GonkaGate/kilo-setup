@@ -37,6 +37,9 @@ Current honest state:
 - the managed GonkaGate provider config writes every fetched chat-completions
   model into Kilo's OpenCode-style `/models` picker with installer-managed
   `limit.output = 8192` for Kilo `7.2.0` compatibility
+- `limit.context` is now written per model from the live `context_length`
+  published by `GET /v1/models`; gateways that do not publish one still get the
+  generic `240000` fallback so older deployments keep installing
 - Kilo detection now accepts `@kilocode/cli >=7.2.0` without pre-blocking
   future Kilo releases, while the audited compatibility baseline remains
   `@kilocode/cli@7.2.0`

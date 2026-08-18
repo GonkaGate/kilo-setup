@@ -132,7 +132,7 @@ test("constants use Kilo-specific defaults and leave OpenCode env vars out", () 
   assert.doesNotMatch(runtimeSource, /OPENCODE_CONFIG/);
 });
 
-test("managed provider config includes generic Kilo model limits", () => {
+test("managed provider config writes per-model context and the managed output clamp", () => {
   const catalog = createValidatedTestModelCatalog([
     TEST_VALIDATED_MODEL,
     TEST_EXTRA_MODEL,
@@ -144,9 +144,17 @@ test("managed provider config includes generic Kilo model limits", () => {
     models: Record<string, { limit?: { context?: number; output?: number } }>;
   };
 
+  assert.notEqual(
+    TEST_VALIDATED_MODEL.limits.context,
+    TEST_EXTRA_MODEL.limits.context,
+  );
   assert.equal(
     providerConfig.models[TEST_VALIDATED_MODEL.key]?.limit?.context,
-    240000,
+    TEST_VALIDATED_MODEL.limits.context,
+  );
+  assert.equal(
+    providerConfig.models[TEST_EXTRA_MODEL.key]?.limit?.context,
+    TEST_EXTRA_MODEL.limits.context,
   );
   assert.equal(
     providerConfig.models[TEST_VALIDATED_MODEL.key]?.limit?.output,

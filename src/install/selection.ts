@@ -109,13 +109,21 @@ function createModelChoice(
   defaultModel: InstallModel | undefined,
 ): InstallSelectChoice<InstallModelKey> {
   return {
-    description: formatKiloModelRef(model),
+    description: createModelChoiceDescription(model),
     label:
       model.key === defaultModel?.key
         ? `${model.displayName} (Recommended)`
         : model.displayName,
     value: model.key,
   };
+}
+
+function createModelChoiceDescription(model: InstallModel): string {
+  const modelRef = formatKiloModelRef(model);
+
+  return model.description === undefined
+    ? modelRef
+    : `${modelRef} — ${model.description}`;
 }
 
 function createScopeChoices(

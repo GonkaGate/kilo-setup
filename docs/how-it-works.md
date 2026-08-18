@@ -34,6 +34,9 @@ Current public limit:
 - the written provider config includes every fetched GonkaGate
   chat-completions model so Kilo's OpenCode-style `/models` picker can switch
   between the live GonkaGate options
+- each fetched model entry gets its own `limit.context` from the live
+  `context_length` in `/v1/models`, and the generic `240000` fallback only when
+  the gateway does not publish a context window for that model
 - each fetched model entry gets installer-managed `limit.output = 8192` for
   Kilo `7.2.0` compatibility
 

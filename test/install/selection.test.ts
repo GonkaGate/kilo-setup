@@ -9,6 +9,7 @@ import { createStubbedTestInstallDependencies } from "./test-deps.js";
 import {
   createEmptyTestModelCatalog,
   createValidatedTestModelCatalog,
+  TEST_EXTRA_MODEL,
   TEST_VALIDATED_MODEL,
 } from "./test-model-catalog.js";
 import { expectInstallErrorCode } from "./test-helpers.js";
@@ -126,4 +127,45 @@ test("resolveInstallModel uses the live default for --yes", async () => {
   );
 
   assert.equal(model.key, TEST_VALIDATED_MODEL.key);
+});
+
+test("resolveInstallModel shows the live description and keeps the model ref when it is absent", async () => {
+  const choiceDescriptions: (string | undefined)[] = [];
+  const model = await resolveInstallModel(
+    {
+      yes: false,
+    },
+    createStubbedTestInstallDependencies({
+      models: {
+        kind: "override",
+        value: createValidatedTestModelCatalog([
+          { ...TEST_VALIDATED_MODEL, description: "Long-context workhorse." },
+          TEST_EXTRA_MODEL,
+        ]),
+      },
+      prompts: {
+        kind: "override",
+        value: {
+          readSecret: async () => "gp-test-secret",
+          selectOption: async (options) => {
+            for (const choice of options.choices) {
+              choiceDescriptions.push(choice.description);
+            }
+
+            return options.defaultValue ?? options.choices[0]!.value;
+          },
+        },
+      },
+      runtime: {
+        stdinIsTTY: true,
+        stdoutIsTTY: true,
+      },
+    }),
+  );
+
+  assert.equal(model.key, TEST_VALIDATED_MODEL.key);
+  assert.deepEqual(choiceDescriptions, [
+    `gonkagate/${TEST_VALIDATED_MODEL.key} — Long-context workhorse.`,
+    `gonkagate/${TEST_EXTRA_MODEL.key}`,
+  ]);
 });

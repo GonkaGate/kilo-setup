@@ -21,6 +21,10 @@ import {
   getInstallPathApi,
   normalizeInstallPath,
 } from "../../src/install/platform-path.js";
+import {
+  TEST_SECONDARY_MODEL,
+  TEST_VALIDATED_MODEL,
+} from "./test-model-catalog.js";
 
 interface StubCommandSuccess {
   kind: "result";
@@ -453,7 +457,14 @@ export function createStubInstallHttp(
     async fetchJson() {
       return {
         body: options.body ?? {
-          data: [{ id: "provider/live-test-model", name: "Live Test Model" }],
+          data: [
+            {
+              context_length: TEST_VALIDATED_MODEL.limits.context,
+              id: TEST_VALIDATED_MODEL.key,
+              name: TEST_VALIDATED_MODEL.displayName,
+              object: "model",
+            },
+          ],
         },
         ok: options.ok ?? true,
         status: options.status ?? 200,
@@ -464,32 +475,8 @@ export function createStubInstallHttp(
 
 export function createStubInstallModelCatalog(): InstallModelCatalog {
   return createInstallModelCatalog([
-    {
-      adapterPackage: "@ai-sdk/openai-compatible",
-      displayName: "Live Test Model",
-      key: "provider/live-test-model",
-      limits: {
-        context: 240000,
-        output: 8192,
-      },
-      modelId: "provider/live-test-model",
-      recommended: true,
-      transport: "chat_completions",
-      validationStatus: "validated",
-    },
-    {
-      adapterPackage: "@ai-sdk/openai-compatible",
-      displayName: "Qwen Fixture",
-      key: "qwen3-235b-a22b-instruct-2507-fp8",
-      limits: {
-        context: 240000,
-        output: 8192,
-      },
-      modelId: "qwen3-235b-a22b-instruct-2507-fp8",
-      recommended: false,
-      transport: "chat_completions",
-      validationStatus: "validated",
-    },
+    TEST_VALIDATED_MODEL,
+    TEST_SECONDARY_MODEL,
   ]);
 }
 

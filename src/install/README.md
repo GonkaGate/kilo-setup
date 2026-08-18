@@ -19,5 +19,9 @@ This directory contains the shipped Kilo installer runtime. Start here:
 
 The stock runtime fetches `GET https://api.gonkagate.com/v1/models` after safe
 API-key intake and uses that live response as the installer model catalog.
+`model-catalog.ts` owns that parse: model id, display name, optional
+description, and per-model context window all come from the response, and every
+field except `id` is treated as possibly absent or `null` so the installer keeps
+working against gateways that still answer with the bare OpenAI model shape.
 Keep Kilo-specific behavior explicit and do not add OpenCode env vars, config
 targets, or runtime defaults.

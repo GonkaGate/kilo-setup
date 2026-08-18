@@ -26,7 +26,9 @@ Today the public package is intentionally narrow:
 - model availability comes from authenticated `GET /v1/models`
 - Kilo's OpenCode-style `/models` picker receives every fetched GonkaGate
   model
-- managed model limit: `limit.output = 8192` for each fetched model entry
+- managed model limits: `limit.context` from each model's live
+  `context_length` (generic `240000` fallback when the gateway does not publish
+  one) and `limit.output = 8192` for each fetched model entry
 - no native Windows production claim yet
 
 ## Before You Run It

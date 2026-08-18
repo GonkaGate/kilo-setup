@@ -75,6 +75,8 @@ Current public baseline:
 - model source of truth: `GET https://api.gonkagate.com/v1/models` after safe
   API-key intake
 - Kilo's OpenCode-style `/models` picker receives every fetched GonkaGate model
+- per-model `limit.context` read from the live `context_length` in
+  `/v1/models`, with a `240000` fallback for gateways that do not publish one
 - installer-managed `limit.output = 8192` for each fetched model entry
 - no native Windows production claim yet
 
