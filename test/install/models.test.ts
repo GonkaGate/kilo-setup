@@ -160,17 +160,49 @@ test("fetchLiveInstallModelCatalog also accepts a camelCase context window", asy
   assert.equal(catalog.getModelByKey("provider/camel")?.limits.context, 240001);
 });
 
-test("fetchLiveInstallModelCatalog rejects a wrong-typed context window", async () => {
-  await assert.rejects(
-    () =>
-      fetchLiveInstallModelCatalog(
-        "gp-test-secret",
-        createStaticModelsHttp({
-          data: [{ context_length: "400000", id: "provider/string-context" }],
-        }),
-      ),
-    expectInstallErrorCode("validated_models_unavailable"),
+test("fetchLiveInstallModelCatalog degrades instead of failing on wrong-typed metadata", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [
+        {
+          context_length: "400000",
+          description: 7,
+          id: "provider/wrong-types",
+          name: false,
+          object: "model",
+        },
+      ],
+    }),
   );
+  const model = catalog.getModelByKey("provider/wrong-types");
+
+  // Optional metadata is cosmetic: a malformed value must never abort an
+  // install that would otherwise succeed.
+  assert.equal(model?.limits.context, FALLBACK_KILO_CONTEXT_LIMIT);
+  assert.equal(model?.displayName, "provider/wrong-types");
+  assert.equal(model?.description, undefined);
+});
+
+test("fetchLiveInstallModelCatalog strips control characters from catalog text", async () => {
+  const catalog = await fetchLiveInstallModelCatalog(
+    "gp-test-secret",
+    createStaticModelsHttp({
+      data: [
+        {
+          description: "line1\nline2\u001B[31mRED",
+          id: "provider/ansi",
+          name: "Bad\u001B[2JName",
+          object: "model",
+        },
+      ],
+    }),
+  );
+  const model = catalog.getModelByKey("provider/ansi");
+
+  assert.equal(model?.description?.includes("\u001B"), false);
+  assert.equal(model?.description?.includes("\n"), false);
+  assert.equal(model?.displayName.includes("\u001B"), false);
 });
 
 test("fetchLiveInstallModelCatalog honors an API-provided default model", async () => {

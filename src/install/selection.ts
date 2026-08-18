@@ -123,7 +123,7 @@ function createModelChoiceDescription(model: InstallModel): string {
 
   return model.description === undefined
     ? modelRef
-    : `${modelRef} — ${model.description}`;
+    : `${modelRef} - ${model.description}`;
 }
 
 function createScopeChoices(

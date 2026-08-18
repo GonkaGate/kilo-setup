@@ -165,7 +165,7 @@ test("resolveInstallModel shows the live description and keeps the model ref whe
 
   assert.equal(model.key, TEST_VALIDATED_MODEL.key);
   assert.deepEqual(choiceDescriptions, [
-    `gonkagate/${TEST_VALIDATED_MODEL.key} — Long-context workhorse.`,
+    `gonkagate/${TEST_VALIDATED_MODEL.key} - Long-context workhorse.`,
     `gonkagate/${TEST_EXTRA_MODEL.key}`,
   ]);
 });

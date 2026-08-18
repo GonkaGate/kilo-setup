@@ -44,8 +44,10 @@ compatibility evidence:
   numeric output limit in custom model config
 - the package no longer writes one generic context window for every model: it
   reads each model's `context_length` from `/v1/models` and only falls back to
-  `240000` when the response omits it, because Kilo `7.2.0` also requires a
-  numeric context limit in custom model config
+  `240000` when the response omits it. The fallback is non-zero because the PRD
+  records that Kilo treats `context: 0` as disabling compaction and
+  context-size-dependent usage tracking; no evidence was captured that Kilo
+  hard-requires a numeric context limit, unlike the output limit above
 - npm registry metadata checked on 2026-04-29 showed `@kilocode/cli` patch
   releases in the `7.2.x` line, including `7.2.14`, with both `kilo` and
   `kilocode` binaries still exposed by the wrapper package

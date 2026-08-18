@@ -456,6 +456,10 @@ export function createStubInstallHttp(
   return {
     async fetchJson() {
       return {
+        // Models the enriched post-PR#70 gateway so flow tests can assert real
+        // display metadata. The currently deployed id-only shape is covered
+        // explicitly by `createStubInstallHttpWithoutModelMetadata` below and by
+        // the parser cases in test/install/models.test.ts.
         body: options.body ?? {
           data: [
             {
